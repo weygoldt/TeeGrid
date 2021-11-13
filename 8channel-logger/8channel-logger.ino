@@ -78,6 +78,7 @@ String setupStorage() {
   file.dataDir(settings.Path);
   file.setWriteInterval(aidata);
   file.setMaxFileTime(settings.FileTime);
+  file.setSoftware("TeeGrid 8channel-logger");
   file.startWrite();
   String name = openNextFile();
   Serial.println();
