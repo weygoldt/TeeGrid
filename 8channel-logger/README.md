@@ -80,3 +80,28 @@ The noise measurements suggest the following settings:
 - ADC0: A4, A5, A6, A7
 - ADC1: A2, A3, A20, A22
 
+
+## Channel order
+
+In files `8channels-gain*.wav` a 630Hz signal was sequentially connected
+to the 8 channels.
+
+
+## Gains and clipping
+
+In files `clipping-gain*-*mV-step*mV.wav` the amplitude of a 630Hz signal
+was increased from a start voltage in steps as specified in the file name.
+
+
+## High- and low-pass filter
+
+In file `filter-p*-gain*` the frequency of a 23mV signal was increased as follows:
+10Hz, 12.5Hz, 16Hz, 20Hz, 25Hz, 31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz,
+100Hz, 125Hz, 160Hz, 200Hz, 250Hz, 315Hz, 400Hz, 500Hz, 630Hz, 800Hz,
+1000Hz, 1250Hz, 1600Hz, 2000Hz, 2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz,
+10000Hz.
+
+p1: upper jumper right (0.1Hz)
+p2: upper jumper left (100Hz)
+p3: upper jumper cable left (300Hz)
+

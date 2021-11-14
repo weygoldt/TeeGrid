@@ -61,7 +61,10 @@ String openNextFile() {
   file.writeData();
   Serial.println(name);
   if (file.isOpen()) {
-    blink.set(5000, 100);
+    if (fileSaveTime < 30)
+      blink.set(2000, 100);
+     else
+      blink.set(5000, 100);
     blink.blink(2000, 1000);
     return name;
   }
