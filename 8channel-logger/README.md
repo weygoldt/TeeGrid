@@ -43,6 +43,21 @@ Running with 20 kHz at 12 bit resolution, the averaging sketch from TeeRec repor
 | med      | med      |    1 |  3.4 |  2.8 |  1.7 |  1.5 |  2.2 |  2.4 |  3.6 |  4.0 |
 
 
+Running with 40 kHz at 12 bit resolution:
+
+| convers  | sampling | avrg |   A4 |   A2 |   A5 |   A3 |   A6 |  A20 |   A7 |  A22 |
+| :------- | :------- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| veryhigh | veryhigh |    1 |  2.7 |  2.1 |  1.5 |  1.4 |  1.9 |  2.1 |  3.4 |  3.6 |
+| veryhigh | veryhigh |    4 |  2.0 |  1.5 |  1.5 |  1.0 |  1.4 |  1.5 |  1.7 |  1.9 |
+| veryhigh | high     |    1 |  2.2 |  2.5 |  1.4 |  1.4 |  1.6 |  2.5 |  3.1 |  3.9 |
+| veryhigh | high     |    4 |  1.6 |  1.5 |  2.0 |  2.5 |  1.7 |  1.0 |  1.3 |  1.8 |
+| veryhigh | med      |    1 |  3.9 |  3.9 |  3.5 |  3.3 |  3.5 |  3.9 |  4.3 |  4.9 |
+| veryhigh | med      |    4 |  1.9 |  1.2 |  2.0 |  2.1 |  1.0 |  1.4 |  1.4 |  1.8 |
+| high     | veryhigh |    1 |  4.4 |  4.2 |  3.8 |  3.7 |  4.0 |  4.1 |  4.9 |  5.3 |
+| high     | high     |    1 |  4.1 |  4.1 |  3.6 |  3.6 |  3.8 |  4.1 |  4.3 |  5.3 |
+| high     | med      |    1 |  3.7 |  3.5 |  3.1 |  3.0 |  3.2 |  3.5 |  4.0 |  4.7 |
+
+
 ## Channels
 
 The averaging sketch results in:
@@ -57,11 +72,11 @@ We connect the 8 channels c0-c1 as follows:
 ## ADC settings
 
 The noise measurements suggest the following settings:
-- sampling rate: 20kHz
+- sampling rate: 20kHz (40kHz)
 - resolution: 12bit
 - averaging: 4
-- conversion speed: high
-- sampling speed: high
+- conversion speed: high (very high)
+- sampling speed: high (med)
 - ADC0: A4, A5, A6, A7
 - ADC1: A2, A3, A20, A22
 
