@@ -96,16 +96,18 @@ The noise measurements suggest the following settings:
 
 ## Channel order
 
-In files `8channels-gain*.wav` a 630Hz signal was sequentially connected
-to the 8 channels. The channels are connected in the right order!
+In files `tests/8channels-gain*.wav` a 630Hz signal was sequentially
+connected to the 8 channels. The channels are connected in the right
+order!
 
 ![channel order](images/8channels-gain5-traces.png)
 
 
 ## Gains and clipping
 
-In files `clipping-gain*-*mV-step*mV.wav` the amplitude of a 630Hz signal
-was increased from a start voltage in steps as specified in the file name.
+In files `tests/clipping-gain*-*mV-step*mV.wav` the amplitude of a
+630Hz signal was increased from a start voltage in steps as specified
+in the file name.
 
 ![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
 
@@ -113,12 +115,14 @@ was increased from a start voltage in steps as specified in the file name.
 
 ![gain180](images/clipping-gain180-3.5mV-step0.1mV-traces.png)
 
-The signals are clipped at the bottom! Why?
+The signals are clipped at the bottom! This looks the same for all
+channels and gains. Why?
 
 
 ## High- and low-pass filter
 
-In file `filter-p*-gain*` the frequency of a 23mV signal was increased as follows:
+In files `tests/filter-p*-gain*.wav` the frequency of a 23mV signal
+was increased as follows:
 10Hz, 12.5Hz, 16Hz, 20Hz, 25Hz, 31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz,
 100Hz, 125Hz, 160Hz, 200Hz, 250Hz, 315Hz, 400Hz, 500Hz, 630Hz, 800Hz,
 1000Hz, 1250Hz, 1600Hz, 2000Hz, 2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz,
