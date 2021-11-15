@@ -1,8 +1,8 @@
 # 8-channel logger
 
-Four of the two-channel amplifiers by Stefan Mucha (TeensyAmp R1.0)
-are connected to a [Teensy
-3.5](https://www.pjrc.com/store/teensy35.html).
+Four of the two-channel amplifiers by Stefan Mucha ([TeensyAmp
+R1.0](https://github.com/muchaste/Teensy_Amp)) are connected to a
+[Teensy 3.5](https://www.pjrc.com/store/teensy35.html).
 
 Designed by Jan Benda in November 2021.
 
@@ -17,7 +17,8 @@ On Teensy, connecting AGND to GND seems to reduce noise a tiny bit.
 ## Noise levels
 
 Running with 20 kHz at 12 bit resolution, the [averaging
-sketch](https://github.com/janscience/TeeRec/blob/main/examples/averaging/averaging.ino) of the [TeeRec](https://github.com/janscience/TeeRec) reports:
+sketch](https://github.com/janscience/TeeRec/blob/main/examples/averaging/averaging.ino)
+of the [TeeRec](https://github.com/janscience/TeeRec) reports for the standard deviations of the raw integer readings:
 
 | convers  | sampling | avrg |   A4 |   A2 |   A5 |   A3 |   A6 |  A20 |   A7 |  A22 |
 | :------- | :------- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -49,10 +50,16 @@ connected to IN-). Recordings are stored in
 [`tests/averaging`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests/averaging).
 
 A good setting:
-![good](images/averaging-020kHz-12bit-convhigh-samplveryhigh-avrg04-traces.png)
+
+![good traces](images/averaging-020kHz-12bit-convhigh-samplveryhigh-avrg04-traces.png)
+
+![good noise](images/averaging-020kHz-12bit-convhigh-samplveryhigh-avrg04-noise.png)
 
 A bad setting:
-![bad](images/averaging-020kHz-12bit-convmed-samplveryhigh-avrg01-traces.png)
+
+![bad traces](images/averaging-020kHz-12bit-convmed-samplveryhigh-avrg01-traces.png)
+
+![bad noise](images/averaging-020kHz-12bit-convmed-samplveryhigh-avrg01-noise.png)
 
 
 Running with 40 kHz at 12 bit resolution:
