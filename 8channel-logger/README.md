@@ -105,6 +105,19 @@ channels are connected in the right order!
 ![channel order](images/8channels-gain5-traces.png)
 
 
+## Polarity and gain
+
+All channels connected to the same 630Hz sinewave signal.
+
+![gain 5](images/gain5-100mV-traces.png)
+
+![gain 30](images/gain30-23mV-traces.png)
+
+What happened to channel 5? I need to check.
+
+![gain 180](images/gain180-3.5mV-traces.png)
+
+
 ## Gains and clipping
 
 In files
