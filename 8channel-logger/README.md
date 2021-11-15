@@ -45,7 +45,8 @@ sketch](https://github.com/janscience/TeeRec/blob/main/examples/averaging/averag
 | med      | med      |    1 |  3.4 |  2.8 |  1.7 |  1.5 |  2.2 |  2.4 |  3.6 |  4.0 |
 
 Amplifiers were connected wit their inputs short-circuited (IN+
-connected to IN-). Recordings are stored in `tests/averaging`.
+connected to IN-). Recordings are stored in
+[`tests/averaging`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests/averaging).
 
 A good setting:
 ![good](images/averaging-020kHz-12bit-convhigh-samplveryhigh-avrg04-traces.png)
@@ -96,18 +97,20 @@ The noise measurements suggest the following settings:
 
 ## Channel order
 
-In files `tests/8channels-gain*.wav` a 630Hz signal was sequentially
-connected to the 8 channels. The channels are connected in the right
-order!
+In files
+[`tests/8channels-gain*.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
+a 630Hz signal was sequentially connected to the 8 channels. The
+channels are connected in the right order!
 
 ![channel order](images/8channels-gain5-traces.png)
 
 
 ## Gains and clipping
 
-In files `tests/clipping-gain*-*mV-step*mV.wav` the amplitude of a
-630Hz signal was increased from a start voltage in steps as specified
-in the file name.
+In files
+[`tests/clipping-gain*-*mV-step*mV.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
+the amplitude of a 630Hz signal was increased from a start voltage in
+steps as specified in the file name.
 
 ![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
 
@@ -121,11 +124,12 @@ channels and gains. Why?
 
 ## High- and low-pass filter
 
-In files `tests/filter-p*-gain*.wav` the frequency of a 23mV signal
-was increased as follows:
-10Hz, 12.5Hz, 16Hz, 20Hz, 25Hz, 31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz,
-100Hz, 125Hz, 160Hz, 200Hz, 250Hz, 315Hz, 400Hz, 500Hz, 630Hz, 800Hz,
-1000Hz, 1250Hz, 1600Hz, 2000Hz, 2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz,
+In files
+[`tests/filter-p*-gain*.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
+the frequency of a 23mV signal was increased as follows: 10Hz, 12.5Hz,
+16Hz, 20Hz, 25Hz, 31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz, 100Hz, 125Hz, 160Hz,
+200Hz, 250Hz, 315Hz, 400Hz, 500Hz, 630Hz, 800Hz, 1000Hz, 1250Hz,
+1600Hz, 2000Hz, 2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz,
 10000Hz.
 
 High-pass filter selection:
