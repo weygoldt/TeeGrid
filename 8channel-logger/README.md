@@ -99,7 +99,7 @@ The noise measurements suggest the following settings:
 In files `8channels-gain*.wav` a 630Hz signal was sequentially connected
 to the 8 channels. The channels are connected in the right order!
 
-!(channel order)[images/8channels-gain5-traces.png]
+![channel order](images/8channels-gain5-traces.png)
 
 
 ## Gains and clipping
@@ -107,11 +107,11 @@ to the 8 channels. The channels are connected in the right order!
 In files `clipping-gain*-*mV-step*mV.wav` the amplitude of a 630Hz signal
 was increased from a start voltage in steps as specified in the file name.
 
-!(gain5)[clipping-gain5-100mV-step10mV-traces.png]
+![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
 
-!(gain30)[clipping-gain30-23mV-step1mV-traces.png]
+![gain30](images/clipping-gain30-23mV-step1mV-traces.png)
 
-!(gain180)[clipping-gain180-3.5mV-step0.1mV-traces.png]
+![gain180](images/clipping-gain180-3.5mV-step0.1mV-traces.png)
 
 The signals are clipped at the bottom! Why?
 
@@ -131,8 +131,8 @@ High-pass filter selection:
 
 100Hz high-pass filter, 7kHz low-pass filter:
 
-!(high-pass p2)[images/filter-p2-gain30-23mV-traces.png]
+![high-pass p2](images/filter-p2-gain30-23mV-traces.png)
 
 300Hz high-pass filter, 7kHz low-pass filter:
 
-!(high-pass p3)[images/filter-p3-gain30-23mV-traces.png]
+![high-pass p3](images/filter-p3-gain30-23mV-traces.png)
