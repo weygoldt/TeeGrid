@@ -101,6 +101,12 @@ The noise measurements suggest the following settings:
 - ADC0: A4, A5, A6, A7
 - ADC1: A2, A3, A20, A22
 
+These settings are saved in the sketch as well as in a configuration
+file
+[teegrid.cfg](https://github.com/janscience/TeeGrid/blob/main/8channel-logger/teegrid.cfg). If
+you copy the configuration file onto the SD card, its settings will be
+loaded by the sketch and override the ones of the sketch.
+
 
 ## Channel order
 
@@ -118,9 +124,7 @@ All channels connected to the same 630Hz sinewave signal.
 
 ![gain 5](images/gain5-100mV-traces.png)
 
-![gain 30](images/gain30-23mV-traces.png)
-
-What happened to channel 5? I need to check.
+![gain 30](images/gain30-20mV-traces.png)
 
 ![gain 180](images/gain180-3.5mV-traces.png)
 
@@ -134,7 +138,7 @@ steps as specified in the file name.
 
 ![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
 
-![gain30](images/clipping-gain30-23mV-step1mV-traces.png)
+![gain30](images/clipping-gain30-20mV-step1mV-traces.png)
 
 ![gain180](images/clipping-gain180-3.5mV-step0.1mV-traces.png)
 
