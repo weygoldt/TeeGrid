@@ -49,7 +49,7 @@ Amplifiers were connected wit their inputs short-circuited (IN+
 connected to IN-). Recordings are stored in
 [`tests/averaging`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests/averaging).
 
-A good setting:
+A good setting (traces plotted with [`viewwave.py`](https://github.com/janscience/TeeRec/blob/main/extras/viewwave.py), histograms with [`noise.py`](https://github.com/janscience/TeeRec/blob/main/extras/noise.py)):
 
 ![good traces](images/averaging-020kHz-12bit-convhigh-samplveryhigh-avrg04-traces.png)
 
