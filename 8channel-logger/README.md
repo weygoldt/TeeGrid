@@ -168,3 +168,12 @@ High-pass filter selection:
 300Hz high-pass filter, 7kHz low-pass filter:
 
 ![high-pass p3](images/filter-p3-gain30-23mV-traces.png)
+
+
+## Real-time clock
+
+On-board RTC, powered by battery separate battery.
+
+When uploading a sketch (?) the real time clock is set to the one of
+the host computer.
+
