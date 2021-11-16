@@ -6,6 +6,16 @@ R1.0](https://github.com/muchaste/Teensy_Amp)) are connected to a
 
 Designed by Jan Benda in November 2021.
 
+The four amplifiers are mounted on the bottom side of the base plate:
+
+![amplifier bottom](images/amplifier-bottom.png)
+
+
+On the upper side we have the Teensy, the power bank, and the screw
+terminals for the 8 inputs and their reference:
+
+![amplifier top](images/amplifier-top.png)
+
 
 ## Wiring
 
