@@ -19,6 +19,17 @@ terminals for the 8 inputs and their reference:
 
 ## Wiring
 
+Input and output signals are color coded:
+
+- channel 0: white
+- channel 1: yellow
+- channel 2: orange
+- channel 3: red
+- channel 4: green
+- channel 5: blue
+- channel 6: purple
+- channel 7: brown
+
 JP3 pin 4 (0V) not connected to AGND or GND.
 
 On Teensy, connecting AGND to GND seems to reduce noise a tiny bit.
