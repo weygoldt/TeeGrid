@@ -7,11 +7,13 @@
 
 
 // Default settings: -----------------------------------------------------------------------
-// (may be overwritten by config file logger.cfg)
+// (may be overwritten by config file teegrid.cfg)
 
+uint32_t samplingRate = 20000;       // samples per second and channel in Hertz
 int bits = 12;                       // resolution: 10bit 12bit, or 16bit
 int averaging = 4;                   // number of averages per sample: 0, 4, 8, 16, 32
-uint32_t samplingRate = 20000;       // samples per second and channel in Hertz
+ADC_CONVERSION_SPEED convs = ADC_CONVERSION_SPEED::HIGH_SPEED;
+ADC_SAMPLING_SPEED sampls = ADC_SAMPLING_SPEED::HIGH_SPEED;
 int8_t channels0 [] =  {A4, A5, A6, A7, -1, A4, A5, A6, A7, A8, A9};      // input pins for ADC0
 int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pins for ADC1
 
@@ -36,8 +38,8 @@ void setupADC() {
   aidata.setRate(samplingRate);
   aidata.setResolution(bits);
   aidata.setAveraging(averaging);
-  aidata.setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED);
-  aidata.setSamplingSpeed(ADC_SAMPLING_SPEED::HIGH_SPEED);
+  aidata.setConversionSpeed(convs);
+  aidata.setSamplingSpeed(sampls);
   aidata.check();
 }
 
@@ -123,6 +125,7 @@ void setup() {
   config.configure(sdcard);
   aidata.check();
   blink.switchOff();
+  delay(200);   // make this configurable and set a blinking pattern
   String name = setupStorage();
   aidata.start();
   aidata.report();
