@@ -17,7 +17,7 @@ switch, and the screw terminals for the 8 inputs and their reference:
 ![amplifier top](images/amplifier-top.png)
 
 
-Viewed from the right we see the screw terminals for the input signals
+Viewed from the left we see the screw terminals for the input signals
 and how the amplified signals are connected to the Teensy:
 
 ![amplifier input](images/amplifier-input.png)
