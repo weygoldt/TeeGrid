@@ -10,6 +10,14 @@ The four amplifiers are mounted on the bottom side of the base plate:
 
 ![amplifier bottom](images/amplifier-bottom.png)
 
+The amplifier to the left for channels 0 and 1 gets the 5V from the
+power bank (red and black cables coming in from the top). This is
+forwarded to the next amplifier together with the 1.6V ground (grey
+cable) that is only produced by the first amplifier.
+
+In the image, the high-pass filter is set to 100Hz (yellow jumpers at
+the bottom), the gain to 30x (middle position of the switch), and the
+low pass filter to 7kHz (left position of the switch).
 
 On the upper side we have the Teensy, the power bank, an on-off
 switch, and the screw terminals for the 8 inputs and their reference:
@@ -17,18 +25,12 @@ switch, and the screw terminals for the 8 inputs and their reference:
 ![amplifier top](images/amplifier-top.png)
 
 
+## Wiring
+
 Viewed from the left we see the screw terminals for the input signals
 and how the amplified signals are connected to the Teensy:
 
 ![amplifier input](images/amplifier-input.png)
-
-Here is the [Teensy 3.5
-pinout](https://www.pjrc.com/teensy/card8a_rev2.png):
-
-![Teensy pinout](https://www.pjrc.com/teensy/card8a_rev2.png)
-
-
-## Wiring
 
 Input and output signals are color coded:
 
@@ -41,9 +43,27 @@ Input and output signals are color coded:
 - channel 6: purple
 - channel 7: brown
 
-JP3 pin 4 (0V) not connected to AGND or GND.
+The 8 amplified signals from the amplifiers are connected as follows
+to the Teensy:
+- channel 0: A4  (ADC0)
+- channel 1: A2  (ADC1)
+- channel 2: A5  (ADC0)
+- channel 3: A3  (ADC1)
+- channel 4: A6  (ADC0)
+- channel 5: A20 (ADC1)
+- channel 6: A7  (ADC0)
+- channel 7: A22 (ADC1)
 
-On Teensy, connecting AGND to GND seems to reduce noise a tiny bit.
+Here is the [Teensy 3.5
+pinout](https://www.pjrc.com/teensy/card8a_rev2.png):
+
+![Teensy pinout](https://www.pjrc.com/teensy/card8a_rev2.png)
+
+JP3 pin 4 (0V) of the amplifiers is *not* connected to AGND or GND of
+the Teensy.
+
+On Teensy, connecting AGND (Ananlog GND) to GND seems to reduce noise
+a tiny bit.
 
 
 ## Noise levels
@@ -110,17 +130,13 @@ Running with 40 kHz at 12 bit resolution:
 | high     | med      |    1 |  3.7 |  3.5 |  3.1 |  3.0 |  3.2 |  3.5 |  4.0 |  4.7 |
 
 
-## Channels
+## Channel quality
 
 The [averaging
 sketch](https://github.com/janscience/TeeRec/blob/main/examples/averaging/averaging.ino)
 results in:
 - ADC0: A0-A9 are good, A14-A15 are slightly more noisy.
 - ADC1: A2-A3, A20, A22 are good, A12-A13, A16-A19 slightly more noisy (by 0.1)
-
-We connect the 8 channels c0-c1 as follows:
-- ADC0: A4 (c0), A5 (c2), A6 (c4), A7 (c6)
-- ADC1: A2 (c1), A3 (c3), A20 (c5), A22 (c7)
 
 
 ## ADC settings
@@ -174,6 +190,11 @@ Nicely amplified signals!
 
 ## Gains and clipping
 
+Gain selection:
+- p1 (switch left):     5x
+- p2 (switch center):  30x
+- p3 (switch right):  180x
+
 In files
 [`tests/clipping-gain*-*mV-step*mV.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
 the amplitude of a 630Hz signal was increased from a start voltage in
@@ -200,9 +221,9 @@ the frequency of a 23mV signal was increased as follows: 10Hz, 12.5Hz,
 10000Hz.
 
 High-pass filter selection:
-- p1: upper jumper right (0.1Hz)
-- p2: upper jumper left (100Hz)  currently selected
-- p3: upper jumper cable left (300Hz)
+- p1 (upper jumper right): 0.1Hz
+- p2 (upper jumper left): 100Hz, currently selected
+- p3 (upper jumper cable left): 300Hz
 
 100Hz high-pass filter, 7kHz low-pass filter:
 
@@ -211,6 +232,10 @@ High-pass filter selection:
 300Hz high-pass filter, 7kHz low-pass filter:
 
 ![high-pass p3](images/filter-p3-gain30-23mV-traces.png)
+
+Low-pass filter selection:
+- p1 (switch left): 7kHz
+- p2 (switch right): 33kHz
 
 
 ## Real-time clock
