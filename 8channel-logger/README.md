@@ -22,6 +22,11 @@ and how the amplified signals are connected to the Teensy:
 
 ![amplifier input](images/amplifier-input.png)
 
+Here is the [Teensy 3.5
+pinout](https://www.pjrc.com/teensy/card8a_rev2.png):
+
+![Teensy pinout](https://www.pjrc.com/teensy/card8a_rev2.png)
+
 
 ## Wiring
 
@@ -135,6 +140,13 @@ file
 [teegrid.cfg](https://github.com/janscience/TeeGrid/blob/main/8channel-logger/teegrid.cfg). If
 you copy the configuration file onto the SD card, its settings will be
 loaded by the sketch and override the ones of the sketch.
+
+
+## SD Card
+
+At 20kHz the 8 channels produce 1.2GB per hour. That makes 28GB per day.
+
+A 128GB card should last four and a half days.
 
 
 ## Channel order
