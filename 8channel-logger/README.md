@@ -11,10 +11,16 @@ The four amplifiers are mounted on the bottom side of the base plate:
 ![amplifier bottom](images/amplifier-bottom.png)
 
 
-On the upper side we have the Teensy, the power bank, and the screw
-terminals for the 8 inputs and their reference:
+On the upper side we have the Teensy, the power bank, an on-off
+switch, and the screw terminals for the 8 inputs and their reference:
 
 ![amplifier top](images/amplifier-top.png)
+
+
+Viewed from the right we see the screw terminals for the input signals
+and how the amplified signals are connected to the Teensy:
+
+![amplifier input](images/amplifier-input.png)
 
 
 ## Wiring
