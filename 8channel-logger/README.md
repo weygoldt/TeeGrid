@@ -39,7 +39,8 @@ On Teensy, connecting AGND to GND seems to reduce noise a tiny bit.
 
 Running with 20 kHz at 12 bit resolution, the [averaging
 sketch](https://github.com/janscience/TeeRec/blob/main/examples/averaging/averaging.ino)
-of the [TeeRec](https://github.com/janscience/TeeRec) reports for the standard deviations of the raw integer readings:
+of the [TeeRec](https://github.com/janscience/TeeRec) library reports
+for the standard deviations of the raw integer readings:
 
 | convers  | sampling | avrg |   A4 |   A2 |   A5 |   A3 |   A6 |  A20 |   A7 |  A22 |
 | :------- | :------- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -113,7 +114,8 @@ We connect the 8 channels c0-c1 as follows:
 
 ## ADC settings
 
-The noise measurements suggest the following settings:
+The noise measurements suggest the following settings (alternative
+settings in brackets):
 - sampling rate: 20kHz (40kHz)
 - resolution: 12bit
 - averaging: 4
@@ -149,6 +151,8 @@ All channels connected to the same 630Hz sinewave signal.
 
 ![gain 180](images/gain180-3.5mV-traces.png)
 
+Nicely amplified signals!
+
 
 ## Gains and clipping
 
@@ -179,7 +183,7 @@ the frequency of a 23mV signal was increased as follows: 10Hz, 12.5Hz,
 
 High-pass filter selection:
 - p1: upper jumper right (0.1Hz)
-- p2: upper jumper left (100Hz)
+- p2: upper jumper left (100Hz)  currently selected
 - p3: upper jumper cable left (300Hz)
 
 100Hz high-pass filter, 7kHz low-pass filter:
@@ -193,8 +197,10 @@ High-pass filter selection:
 
 ## Real-time clock
 
-On-board RTC, powered by battery separate battery.
+On-board RTC powered by separate battery.
 
-When uploading a sketch (?) the real time clock is set to the one of
-the host computer.
+When compiling and uploading the sketch, the real time clock is set to
+the time of the host computer. This way you can easily set the
+real-time clock.
+
 
