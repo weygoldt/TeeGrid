@@ -55,7 +55,7 @@ to the Teensy:
 - channel 7: A22 (ADC1)
 
 Here is the [Teensy 3.5
-pinout](https://www.pjrc.com/teensy/card8a_rev2.png):
+pinout](https://www.pjrc.com/teensy/pinout.html#Teensy_3.5):
 
 ![Teensy pinout](https://www.pjrc.com/teensy/card8a_rev2.png)
 

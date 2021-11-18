@@ -121,6 +121,7 @@ void setup() {
   prevname = "";
   setupADC();
   sdcard.begin();
+  rtclock.setFromFile(sdcard);
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
   aidata.check();
