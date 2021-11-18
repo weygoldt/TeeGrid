@@ -20,13 +20,16 @@ int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pin
 char fileName[] = "grid1-SDATETIME.wav";   // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 float fileSaveTime = 10*60;             // seconds
 
+float initialDelay = 2.0;               // seconds
+
 // ------------------------------------------------------------------------------------------
 
 Configurator config;
 ContinuousADC aidata;
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
-Settings settings("recordings", fileName, fileSaveTime);
+Settings settings("recordings", fileName, fileSaveTime, 100.0,
+                  0.0, initialDelay);
 RTClock rtclock;
 String prevname; // previous file name
 Blink blink;
@@ -128,7 +131,13 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  delay(200);   // make this configurable and set a blinking pattern
+  if (settings.InitialDelay >= 2.0) {
+    uint32_t delayblinks[] = {50, 150, 50, 2000, 0};
+    blink.setDelayed(1000, delayblinks);
+    blink.delay(uint32_t(1000.0*settings.InitialDelay));
+  }
+  else
+    delay(uint32_t(1000.0*settings.InitialDelay));
   setupStorage();
 }
 
