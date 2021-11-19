@@ -20,7 +20,7 @@ int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pin
 char fileName[] = "grid1-SDATETIME.wav";   // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 float fileSaveTime = 10*60;             // seconds
 
-float initialDelay = 2.0;               // seconds
+float initialDelay = 10.0;               // seconds
 
 // ------------------------------------------------------------------------------------------
 
@@ -47,7 +47,8 @@ void setupADC() {
 }
 
 
-String openNextFile() {
+bool openNextFile() {
+  blink.clear();
   String name = rtclock.makeStr(settings.FileName, true);
   if (name != prevname) {
     file.resetFileCounter();
@@ -58,7 +59,7 @@ String openNextFile() {
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted.");
     Serial.println();
-    return "";
+    return false;
   }
   char dts[20];
   rtclock.dateTime(dts);
@@ -71,13 +72,13 @@ String openNextFile() {
      else
       blink.set(5000, 100);
     blink.blink(2000, 1000);
-    return name;
+    return true;
   }
   else {
     Serial.println();
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted.");
-    return "";
+    return false;
   }
 }
 
@@ -106,7 +107,6 @@ void storeData() {
     }
     if (file.endWrite()) {
       file.close();  // file size was set by openWave()
-      blink.clear();
       openNextFile();
     }
   }
