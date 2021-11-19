@@ -246,4 +246,35 @@ When compiling and uploading the sketch, the real time clock is set to
 the time of the host computer. This way you can easily set the
 real-time clock.
 
+You can also put a file called `settime.cfg` on the SD card. This file
+should contain a single line with a date and a time in
+`YYYY-MM-DDTHH:MM:SS` format. On startup, this file is read and the
+time is set accordingly. The file is then removed to avoid resetting
+the time on the next run of the sketch.
+
+
+## Power consumption and supply
+
+Running the system (Teensy with 20kHz ADC on 8 channels with four
+amplifiers) results in:
+
+| Voltage | Current | Power | Runtime |
+| ------: | ------: | ----: | ------: |
+| 5V      | 133mA   | 664mW | 75h     |
+| 3.3V    | 111mA   | 366mW | 90h     |
+
+The last colum is the run time to be expected for a 10Ah battery (10Ah
+divided by current).
+
+The system, i.e. the Teensy and the four amplifiers, is powered with a
+[10000mAh power
+bank](https://www.conrad.de/de/p/realpower-pb-10000-powerbank-zusatzakku-lipo-10000-mah-270315-2304822.html)
+providing a voltage of 5.04V.
+
+On a first run, this power bank powered the system for 39 hours and 20
+minutes, i.e. one and a half day. The manual of the power bank
+suggests that after a few cycles of using and charging the power bank,
+its capacity gets larger. So, given the theoretical value it should be
+easily possible to eventually run the system for at least 2 full days
+or maybe even three days.
 
