@@ -100,7 +100,7 @@ for the standard deviations of the raw integer readings:
 
 Amplifiers were connected wit their inputs short-circuited (IN+
 connected to IN-). Recordings are stored in
-[`tests/averaging`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests/averaging).
+[`tests/averaging`](tests/averaging).
 
 A good setting (traces plotted with [`viewwave.py`](https://github.com/janscience/TeeRec/blob/main/extras/viewwave.py), histograms with [`noise.py`](https://github.com/janscience/TeeRec/blob/main/extras/noise.py)):
 
@@ -152,10 +152,9 @@ settings in brackets):
 - ADC1: A2, A3, A20, A22
 
 These settings are saved in the sketch as well as in a configuration
-file
-[teegrid.cfg](https://github.com/janscience/TeeGrid/blob/main/8channel-logger/teegrid.cfg). If
-you copy the configuration file onto the SD card, its settings will be
-loaded by the sketch and override the ones of the sketch.
+file [teegrid.cfg](teegrid.cfg). If you copy the configuration file
+onto the SD card, its settings will be loaded by the sketch and
+override the ones of the sketch.
 
 
 ## SD Card
@@ -167,10 +166,9 @@ A 128GB card should last four and a half days.
 
 ## Channel order
 
-In files
-[`tests/8channels-gain*.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
-a 630Hz signal was sequentially connected to the 8 channels. The
-channels are connected in the right order!
+In files [`tests/8channels-gain*.wav`](tests) a 630Hz signal was
+sequentially connected to the 8 channels. The channels are connected
+in the right order!
 
 ![channel order](images/8channels-gain5-traces.png)
 
@@ -195,10 +193,9 @@ Gain selection:
 - p2 (switch center):  30x
 - p3 (switch right):  180x
 
-In files
-[`tests/clipping-gain*-*mV-step*mV.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
-the amplitude of a 630Hz signal was increased from a start voltage in
-steps as specified in the file name.
+In files [`tests/clipping-gain*-*mV-step*mV.wav`](tests) the amplitude
+of a 630Hz signal was increased from a start voltage in steps as
+specified in the file name.
 
 ![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
 
@@ -212,13 +209,17 @@ channels and gains. Why?
 
 ## High- and low-pass filter
 
-In files
-[`tests/filter-p*-gain*.wav`](https://github.com/janscience/TeeGrid/tree/main/8channel-logger/tests)
-the frequency of a 23mV signal was increased as follows: 10Hz, 12.5Hz,
-16Hz, 20Hz, 25Hz, 31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz, 100Hz, 125Hz, 160Hz,
-200Hz, 250Hz, 315Hz, 400Hz, 500Hz, 630Hz, 800Hz, 1000Hz, 1250Hz,
-1600Hz, 2000Hz, 2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz,
-10000Hz.
+For filter selection and test measurements see [TeensyAmp filter
+section](https://github.com/janscience/Teensy_Amp/tree/main/R1.0#filter).
+
+- High-pass filter is set to 100Hz.
+- Low-pass filter is set to 7kHz.
+
+In files [`tests/filter-p*-gain*.wav`](tests) the frequency of a 23mV
+signal was increased as follows: 10Hz, 12.5Hz, 16Hz, 20Hz, 25Hz,
+31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz, 100Hz, 125Hz, 160Hz, 200Hz, 250Hz,
+315Hz, 400Hz, 500Hz, 630Hz, 800Hz, 1000Hz, 1250Hz, 1600Hz, 2000Hz,
+2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz, 10000Hz.
 
 High-pass filter selection:
 - p1 (upper jumper right): 0.1Hz
