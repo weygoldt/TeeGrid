@@ -175,6 +175,10 @@ in the right order!
 
 ## Polarity and gain
 
+See the [Teensy Amp
+documentation](https://github.com/janscience/Teensy_Amp/tree/main/R1.0#gains-and-clipping)
+for details on gain settings.
+
 All channels connected to the same 630Hz sinewave signal.
 
 ![gain 5](images/gain5-100mV-traces.png)
@@ -186,27 +190,6 @@ All channels connected to the same 630Hz sinewave signal.
 Nicely amplified signals!
 
 
-## Gains and clipping
-
-Gain selection:
-- p1 (switch left):     5x
-- p2 (switch center):  30x
-- p3 (switch right):  180x
-
-In files [`tests/clipping-gain*-*mV-step*mV.wav`](tests) the amplitude
-of a 630Hz signal was increased from a start voltage in steps as
-specified in the file name.
-
-![gain5](images/clipping-gain5-100mV-step10mV-traces.png)
-
-![gain30](images/clipping-gain30-20mV-step1mV-traces.png)
-
-![gain180](images/clipping-gain180-3.5mV-step0.1mV-traces.png)
-
-The signals are clipped at the bottom! This looks the same for all
-channels and gains. Why?
-
-
 ## High- and low-pass filter
 
 For filter selection and test measurements see [TeensyAmp filter
@@ -214,29 +197,6 @@ section](https://github.com/janscience/Teensy_Amp/tree/main/R1.0#filter).
 
 - High-pass filter is set to 100Hz.
 - Low-pass filter is set to 7kHz.
-
-In files [`tests/filter-p*-gain*.wav`](tests) the frequency of a 23mV
-signal was increased as follows: 10Hz, 12.5Hz, 16Hz, 20Hz, 25Hz,
-31.5Hz, 40Hz, 50Hz, 63Hz, 80Hz, 100Hz, 125Hz, 160Hz, 200Hz, 250Hz,
-315Hz, 400Hz, 500Hz, 630Hz, 800Hz, 1000Hz, 1250Hz, 1600Hz, 2000Hz,
-2500Hz, 3150Hz, 4000Hz, 5000Hz, 6300Hz, 8000Hz, 10000Hz.
-
-High-pass filter selection:
-- p1 (upper jumper right): 0.1Hz
-- p2 (upper jumper left): 100Hz, currently selected
-- p3 (upper jumper cable left): 300Hz
-
-100Hz high-pass filter, 7kHz low-pass filter:
-
-![high-pass p2](images/filter-p2-gain30-23mV-traces.png)
-
-300Hz high-pass filter, 7kHz low-pass filter:
-
-![high-pass p3](images/filter-p3-gain30-23mV-traces.png)
-
-Low-pass filter selection:
-- p1 (switch left): 7kHz
-- p2 (switch right): 33kHz
 
 
 ## Real-time clock
