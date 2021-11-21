@@ -272,10 +272,15 @@ The system, i.e. the Teensy and the four amplifiers, is powered with a
 bank](https://www.conrad.de/de/p/realpower-pb-10000-powerbank-zusatzakku-lipo-10000-mah-270315-2304822.html)
 providing a voltage of 5.04V.
 
-On a first run, this power bank powered the system for 39 hours and 20
-minutes, i.e. one and a half day. The manual of the power bank
-suggests that after a few cycles of using and charging the power bank,
-its capacity gets larger. So, given the theoretical value it should be
-easily possible to eventually run the system for at least 2 full days
-or maybe even three days.
+| Run  | Time     |
+| ---: | -------: |
+| 1    | 39h20min |
+| 2    | 38h40min |
+
+The first two runs did this power bank power the system about one and
+a half day. This is just half of what is expected from the capacity of
+10Ah.  The manual of the power bank suggests that after a few cycles
+of using and charging the power bank, its capacity gets larger. So,
+hopefully it is possible to eventually run the system for at least 2
+full days or maybe even three days.
 
