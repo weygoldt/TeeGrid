@@ -17,6 +17,7 @@ ADC_SAMPLING_SPEED sampls = ADC_SAMPLING_SPEED::HIGH_SPEED;
 int8_t channels0 [] =  {A4, A5, A6, A7, -1, A4, A5, A6, A7, A8, A9};      // input pins for ADC0
 int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pins for ADC1
 
+char path[] = "recordings";              // folder where to store the recordings
 char fileName[] = "grid1-SDATETIME.wav";   // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 float fileSaveTime = 10*60;             // seconds
 
@@ -28,7 +29,7 @@ Configurator config;
 ContinuousADC aidata;
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
-Settings settings("recordings", fileName, fileSaveTime, 100.0,
+Settings settings(path, fileName, fileSaveTime, 100.0,
                   0.0, initialDelay);
 RTClock rtclock;
 String prevname; // previous file name

@@ -25,6 +25,11 @@ switch, and the screw terminals for the 8 inputs and their reference:
 ![amplifier top](images/amplifier-top.png)
 
 
+## Usage
+
+For setting up and operating the logger software, see [usage](usage.md).
+
+
 ## Wiring
 
 Viewed from the left we see the screw terminals for the input signals
