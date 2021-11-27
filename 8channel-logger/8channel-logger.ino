@@ -20,13 +20,16 @@ ADC_SAMPLING_SPEED sampls = ADC_SAMPLING_SPEED::HIGH_SPEED;
 int8_t channels0 [] =  {A4, A5, A6, A7, -1, A4, A5, A6, A7, A8, A9};      // input pins for ADC0
 int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pins for ADC1
 
+uint8_t tempPin = 10;                    // pin for DATA of thermometer
+float sensorsInterval = 5.0;             // interval between sensors readings in seconds
+
 char path[] = "recordings";              // folder where to store the recordings
-char fileName[] = "grid1-SDATETIME.wav";   // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-float fileSaveTime = 10*60;             // seconds
+char fileName[] = "grid1-SDATETIME.wav"; // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+float fileSaveTime = 10*60;              // seconds
 
 float initialDelay = 10.0;               // seconds
 
-int pulseFrequency = 230;            // Hertz
+int pulseFrequency = 230;                // Hertz
 int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test signals
 
 // ------------------------------------------------------------------------------------------
@@ -121,8 +124,8 @@ void storeData() {
 
 
 void setupSensors() {
-  temp.begin(10);              // DATA on pin 10
-  sensors.setInterval(5.0);
+  temp.begin(tempPin);
+  sensors.setInterval(sensorsInterval);
   sensors.addSensor(temp);
   sensors.report();
   sensors.writeCSVHeader(sdcard, "temperatures.csv", rtclock);
