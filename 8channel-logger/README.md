@@ -1,8 +1,11 @@
 # 8-channel logger
 
-Four of the two-channel amplifiers by Stefan Mucha ([TeensyAmp
-R1.0](https://github.com/muchaste/Teensy_Amp)) are connected to a
-[Teensy 3.5](https://www.pjrc.com/store/teensy35.html).
+- Four of the two-channel amplifiers by Stefan Mucha ([TeensyAmp
+  R1.0](https://github.com/muchaste/Teensy_Amp/R1.0)) are connected to a
+  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html).
+
+- Water temperature is logged from a [DS18B20 1-wire digital
+  thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf).
 
 Designed by Jan Benda in November 2021.
 

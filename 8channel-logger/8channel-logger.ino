@@ -1,9 +1,12 @@
 #include <Configurator.h>
 #include <ContinuousADC.h>
+#include <Sensors.h>
+#include <Temperature.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Settings.h>
 #include <Blink.h>
+#include <TestSignals.h>
 
 
 // Default settings: -----------------------------------------------------------------------
@@ -23,10 +26,15 @@ float fileSaveTime = 10*60;             // seconds
 
 float initialDelay = 10.0;               // seconds
 
+int pulseFrequency = 230;            // Hertz
+int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test signals
+
 // ------------------------------------------------------------------------------------------
 
 Configurator config;
 ContinuousADC aidata;
+Temperature temp;
+Sensors sensors;
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
@@ -90,8 +98,6 @@ void setupStorage() {
   file.setWriteInterval(aidata);
   file.setMaxFileTime(settings.FileTime);
   file.setSoftware("TeeGrid 8channel-logger");
-  file.startWrite();
-  openNextFile();
 }
 
 
@@ -114,6 +120,16 @@ void storeData() {
 }
 
 
+void setupSensors() {
+  temp.begin(10);              // DATA on pin 10
+  sensors.setInterval(5.0);
+  sensors.addSensor(temp);
+  sensors.report();
+  sensors.writeCSVHeader(sdcard, "temperatures.csv", rtclock);
+  Serial.println();
+}
+
+
 // ------------------------------------------------------------------------------------------
 
 void setup() {
@@ -128,6 +144,9 @@ void setup() {
   rtclock.report();
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
+  setupTestSignals(signalPins, pulseFrequency);
+  setupStorage();
+  setupSensors();
   aidata.check();
   aidata.start();
   aidata.report();
@@ -139,11 +158,15 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
-  setupStorage();
+  sensors.start();
+  file.startWrite();
+  openNextFile();
 }
 
 
 void loop() {
   storeData();
+  if (sensors.update())
+    sensors.writeCSV();
   blink.update();
 }
