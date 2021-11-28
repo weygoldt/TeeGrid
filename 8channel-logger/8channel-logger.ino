@@ -76,7 +76,7 @@ bool openNextFile() {
   char dts[20];
   rtclock.dateTime(dts);
   file.openWave(name.c_str(), aidata, -1, dts);
-  file.writeData();
+  file.write();
   Serial.println(name);
   if (file.isOpen()) {
     if (fileSaveTime < 30)
@@ -98,7 +98,7 @@ bool openNextFile() {
 void setupStorage() {
   if (file.dataDir(settings.Path))
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval(aidata);
+  file.setWriteInterval();
   file.setMaxFileTime(settings.FileTime);
   file.setSoftware("TeeGrid 8channel-logger");
 }
@@ -106,7 +106,7 @@ void setupStorage() {
 
 void storeData() {
   if (file.needToWrite()) {
-    size_t samples = file.writeData();
+    size_t samples = file.write();
     if (samples == 0) {
       blink.clear();
       Serial.println();
@@ -162,7 +162,7 @@ void setup() {
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
   sensors.start();
-  file.startWrite();
+  file.start();
   openNextFile();
 }
 
