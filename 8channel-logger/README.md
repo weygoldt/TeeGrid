@@ -229,11 +229,12 @@ amplifiers) results in:
 
 | Voltage | Current | Power | Runtime |
 | ------: | ------: | ----: | ------: |
-| 5V      | 133mA   | 664mW | 75h     |
-| 3.3V    | 111mA   | 366mW | 90h     |
+| 5V      | 133mA   | 664mW | 46h     |
+| 3.3V    | 111mA   | 366mW | -       |
 
 The last colum is the run time to be expected for a 10Ah battery (10Ah
-divided by current).
+times 3.7V LiPo voltage divided by 5.1V output voltage times 85%
+efficiancy (=0.62) divided by current).
 
 The system, i.e. the Teensy and the four amplifiers, is powered with a
 [10000mAh power
@@ -246,9 +247,9 @@ providing a voltage of 5.04V.
 | 2    | 38h40min |
 
 The first two runs did this power bank power the system about one and
-a half day. This is just half of what is expected from the capacity of
-10Ah.  The manual of the power bank suggests that after a few cycles
-of using and charging the power bank, its capacity gets larger. So,
-hopefully it is possible to eventually run the system for at least 2
-full days or maybe even three days.
+a half day. This is 6h (=15%) less of what is expected from the
+capacity.  The manual of the power bank suggests that after a few
+cycles of using and charging the power bank, its capacity gets
+larger. So, hopefully it is possible to eventually run the system for
+two full days.
 
