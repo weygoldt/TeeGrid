@@ -1,8 +1,8 @@
 # 8-channel logger
 
 - Four of the two-channel amplifiers by Stefan Mucha ([TeensyAmp
-  R1.0](https://github.com/muchaste/Teensy_Amp/R1.0)) are connected to a
-  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html).
+  R1.0](https://github.com/muchaste/Teensy_Amp/tree/main/R1.0)) are
+  connected to a [Teensy 3.5](https://www.pjrc.com/store/teensy35.html).
 
 - Water temperature is logged from a [DS18B20 1-wire digital
   thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf).
@@ -184,7 +184,7 @@ in the right order!
 ## Polarity and gain
 
 See the [Teensy Amp
-documentation](https://github.com/janscience/Teensy_Amp/tree/main/R1.0#gains-and-clipping)
+documentation](https://github.com/muchaste/Teensy_Amp/tree/main/R1.0#gains-and-clipping)
 for details on gain settings.
 
 All channels connected to the same 630Hz sinewave signal.
@@ -201,7 +201,7 @@ Nicely amplified signals!
 ## High- and low-pass filter
 
 For filter selection and test measurements see [TeensyAmp filter
-section](https://github.com/janscience/Teensy_Amp/tree/main/R1.0#filter).
+section](https://github.com/muchaste/Teensy_Amp/tree/main/R1.0#filter).
 
 - High-pass filter is set to 100Hz.
 - Low-pass filter is set to 7kHz.
