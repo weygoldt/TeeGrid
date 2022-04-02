@@ -13,30 +13,59 @@ the following libraries:
 
 ## Installation
 
-The [Arduino Time Library](https://github.com/PaulStoffregen/Time) and
-[ADC](https://github.com/pedvide/ADC) libraries are already included
-in [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
+1. Download and install Teensyduino and the Arduino IDE, following the
+   [installation instructions](https://www.pjrc.com/teensy/td_download.html).
 
-For installing [SdFat version2](https://github.com/greiman/SdFat) open in
-the Arduino IDE Tools - Manage libraries. Search for SdFat and install it.
+2. The [Arduino Time Library](https://github.com/PaulStoffregen/Time)
+   and [ADC](https://github.com/pedvide/ADC) libraries are already
+   included in
+   [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
-For [TeeRec](https://github.com/janscience/TeeRec) clone the
-repository in 'Arduino/libraries':
-```sh
-cd Arduino/libraries
-git clone https://github.com/janscience/TeeRec.git
-```
+3. For installing [SdFat version2](https://github.com/greiman/SdFat)
+   open in the Arduino IDE Tools - Manage libraries. Search for SdFat
+   and install or update it.
 
-Alternatively, download the whole repository as a zip archive (open
-https://github.com/janscience/TeeRec in your browser and click on the
-green "Code" button). Unpack the zip file:
-```sh
-cd Arduino/libraries
-unzip ~/Downloads/TeeRec-main.zip
-```
+4. For [TeeRec](https://github.com/janscience/TeeRec) clone the
+   repository into `Arduino/libraries/`:
+   ```sh
+   cd Arduino/libraries
+   git clone https://github.com/janscience/TeeRec.git
+   ```
 
-Close the Arduino IDE and open it again. Then the Arduino IDE knows
-about the newly installed libraries.
+    Alternatively, download the whole repository as a zip archive (open
+    https://github.com/janscience/TeeRec in your browser and click on the
+    green `Code` button). Unpack the zip file:
+    ```sh
+    cd Arduino/libraries
+    unzip ~/Downloads/TeeRec-main.zip
+    ```
+
+5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
+   about the newly installed libraries.
+
+6. Clone TeeGrid into `Arduino/`
+   ```sh
+   cd Arduino/
+   git clone https://github.com/janscience/TeeGrid.git
+   ```
+
+   As with TeeRec, alternatively, you can download the whole
+   repository as a zip archive (open
+   https://github.com/janscience/TeeGrid in your browser and click on
+   the green `Code` button). Then unpack the zip file:
+   ```sh
+   cd Arduino/
+   unzip ~/Downloads/TeeGrid-main.zip
+   ```
+
+7. Load `Arduino/TeeGrid/8channel-logger/channel-logger.ino` into the
+   Arduino IDE (`File` - `Open`, `Ctrl-O`).
+
+8. Select the right Teensy board: in the menu of the Arduino IDE go to
+   `Tools` - `Board` - `Teensyduino` and select your Teensy board.
+
+9. Connect the Teensy to the USB. Compile and upload the
+   `channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 
 ## Setup
@@ -51,7 +80,7 @@ Arduino IDE.
 
 ### Data acquisition
 
-In the top section marked as "Settings" you may adapt some settings
+In the top section marked as `Settings` you may adapt some settings
 according to your needs. The first section is about the data
 acquisition. You can set the sampling rate, bit resolution, number of
 averages per sample, conversion and sampling speeds, and input pins
