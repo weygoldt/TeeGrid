@@ -22,8 +22,8 @@ the following libraries:
    [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
 3. For installing [SdFat version2](https://github.com/greiman/SdFat)
-   open in the Arduino IDE Tools - Manage libraries. Search for SdFat
-   and install or update it.
+   open in the Arduino IDE `Tools` - `Manage libraries`. Search for
+   SdFat and install or update it.
 
 4. For [TeeRec](https://github.com/janscience/TeeRec) clone the
    repository into `Arduino/libraries/`:
@@ -58,14 +58,14 @@ the following libraries:
    unzip ~/Downloads/TeeGrid-main.zip
    ```
 
-7. Load `Arduino/TeeGrid/8channel-logger/channel-logger.ino` into the
+7. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
    Arduino IDE (`File` - `Open`, `Ctrl-O`).
 
 8. Select the right Teensy board: in the menu of the Arduino IDE go to
    `Tools` - `Board` - `Teensyduino` and select your Teensy board.
 
 9. Connect the Teensy to the USB. Compile and upload the
-   `channel-logger.ino` sketch by pressing `Ctrl-U`.
+   `8channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 
 ## Setup
@@ -75,8 +75,13 @@ ways. Either by editing some variables directly in the sketch, as
 described here, or by a configuration file provided on the SD card, as
 described in the next section.
 
-Open the [`8channel-logger.ino`](8channel-logger.ino) sketch in the
-Arduino IDE.
+*WARNING* the settings of the config file overwrite the settings made
+ in the sketch!
+
+For editing the sketch, open the
+[`8channel-logger.ino`](8channel-logger.ino) sketch in the Arduino IDE
+(`File` - `Open`, `Ctrl-O`) and edit it appropriately as described in
+the next paragraphs.
 
 ### Data acquisition
 
@@ -86,9 +91,9 @@ acquisition. You can set the sampling rate, bit resolution, number of
 averages per sample, conversion and sampling speeds, and input pins
 (channels). If you change these settings, check the output on the
 serial monitor and the performance before using the logger! See
-[TeeRec](https://github.com/janscience/TeeRec) for various sketches
-and tools that help you to select the best settings for the data
-acquisition.
+[TeeRec](https://github.com/janscience/TeeRec#testing-data-acquisition)
+for various sketches and tools that help you to select the best
+settings for the data acquisition.
 
 ### Environmental sensors
 
@@ -123,8 +128,8 @@ each file. The default is 10min.
 `initialDelay` specifies an initial delay right after start up the
 sketch waits before starting to store data on SD card.
 
-Once you modified the sketch to your needs, upload it to the Teensy
-(`CTRL U`).
+Once you modified the sketch to your needs, compile and upload it to
+the Teensy (`Ctrl-U`).
 
 
 ## Configuration
@@ -134,16 +139,13 @@ configuration file. Simply place a configuration file named
 [`teegrid.cfg`](teegrid.cfg) into the root folder of the SD card. If
 present, this file is read once on startup.
 
-*WARNING* the settings of the config file overwrite the settings made
- in the sketch!
-
 The content of the configuration file should look like this:
 
 ```txt
 # Configuration file for TeeGrid logger unit.
 
 Settings:
-  Path        : recordings     # path where to store data
+  Path        : recordings  # path where to store data
   FileName    : grid1-SDATETIME.wav  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
   FileTime    : 10min       # s, min, or h
   InitialDelay: 10s         # ms, s, or min
@@ -158,14 +160,15 @@ ADC:
 
 Sensors:
   NFiles       : 2
-  WriteInterval: 10s          # ms, s, or min
+  WriteInterval: 10s        # ms, s, or min
   DS18X20-Pin  : 10
 ``` 
 
 Everything behind '#' is a comment. All lines without a colon are
 ignored.  Unknown keys are ignored but reported. Times and frequencies
 understand various units as indicated in the comments. Check the
-serial monitor to confirm the right settings.
+serial monitor of the Arduino IDE (`Ctrl+Shif+M`) to confirm the right
+settings.
 
 
 ## Real-time clock
