@@ -253,3 +253,22 @@ cycles of using and charging the power bank, its capacity gets
 larger. So, hopefully it is possible to eventually run the system for
 two full days.
 
+
+## Temperature
+
+Temperature is logged via an [DS18B20 1-wire digital
+  thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf).
+
+Here is how to connect the DS18B20 to the
+[Teensy](https://www.pjrc.com/teensy/pinout.html#Teensy_3.5):
+
+![ds18b20 teensy](images/ds18b20-teensy.png)
+
+- black wire: GND (left most pin on the Teensy)
+- red wire: 3.3V (between pin 12 and 14 on the Teensy)
+- yellow wire: data on pin 10 (or any other digital input pin).
+
+In addition you need to connect the data pin to 3.3V via a 4.7kΩ
+pullup resistance.  See [here](
+https://create.arduino.cc/projecthub/TheGadgetBoy/ds18b20-digital-temperature-sensor-and-arduino-9cc806)
+for a circuit diagram.
