@@ -7,7 +7,7 @@
 - Water temperature is logged from a [DS18B20 1-wire digital
   thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf).
 
-Designed by Jan Benda in November 2021.
+Designed by Jan Benda in November 2021. Temperature logging added in April 2022.
 
 The four amplifiers are mounted on the bottom side of the base plate:
 

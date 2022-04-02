@@ -41,13 +41,18 @@ about the newly installed libraries.
 
 ## Setup
 
+The behavior of the logger sketch can be modfied in various
+ways. Either by editing some variables directly in the sketch, as
+described here, or by a configuration file provided on the SD card, as
+described in the next section.
+
 Open the [`8channel-logger.ino`](8channel-logger.ino) sketch in the
 Arduino IDE.
 
 ### Data acquisition
 
 In the top section marked as "Settings" you may adapt some settings
-according to your needs. The first block is about the data
+according to your needs. The first section is about the data
 acquisition. You can set the sampling rate, bit resolution, number of
 averages per sample, conversion and sampling speeds, and input pins
 (channels). If you change these settings, check the output on the
@@ -56,9 +61,18 @@ serial monitor and the performance before using the logger! See
 and tools that help you to select the best settings for the data
 acquisition.
 
+### Environmental sensors
+
+In the second section environmental sensors are configured. Here you
+can specify on which pin the temperature sensor is connected to, and
+at which intervals the environmental data are written into how many
+csv files. To be fail safe against file corruption by power loss, the
+environmental data are alternately written into the given number of
+csv files.
+
 ### File size and naming
 
-The second section is about the files that store the data on the SD
+The third section is about the files that store the data on the SD
 card.  The files are stored in a directory whose name is specified by
 the `path` variable. The file names in this directory are specified by
 the `fileName` variable. The file name can be an arbitrary string, but
@@ -103,15 +117,20 @@ Settings:
   Path        : recordings     # path where to store data
   FileName    : grid1-SDATETIME.wav  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
   FileTime    : 10min       # s, min, or h
-  InitialDelay: 10s         # s, min, or h
+  InitialDelay: 10s         # ms, s, or min
 
 ADC:
-  SamplingRate: 20kHz      # Hz, kHz, MHz
+  SamplingRate: 20kHz       # Hz, kHz, MHz
   Averaging   : 4
   Conversion  : high
   Sampling    : high
   Resolution  : 12bit
   Reference   : 3.3V
+
+Sensors:
+  NFiles       : 2
+  WriteInterval: 10s          # ms, s, or min
+  DS18X20-Pin  : 10
 ``` 
 
 Everything behind '#' is a comment. All lines without a colon are
@@ -133,14 +152,21 @@ and a time in the following format:
 ``` txt
 YYYY-MM-DDTHH:MM:SS
 ```
-Insert the SD card into the Teensy. Then start the Teensy by
+
+In a shell you might generate this file via
+``` sh
+date +%FT%T > settime.cfg
+```
+and then editing the file to some time in the near future.
+
+Then insert the SD card into the Teensy. Start the Teensy by
 connecting it to power. On start up the
 [`8channel-logger.ino`](8channel-logger.ino) sketch reads in the
-`settime.cfg` file and sets the real-time clock to this time. Then the
-file is deleted to avoid resetting the time.
+`settime.cfg` file, sets the real-time clock to this time, and then
+deletes the file to avoid resetting the time at the next start up.
 
 
-## Usage
+## Logging
 
 Connect the Teensy to a battery and let it record the data.
 
@@ -159,13 +185,13 @@ The on-board LED of the Teensy indicates the following events:
 - Normal operation, i.e. data acquisition is running and data are
   written to SD card: the LED briefly flashes every 5 seconds.
 
-- Whenever a file is closed (and a new one opened), the LED lights for
+- Whenever a file is closed and the next one opened, the LED lights for
   1 second. Then it continues with flashes every 5 seconds.
 
 - The LED is switched off if no data can be written on the SD card (no
   SD card present or SD card full) or data acquisition is not working.
-  Connect the Teensy to the computer and open the serial monitor of
-  the Arduino IDE (`Ctrl+Shif+M`). On startup the settings for the
-  data acquisition are reported and in case of problems an error
-  message is displayed.
+  In this case, connect the Teensy to a computer and open the serial
+  monitor of the Arduino IDE (`Ctrl+Shif+M`). On startup the settings
+  for the data acquisition are reported and in case of problems an
+  error message is displayed.
 
