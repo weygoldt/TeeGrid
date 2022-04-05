@@ -227,3 +227,13 @@ The on-board LED of the Teensy indicates the following events:
   for the data acquisition are reported and in case of problems an
   error message is displayed.
 
+
+## Files
+
+Analog input data are stored on the SD card as wave files in the
+directory specified by `Path` with names `FileName`.wav .
+
+Sensor data (currently only water temperature) are stored in the same
+directory as csv files with names `FileName`-temperatures1.csv .
+First column is a time stamp in ISO date/time formar. Second column is
+the water temperature in degrees celsius.
