@@ -35,6 +35,8 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ------------------------------------------------------------------------------------------
 
+const char version[4] = "2.0";
+
 Configurator config;
 ContinuousADC aidata;
 Temperature temp;
@@ -107,7 +109,9 @@ void setupStorage() {
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
   file.setWriteInterval();
   file.setMaxFileTime(settings.FileTime);
-  file.setSoftware("TeeGrid 8channel-logger");
+  char ss[30] = "TeeGrid 8channel-logger v";
+  strcat(ss, version);
+  file.setSoftware(ss);
 }
 
 
