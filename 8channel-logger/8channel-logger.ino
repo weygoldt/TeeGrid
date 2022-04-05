@@ -82,6 +82,8 @@ String makeFileName() {
 
 bool openNextFile(const String &name) {
   blink.clear();
+  if (name.length() == 0)
+    return false;
   String fname = name + ".wav";
   char dts[20];
   rtclock.dateTime(dts);
@@ -138,6 +140,7 @@ void storeData() {
 void setupSensors() {
   if (!temp.available() && tempPin >= 0)
     temp.begin(tempPin);
+  temp.setName("Twater");
   sensors.report();
   Serial.println();
 }
