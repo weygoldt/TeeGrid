@@ -109,9 +109,9 @@ csv files.
 The third section is about the files that store the data on the SD
 card.  The files are stored in a directory whose name is specified by
 the `path` variable. The file names in this directory are specified by
-the `fileName` variable. The file name can be an arbitrary string, but
-should end with the '.wav' extension. The following special strings in
-the file name are replaced by the current date, time, or a number:
+the `fileName` variable. The '.wav' extension is added by the
+sketch. The following special strings in the file name are replaced by
+the current date, time, or a number:
 
 - `DATE`: the current date as ISO string (YYYY-MM-DD)
 - `SDATE`: "short date" - the current date as YYYYMMDD
@@ -146,7 +146,7 @@ The content of the configuration file should look like this:
 
 Settings:
   Path        : recordings  # path where to store data
-  FileName    : grid1-SDATETIME.wav  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+  FileName    : grid1-SDATETIME  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM; the wav extension is added by the sketch.
   FileTime    : 10min       # s, min, or h
   InitialDelay: 10s         # ms, s, or min
 

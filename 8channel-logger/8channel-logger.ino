@@ -60,9 +60,9 @@ void setupADC() {
 }
 
 
-bool openNextFile() {
-  blink.clear();
-  String name = rtclock.makeStr(settings.FileName, true);
+String makeFileName() {
+  time_t t = now();
+  String name = rtclock.makeStr(settings.FileName, t, true);
   if (name != prevname) {
     file.resetFileCounter();
     prevname = name;
@@ -72,13 +72,20 @@ bool openNextFile() {
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted.");
     Serial.println();
-    return false;
+    return "";
   }
+  return name;
+}
+
+
+bool openNextFile(const String &name) {
+  blink.clear();
+  String fname = name + ".wav";
   char dts[20];
   rtclock.dateTime(dts);
-  file.openWave(name.c_str(), -1, dts);
+  file.openWave(fname.c_str(), -1, dts);
   file.write();
-  Serial.println(name);
+  Serial.println(fname);
   if (file.isOpen()) {
     blink.setSingle();
     blink.blinkSingle(0, 1000);
@@ -117,7 +124,8 @@ void storeData() {
     }
     if (file.endWrite()) {
       file.close();  // file size was set by openWave()
-      openNextFile();
+      String name = makeFileName();
+      openNextFile(name);
     }
   }
 }
@@ -127,7 +135,6 @@ void setupSensors() {
   if (!temp.available() && tempPin >= 0)
     temp.begin(tempPin);
   sensors.report();
-  sensors.openCSV(sdcard, "temperatures", rtclock);
   Serial.println();
 }
 
@@ -163,9 +170,12 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
+  String name = makeFileName();
+  String sname = name + "-temperatures";
+  sensors.openCSV(sdcard, sname.c_str(), rtclock);
   sensors.start();
   file.start();
-  openNextFile();
+  openNextFile(name);
 }
 
 
