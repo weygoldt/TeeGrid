@@ -138,7 +138,7 @@ void storeData() {
 
 
 void setupSensors() {
-  if (!temp.available() && tempPin >= 0)
+  if (!temp.available() && !temp.configured() && tempPin >= 0)
     temp.begin(tempPin);
   temp.setName("Twater");
   sensors.report();

@@ -161,7 +161,7 @@ ADC:
 Sensors:
   NFiles       : 2
   WriteInterval: 10s        # ms, s, or min
-  DS18X20-Pin  : 10
+  DS18X20-Pin  : 10         # set to "none" or -1 to disable temperature logging.
 ``` 
 
 Everything behind '#' is a comment. All lines without a colon are
