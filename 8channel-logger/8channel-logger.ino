@@ -133,6 +133,8 @@ void storeData() {
       String name = makeFileName();
       openNextFile(name);
     }
+    else if (sensors.pending())
+      sensors.writeCSV();
   }
 }
 
@@ -188,7 +190,6 @@ void setup() {
 
 void loop() {
   storeData();
-  if (sensors.update())
-    sensors.writeCSV();
+  sensors.update();
   blink.update();
 }
