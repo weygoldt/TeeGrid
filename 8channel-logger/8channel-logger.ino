@@ -37,15 +37,15 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 const char version[4] = "2.0";
 
+RTClock rtclock;
 Configurator config;
 ContinuousADC aidata;
 Temperature temp;
-Sensors sensors;
+Sensors sensors(rtclock);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
                   0.0, initialDelay);
-RTClock rtclock;
 String prevname; // previous file name
 Blink blink;
 
@@ -59,6 +59,15 @@ void setupADC() {
   aidata.setConversionSpeed(convs);
   aidata.setSamplingSpeed(sampls);
   aidata.check();
+}
+
+
+void setupSensors() {
+  if (!temp.available() && !temp.configured() && tempPin >= 0)
+    temp.begin(tempPin);
+  temp.setName("Twater");
+  sensors.report();
+  Serial.println();
 }
 
 
@@ -133,18 +142,9 @@ void storeData() {
       String name = makeFileName();
       openNextFile(name);
     }
-    else if (sensors.pending())
+    else if (!sensors.isBusy() && sensors.pending())
       sensors.writeCSV();
   }
-}
-
-
-void setupSensors() {
-  if (!temp.available() && !temp.configured() && tempPin >= 0)
-    temp.begin(tempPin);
-  temp.setName("Twater");
-  sensors.report();
-  Serial.println();
 }
 
 
@@ -181,7 +181,7 @@ void setup() {
     delay(uint32_t(1000.0*settings.InitialDelay));
   String name = makeFileName();
   String sname = name + "-temperatures";
-  sensors.openCSV(sdcard, sname.c_str(), rtclock);
+  sensors.openCSV(sdcard, sname.c_str());
   sensors.start();
   file.start();
   openNextFile(name);
