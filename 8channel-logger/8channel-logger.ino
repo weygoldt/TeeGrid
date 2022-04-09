@@ -21,7 +21,6 @@ int8_t channels0 [] =  {A4, A5, A6, A7, -1, A4, A5, A6, A7, A8, A9};      // inp
 int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pins for ADC1
 
 uint8_t tempPin = 10;                    // pin for DATA of thermometer
-int sensorsNFiles = 2;                   // number of files used for storing sensor data
 float sensorsInterval = 10.0;             // interval between sensors readings in seconds
 
 char path[] = "recordings";              // folder where to store the recordings
@@ -159,7 +158,6 @@ void setup() {
   setupADC();
   sensors.addSensor(temp);
   sensors.setInterval(sensorsInterval);
-  sensors.setNFiles(sensorsNFiles);
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();

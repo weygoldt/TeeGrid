@@ -99,10 +99,8 @@ settings for the data acquisition.
 
 In the second section environmental sensors are configured. Here you
 can specify on which pin the temperature sensor is connected to, and
-at which intervals the environmental data are written into how many
-csv files. To be fail safe against file corruption by power loss, the
-environmental data are alternately written into the given number of
-csv files.
+at which intervals the environmental data are written into how many a
+csv file.
 
 ### File size and naming
 
@@ -159,7 +157,6 @@ ADC:
   Reference   : 3.3V
 
 Sensors:
-  NFiles       : 2
   WriteInterval: 10s        # ms, s, or min
   DS18X20-Pin  : 10         # set to "none" or -1 to disable temperature logging.
 ``` 
@@ -234,6 +231,6 @@ Analog input data are stored on the SD card as wave files in the
 directory specified by `Path` with names `FileName`.wav .
 
 Sensor data (currently only water temperature) are stored in the same
-directory as csv files with names `FileName`-temperatures1.csv .
+directory as an csv file with name `FileName`-temperatures.csv .
 First column is a time stamp in ISO date/time formar. Second column is
 the water temperature in degrees celsius.
