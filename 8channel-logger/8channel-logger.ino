@@ -46,7 +46,7 @@ SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
                   0.0, initialDelay);
 String prevname; // previous file name
-Blink blink;
+Blink blink(LED_BUILTIN);
 
 
 void setupADC() {
@@ -141,8 +141,6 @@ void storeData() {
       String name = makeFileName();
       openNextFile(name);
     }
-    else if (!sensors.isBusy() && sensors.pending())
-      sensors.writeCSV();
   }
 }
 
@@ -189,5 +187,9 @@ void setup() {
 void loop() {
   storeData();
   sensors.update();
+  if (file.fileTime() > sensors.interval() &&
+      file.fileTime() < file.maxFileTime()-sensors.interval() &&
+      sensors.pending())
+    sensors.writeCSV();
   blink.update();
 }
