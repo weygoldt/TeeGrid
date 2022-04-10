@@ -126,7 +126,7 @@ void setupStorage() {
 
 
 void storeData() {
-  if (file.needToWrite()) {
+  if (file.pending()) {
     size_t samples = file.write();
     if (samples == 0) {
       blink.clear();
@@ -187,8 +187,7 @@ void setup() {
 void loop() {
   storeData();
   sensors.update();
-  if (file.fileTime() > sensors.interval() &&
-      file.fileTime() < file.maxFileTime()-sensors.interval() &&
+  if (file.writeTime() < 0.005 &&
       sensors.pending())
     sensors.writeCSV();
   blink.update();
