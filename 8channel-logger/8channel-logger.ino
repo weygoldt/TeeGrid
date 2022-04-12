@@ -187,7 +187,7 @@ void setup() {
 void loop() {
   storeData();
   sensors.update();
-  if (file.writeTime() < 0.005 &&
+  if (file.writeTime() < 0.01 &&
       sensors.pending())
     sensors.writeCSV();
   blink.update();
