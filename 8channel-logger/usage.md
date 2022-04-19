@@ -197,7 +197,22 @@ deletes the file to avoid resetting the time at the next start up.
 
 ## Logging
 
-Connect the Teensy to a battery and let it record the data.
+1. *Format the SD card.*
+2. Copy your teegrid.cfg file onto the SD card.
+3. Insert the SD card into the Teensy.
+4. Connect the Teensy to a battery and let it record the data.
+
+The SD card needs to be *reformatted after every usage* of the
+logger. The logger runs until the battery is drained and therefore
+cannot properly close the last files. This leaves the file system in a
+corrupted state, which apparently results in very long delays when
+writing to the SD card again.
+
+You may use the sketch provided by the SdFat library for formatting
+the SD card directly on the Teensy: In the Arduino IDE menu select
+File - Examples, browse to the last section ("Examples from custom
+libraries"), select "SdFat" and then "SdFormatter". Upload the script
+on Teensy and open the serial monitor. Follow the instructions.
 
 
 ### LED

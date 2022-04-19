@@ -48,6 +48,8 @@ Settings settings(path, fileName, fileSaveTime, 100.0,
 String prevname; // previous file name
 Blink blink(LED_BUILTIN);
 
+int restarts = 0;
+
 
 void setupADC() {
   aidata.setChannels(0, channels0);
@@ -127,18 +129,48 @@ void setupStorage() {
 
 void storeData() {
   if (file.pending()) {
-    size_t samples = file.write();
-    if (samples == 0) {
+    ssize_t samples = file.write();
+    if (samples <= 0) {
       blink.clear();
       Serial.println();
-      Serial.println("ERROR: data acquisition not running.");
-      Serial.println("sampling rate probably too high,");
-      Serial.println("given the number of channels, averaging, sampling and conversion speed.");
-      while (1) {};
+      Serial.println("ERROR in writing data to file:");
+      switch (samples) {
+        case -1: Serial.println("  File not open."); break;
+        case -2: Serial.println("  No data available, data acquisition probably not running."); break;
+        case -3: Serial.println("  File already full."); break;
+        case 0: Serial.println("  Nothing written into the file."); break;
+        default: Serial.printf("  Unknown error %d.\n", samples);
+      }
+      Serial.println("  sampling rate probably too high,");
+      Serial.println("  given the number of channels, averaging, sampling and conversion speed.");
+      if (samples != -3) {
+        aidata.stop();
+        file.close();
+        sensors.closeCSV();
+        char mfs[20];
+        sprintf(mfs, "error%d-%d.msg", restarts+1, -samples);
+        FsFile mf = sdcard.openWrite(mfs);
+        mf.close();
+        if (samples == 0)
+          samples = -1;
+      }
+      else
+        samples = 0;
     }
-    if (file.endWrite()) {
+    if (file.endWrite() || samples < 0) {
       file.close();  // file size was set by openWave()
       String name = makeFileName();
+      if (samples < 0) {
+        if (restarts >= 5) {
+          Serial.println("ERROR: Too many file errors -> halt.");
+          while (1) {};
+        }
+        String sname = name + "-temperatures";
+        sensors.openCSV(sdcard, sname.c_str());
+        aidata.start();
+        file.start();
+        restarts++;
+      }
       openNextFile(name);
     }
   }
@@ -181,6 +213,7 @@ void setup() {
   sensors.start();
   file.start();
   openNextFile(name);
+  delay(5);
 }
 
 
