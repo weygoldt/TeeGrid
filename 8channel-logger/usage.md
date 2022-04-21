@@ -16,16 +16,15 @@ the following libraries:
 1. Download and install Teensyduino and the Arduino IDE, following the
    [installation instructions](https://www.pjrc.com/teensy/td_download.html).
 
-2. The [Arduino Time Library](https://github.com/PaulStoffregen/Time)
-   and [ADC](https://github.com/pedvide/ADC) libraries are already
-   included in
+2. Make sure that you also install the [Arduino Time
+   Library](https://github.com/PaulStoffregen/Time),
+   [ADC](https://github.com/pedvide/ADC), [SdFat
+   version2](https://github.com/greiman/SdFat), and
+   [Bounce2](https://github.com/thomasfredericks/Bounce2) libraries
+   during the installation process of
    [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
-3. For installing [SdFat version2](https://github.com/greiman/SdFat)
-   open in the Arduino IDE `Tools` - `Manage libraries`. Search for
-   SdFat and install or update it.
-
-4. For [TeeRec](https://github.com/janscience/TeeRec) clone the
+3. For [TeeRec](https://github.com/janscience/TeeRec) clone the
    repository into `Arduino/libraries/`:
    ```sh
    cd Arduino/libraries
@@ -40,10 +39,10 @@ the following libraries:
     unzip ~/Downloads/TeeRec-main.zip
     ```
 
-5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
+4. Close the Arduino IDE and open it again. Then the Arduino IDE knows
    about the newly installed libraries.
 
-6. Clone TeeGrid into `Arduino/`
+5. Clone TeeGrid into `Arduino/`
    ```sh
    cd Arduino/
    git clone https://github.com/janscience/TeeGrid.git
@@ -58,13 +57,13 @@ the following libraries:
    unzip ~/Downloads/TeeGrid-main.zip
    ```
 
-7. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
+6. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
    Arduino IDE (`File` - `Open`, `Ctrl-O`).
 
-8. Select the right Teensy board: in the menu of the Arduino IDE go to
+7. Select the right Teensy board: in the menu of the Arduino IDE go to
    `Tools` - `Board` - `Teensyduino` and select your Teensy board.
 
-9. Connect the Teensy to the USB. Compile and upload the
+8. Connect the Teensy to the USB. Compile and upload the
    `8channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 
