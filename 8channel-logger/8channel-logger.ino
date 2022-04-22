@@ -1,7 +1,7 @@
 #include <Configurator.h>
 #include <ContinuousADC.h>
 #include <Sensors.h>
-#include <Temperature.h>
+#include <TemperatureDS18x20.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Settings.h>
@@ -39,7 +39,7 @@ const char version[4] = "2.0";
 RTClock rtclock;
 Configurator config;
 ContinuousADC aidata;
-Temperature temp;
+TemperatureDS18x20 temp;
 Sensors sensors(rtclock);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -114,6 +114,7 @@ bool openNextFile(const String &name) {
 
 
 void setupStorage() {
+  prevname = "";
   if (settings.FileTime > 30)
     blink.setTiming(5000);
   if (file.dataDir(settings.Path))
@@ -192,7 +193,6 @@ void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   rtclock.check();
-  prevname = "";
   setupADC();
   sensors.addSensor(temp);
   sensors.setInterval(sensorsInterval);
