@@ -98,8 +98,7 @@ settings for the data acquisition.
 
 In the second section environmental sensors are configured. Here you
 can specify on which pin the temperature sensor is connected to, and
-at which intervals the environmental data are written into how many a
-csv file.
+at which intervals the environmental data are written into a csv file.
 
 ### File size and naming
 
@@ -142,22 +141,19 @@ The content of the configuration file should look like this:
 # Configuration file for TeeGrid logger unit.
 
 Settings:
-  Path        : recordings  # path where to store data
-  FileName    : grid1-SDATETIME  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM; the wav extension is added by the sketch.
-  FileTime    : 10min       # s, min, or h
-  InitialDelay: 10s         # ms, s, or min
+  Path           : recordings  # path where to store data
+  FileName       : grid1-SDATETIME  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM; the wav extension is added by the sketch.
+  FileTime       : 10min       # s, min, or h
+  InitialDelay   : 10s         # ms, s, or min
+  SensorsInterval: 10s         # ms, s, or min
 
 ADC:
-  SamplingRate: 20kHz       # Hz, kHz, MHz
+  SamplingRate: 20kHz          # Hz, kHz, MHz
   Averaging   : 4
   Conversion  : high
   Sampling    : high
   Resolution  : 12bit
   Reference   : 3.3V
-
-Sensors:
-  WriteInterval: 10s        # ms, s, or min
-  DS18X20-Pin  : 10         # set to "none" or -1 to disable temperature logging.
 ``` 
 
 Everything behind '#' is a comment. All lines without a colon are

@@ -34,17 +34,17 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ------------------------------------------------------------------------------------------
 
-const char version[4] = "2.0";
+const char version[4] = "2.2";
 
 RTClock rtclock;
 Configurator config;
 ContinuousADC aidata;
-TemperatureDS18x20 temp;
-Sensors sensors(rtclock);
+Sensors sensors;
+TemperatureDS18x20 temp(&sensors);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
-                  0.0, initialDelay);
+                  0.0, initialDelay, sensorsInterval);
 String prevname; // previous file name
 Blink blink(LED_BUILTIN);
 
@@ -64,9 +64,9 @@ void setupADC() {
 
 
 void setupSensors() {
-  if (!temp.available() && !temp.configured() && tempPin >= 0)
-    temp.begin(tempPin);
+  temp.begin(tempPin);
   temp.setName("Twater");
+  sensors.setInterval(settings.SensorsInterval);
   sensors.report();
   Serial.println();
 }
@@ -194,8 +194,6 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   rtclock.check();
   setupADC();
-  sensors.addSensor(temp);
-  sensors.setInterval(sensorsInterval);
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
