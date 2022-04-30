@@ -9,7 +9,7 @@ the following libraries:
 - [ADC](https://github.com/pedvide/ADC)
 - [SdFat version2](https://github.com/greiman/SdFat)
 - [TeeRec](https://github.com/janscience/TeeRec) library.
-
+- [Sensors](https://github.com/janscience/Sensors) library.
 
 ## Installation
 
@@ -39,10 +39,12 @@ the following libraries:
     unzip ~/Downloads/TeeRec-main.zip
     ```
 
-4. Close the Arduino IDE and open it again. Then the Arduino IDE knows
+4. Same for the [Sensors](https://github.com/janscience/Sensors) library.
+
+5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
    about the newly installed libraries.
 
-5. Clone TeeGrid into `Arduino/`
+6. Clone TeeGrid into `Arduino/`
    ```sh
    cd Arduino/
    git clone https://github.com/janscience/TeeGrid.git
@@ -57,13 +59,13 @@ the following libraries:
    unzip ~/Downloads/TeeGrid-main.zip
    ```
 
-6. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
+7. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
    Arduino IDE (`File` - `Open`, `Ctrl-O`).
 
-7. Select the right Teensy board: in the menu of the Arduino IDE go to
+8. Select the right Teensy board: in the menu of the Arduino IDE go to
    `Tools` - `Board` - `Teensyduino` and select your Teensy board.
 
-8. Connect the Teensy to the USB. Compile and upload the
+9. Connect the Teensy to the USB. Compile and upload the
    `8channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 
@@ -94,13 +96,7 @@ serial monitor and the performance before using the logger! See
 for various sketches and tools that help you to select the best
 settings for the data acquisition.
 
-### Environmental sensors
-
-In the second section environmental sensors are configured. Here you
-can specify on which pin the temperature sensor is connected to, and
-at which intervals the environmental data are written into a csv file.
-
-### File size and naming
+### File size and naming, sensor readings
 
 The third section is about the files that store the data on the SD
 card.  The files are stored in a directory whose name is specified by
@@ -123,6 +119,8 @@ each file. The default is 10min.
 
 `initialDelay` specifies an initial delay right after start up the
 sketch waits before starting to store data on SD card.
+
+`sensorsInterval` specifies at which intervals the environmental data are written into a csv file.
 
 Once you modified the sketch to your needs, compile and upload it to
 the Teensy (`Ctrl-U`).
@@ -181,13 +179,13 @@ In a shell you might generate this file via
 ``` sh
 date +%FT%T > settime.cfg
 ```
-and then editing the file to some time in the near future.
+and then edit this file to some time in the near future.
 
-Then insert the SD card into the Teensy. Start the Teensy by
-connecting it to power. On start up the
-[`8channel-logger.ino`](8channel-logger.ino) sketch reads in the
-`settime.cfg` file, sets the real-time clock to this time, and then
-deletes the file to avoid resetting the time at the next start up.
+Insert the SD card into the Teensy. Start the Teensy by connecting it
+to power. On start up the [`8channel-logger.ino`](8channel-logger.ino)
+sketch reads in the `settime.cfg` file, sets the real-time clock to
+this time, and then deletes the file from the SD card to avoid
+resetting the time at the next start up.
 
 
 ## Logging
@@ -242,5 +240,5 @@ directory specified by `Path` with names `FileName`.wav .
 
 Sensor data (currently only water temperature) are stored in the same
 directory as an csv file with name `FileName`-temperatures.csv .
-First column is a time stamp in ISO date/time formar. Second column is
+First column is a time stamp in ISO date/time format. Second column is
 the water temperature in degrees celsius.

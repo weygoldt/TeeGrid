@@ -176,7 +176,7 @@ void storeData() {
       }
       if (samples == -3) {
         String sname = name + "-temperatures";
-        sensors.openCSV(sdcard, sname.c_str());
+        sensors.openCSV(sdcard.sdcard(), sname.c_str());
         aidata.start();
         file.start();
       }
@@ -220,7 +220,7 @@ void setup() {
     while (1) {};
   }
   String sname = name + "-temperatures";
-  sensors.openCSV(sdcard, sname.c_str());
+  sensors.openCSV(sdcard.sdcard(), sname.c_str());
   sensors.start();
   file.start();
   openNextFile(name);
