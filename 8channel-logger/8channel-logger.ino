@@ -1,6 +1,6 @@
 #include <Configurator.h>
 #include <ContinuousADC.h>
-#include <Sensors.h>
+#include <ESensors.h>
 #include <TemperatureDS18x20.h>
 #include <SDWriter.h>
 #include <RTClock.h>
@@ -39,7 +39,7 @@ const char version[4] = "2.2";
 RTClock rtclock;
 Configurator config;
 ContinuousADC aidata;
-Sensors sensors;
+ESensors sensors;
 TemperatureDS18x20 temp(&sensors);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -231,7 +231,7 @@ void loop() {
   storeData();
   sensors.update();
   if (file.writeTime() < 0.01 &&
-      sensors.pending())
+      sensors.pendingCSV())
     sensors.writeCSV();
   blink.update();
 }

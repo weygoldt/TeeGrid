@@ -6,7 +6,7 @@
 
 - Water temperature is logged from a [DS18B20 1-wire digital
   thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf)
-  via [Sensors](https://github.com/janscience/Sensors) library.
+  via [ESensors](https://github.com/janscience/ESensors) library.
 
 Designed by Jan Benda in November 2021. Temperature logging added in April 2022.
 

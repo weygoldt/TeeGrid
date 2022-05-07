@@ -9,7 +9,7 @@ the following libraries:
 - [ADC](https://github.com/pedvide/ADC)
 - [SdFat version2](https://github.com/greiman/SdFat)
 - [TeeRec](https://github.com/janscience/TeeRec) library.
-- [Sensors](https://github.com/janscience/Sensors) library.
+- [ESensors](https://github.com/janscience/ESensors) library.
 
 ## Installation
 
@@ -39,7 +39,9 @@ the following libraries:
     unzip ~/Downloads/TeeRec-main.zip
     ```
 
-4. Same for the [Sensors](https://github.com/janscience/Sensors) library.
+4. Same for the [ESensors](https://github.com/janscience/ESensors)
+   library and see [installation
+   instructions](https://github.com/janscience/ESensors/docs/install.md)
 
 5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
    about the newly installed libraries.
