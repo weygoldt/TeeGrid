@@ -24,7 +24,12 @@ the following libraries:
    during the installation process of
    [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
-3. For [TeeRec](https://github.com/janscience/TeeRec) clone the
+3. Install the [ESensors](https://github.com/janscience/ESensors)
+   library with all its dependencies from the Library manager of the
+   Arduino IDE (Tools menu). See also the [ESensors installation
+   instructions](https://github.com/janscience/ESensors/docs/install.md)
+
+4. For [TeeRec](https://github.com/janscience/TeeRec) clone the
    repository into `Arduino/libraries/`:
    ```sh
    cd Arduino/libraries
@@ -38,10 +43,6 @@ the following libraries:
     cd Arduino/libraries
     unzip ~/Downloads/TeeRec-main.zip
     ```
-
-4. Same for the [ESensors](https://github.com/janscience/ESensors)
-   library and see [installation
-   instructions](https://github.com/janscience/ESensors/docs/install.md)
 
 5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
    about the newly installed libraries.
