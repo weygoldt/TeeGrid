@@ -5,8 +5,10 @@
 
 - Water temperature is logged from a [DS18B20 1-wire digital
   thermometer](https://datasheets.maximintegrated.com/en/ds/DS18B20.pdf),
-  air temperature, humidity, and pressure via [Bosch sensortec BME280](https://github.com/janscience/ESensors/docs/chips/bme280.md), and light intensity via
-  [AMS TSL2591](https://github.com/janscience/ESensors/docs/chips/tsl2591.md)
+  air temperature, humidity, and pressure via [Bosch sensortec
+  BME280](https://github.com/janscience/ESensors/blob/main/docs/chips/bme280.md),
+  and light intensity via [AMS
+  TSL2591](https://github.com/janscience/ESensors/blob/main/docs/chips/tsl2591.md)
   via [ESensors](https://github.com/janscience/ESensors) library.
 
 Designed by Jan Benda in May 2022.
@@ -27,7 +29,7 @@ The sketch depends in addition on
 Install [ESensors library](https://github.com/janscience/ESensors)
 from the Library Manager of the Arduino IDE. See also the
 [installation
-instructions](https://github.com/janscience/ESensors/docs/install.md).
+instructions](https://github.com/janscience/ESensors/blob/main/docs/install.md).
 
 
 ## Variables
