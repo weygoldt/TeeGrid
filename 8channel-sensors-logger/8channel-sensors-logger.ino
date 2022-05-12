@@ -37,7 +37,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ------------------------------------------------------------------------------------------
 
-const char version[4] = "2.2";
+const char version[4] = "1.0";
 
 RTClock rtclock;
 Configurator config;
@@ -55,7 +55,7 @@ TemperatureBME280 tempbme(&bme, &sensors);
 HumidityBME280 hum(&bme, &sensors);
 DewPoint dp(&hum, &tempbme, &sensors);
 PressureBME280 pres(&bme, &sensors);
-LightTSL2591 tsl(&Wire);
+LightTSL2591 tsl;
 IRRatioTSL2591 irratio(&tsl, &sensors);
 IlluminanceTSL2591 illum(&tsl, &sensors);
 
