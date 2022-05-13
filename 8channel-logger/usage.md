@@ -9,7 +9,6 @@ the following libraries:
 - [ADC](https://github.com/pedvide/ADC)
 - [SdFat version2](https://github.com/greiman/SdFat)
 - [TeeRec](https://github.com/janscience/TeeRec) library.
-- [ESensors](https://github.com/janscience/ESensors) library.
 
 ## Installation
 
@@ -24,12 +23,7 @@ the following libraries:
    during the installation process of
    [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
-3. Install the [ESensors](https://github.com/janscience/ESensors)
-   library with all its dependencies from the Library manager of the
-   Arduino IDE (Tools menu). See also the [ESensors installation
-   instructions](https://github.com/janscience/ESensors/docs/install.md)
-
-4. For [TeeRec](https://github.com/janscience/TeeRec) clone the
+3. For [TeeRec](https://github.com/janscience/TeeRec) clone the
    repository into `Arduino/libraries/`:
    ```sh
    cd Arduino/libraries
@@ -44,10 +38,10 @@ the following libraries:
     unzip ~/Downloads/TeeRec-main.zip
     ```
 
-5. Close the Arduino IDE and open it again. Then the Arduino IDE knows
+4. Close the Arduino IDE and open it again. Then the Arduino IDE knows
    about the newly installed libraries.
 
-6. Clone TeeGrid into `Arduino/`
+5. Clone TeeGrid into `Arduino/`
    ```sh
    cd Arduino/
    git clone https://github.com/janscience/TeeGrid.git
@@ -62,13 +56,13 @@ the following libraries:
    unzip ~/Downloads/TeeGrid-main.zip
    ```
 
-7. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
+6. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
    Arduino IDE (`File` - `Open`, `Ctrl-O`).
 
-8. Select the right Teensy board: in the menu of the Arduino IDE go to
+7. Select the right Teensy board: in the menu of the Arduino IDE go to
    `Tools` - `Board` - `Teensyduino` and select your Teensy board.
 
-9. Connect the Teensy to the USB. Compile and upload the
+8. Connect the Teensy to the USB. Compile and upload the
    `8channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 
@@ -99,7 +93,7 @@ serial monitor and the performance before using the logger! See
 for various sketches and tools that help you to select the best
 settings for the data acquisition.
 
-### File size and naming, sensor readings
+### File size and naming
 
 The third section is about the files that store the data on the SD
 card.  The files are stored in a directory whose name is specified by
@@ -123,8 +117,6 @@ each file. The default is 10min.
 `initialDelay` specifies an initial delay right after start up the
 sketch waits before starting to store data on SD card.
 
-`sensorsInterval` specifies at which intervals the environmental data are written into a csv file.
-
 Once you modified the sketch to your needs, compile and upload it to
 the Teensy (`Ctrl-U`).
 
@@ -146,7 +138,6 @@ Settings:
   FileName       : grid1-SDATETIME  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM; the wav extension is added by the sketch.
   FileTime       : 10min       # s, min, or h
   InitialDelay   : 10s         # ms, s, or min
-  SensorsInterval: 10s         # ms, s, or min
 
 ADC:
   SamplingRate: 20kHz          # Hz, kHz, MHz
@@ -240,8 +231,3 @@ The on-board LED of the Teensy indicates the following events:
 
 Analog input data are stored on the SD card as wave files in the
 directory specified by `Path` with names `FileName`.wav .
-
-Sensor data (currently only water temperature) are stored in the same
-directory as an csv file with name `FileName`-temperatures.csv .
-First column is a time stamp in ISO date/time format. Second column is
-the water temperature in degrees celsius.

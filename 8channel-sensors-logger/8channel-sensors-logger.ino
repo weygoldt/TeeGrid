@@ -1,5 +1,10 @@
 #include <Configurator.h>
 #include <ContinuousADC.h>
+#include <ESensors.h>
+#include <TemperatureDS18x20.h>
+#include <SenseBME280.h>
+#include <LightTSL2591.h>
+#include <DewPoint.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Settings.h>
@@ -18,6 +23,9 @@ ADC_SAMPLING_SPEED sampls = ADC_SAMPLING_SPEED::HIGH_SPEED;
 int8_t channels0 [] =  {A4, A5, A6, A7, -1, A4, A5, A6, A7, A8, A9};      // input pins for ADC0
 int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pins for ADC1
 
+uint8_t tempPin = 25;                // pin for DATA of thermometer
+float sensorsInterval = 10.0;        // interval between sensors readings in seconds
+
 char path[] = "recordings";          // folder where to store the recordings
 char fileName[] = "grid1-SDATETIME"; // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 float fileSaveTime = 10*60;          // seconds
@@ -29,7 +37,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ------------------------------------------------------------------------------------------
 
-const char version[4] = "2.3";
+const char version[4] = "1.0";
 
 RTClock rtclock;
 Configurator config;
@@ -37,10 +45,21 @@ ContinuousADC aidata;
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
-                  0.0, initialDelay);
-String prevname; // previous file name
+                  0.0, initialDelay, sensorsInterval);
 Blink blink(LED_BUILTIN);
 
+ESensors sensors;
+TemperatureDS18x20 temp(&sensors);
+SenseBME280 bme;
+TemperatureBME280 tempbme(&bme, &sensors);
+HumidityBME280 hum(&bme, &sensors);
+DewPoint dp(&hum, &tempbme, &sensors);
+PressureBME280 pres(&bme, &sensors);
+LightTSL2591 tsl;
+IRRatioTSL2591 irratio(&tsl, &sensors);
+IlluminanceTSL2591 illum(&tsl, &sensors);
+
+String prevname; // previous file name
 int restarts = 0;
 
 
@@ -53,6 +72,30 @@ void setupADC() {
   aidata.setConversionSpeed(convs);
   aidata.setSamplingSpeed(sampls);
   aidata.check();
+}
+
+
+void setupSensors() {
+  temp.begin(tempPin);
+  temp.setName("water temperature", "Tw");
+  Wire1.begin();
+  bme.beginI2C(Wire1, 0x77);
+  tempbme.setName("air temperature", "Ta");
+  hum.setPercent();
+  pres.setHecto();
+  tsl.begin(Wire1);
+  tsl.setGain(LightTSL2591::AUTO_GAIN);
+  irratio.setPercent();
+  sensors.setInterval(sensorsInterval);
+  sensors.setPrintTime(ESensors::ISO_TIME);
+  sensors.report();
+  Serial.println();
+  // init sensors:
+  sensors.start();
+  sensors.read();
+  tsl.setTemperature(bme.temperature());
+  sensors.read();
+  sensors.start();
 }
 
 
@@ -140,6 +183,7 @@ void storeData() {
       if (samples == -3) {
         aidata.stop();
         file.closeWave();
+        sensors.closeCSV();
         char mfs[20];
         sprintf(mfs, "error%d-%d.msg", restarts+1, -samples);
         FsFile mf = sdcard.openWrite(mfs);
@@ -158,6 +202,8 @@ void storeData() {
         }
       }
       if (samples == -3) {
+        String sname = name + "-sensors";
+        sensors.openCSV(sdcard.sdcard(), sname.c_str());
         aidata.start();
         file.start();
       }
@@ -182,6 +228,7 @@ void setup() {
   config.configure(sdcard);
   setupTestSignals(signalPins, pulseFrequency);
   setupStorage();
+  setupSensors();
   aidata.check();
   aidata.start();
   aidata.report();
@@ -199,6 +246,9 @@ void setup() {
     aidata.stop();
     while (1) {};
   }
+  String sname = name + "-sensors";
+  sensors.openCSV(sdcard.sdcard(), sname.c_str());
+  sensors.start();
   file.start();
   openNextFile(name);
 }
@@ -206,5 +256,12 @@ void setup() {
 
 void loop() {
   storeData();
+  if (sensors.update()) {
+    tsl.setTemperature(bme.temperature());
+    sensors.print();
+  }
+  if (file.writeTime() < 0.01 &&
+      sensors.pendingCSV())
+    sensors.writeCSV();
   blink.update();
 }
