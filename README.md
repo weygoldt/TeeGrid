@@ -11,7 +11,14 @@ inspired by Stefan Mucha's
 ## 8-channel logger
 
 Not really a grid yet, but a first step towards it. [Read
-more](8channel-logger/README.md).
+more](8channel-logger/).
+
+
+## 8-channel logger with sensors
+
+A variant of the [8-channel logger](8channel-logger/) that
+supports a variety of environmental sensors. [Read
+more](8channel-sensors-logger/).
 
 
 ## Resources

@@ -23,25 +23,11 @@ the following libraries:
    during the installation process of
    [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html).
 
-3. For [TeeRec](https://github.com/janscience/TeeRec) clone the
-   repository into `Arduino/libraries/`:
-   ```sh
-   cd Arduino/libraries
-   git clone https://github.com/janscience/TeeRec.git
-   ```
+3. Install [TeeRec library](https://github.com/janscience/TeeRec) from
+   the Library Manager of the Arduino IDE. See also the [installation
+   instructions](https://github.com/janscience/TeeRec/blob/main/docs/install.md).
 
-    Alternatively, download the whole repository as a zip archive (open
-    https://github.com/janscience/TeeRec in your browser and click on the
-    green `Code` button). Unpack the zip file:
-    ```sh
-    cd Arduino/libraries
-    unzip ~/Downloads/TeeRec-main.zip
-    ```
-
-4. Close the Arduino IDE and open it again. Then the Arduino IDE knows
-   about the newly installed libraries.
-
-5. Clone TeeGrid into `Arduino/`
+4. Clone TeeGrid into `Arduino/`
    ```sh
    cd Arduino/
    git clone https://github.com/janscience/TeeGrid.git
@@ -56,13 +42,13 @@ the following libraries:
    unzip ~/Downloads/TeeGrid-main.zip
    ```
 
-6. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
+5. Load `Arduino/TeeGrid/8channel-logger/8channel-logger.ino` into the
    Arduino IDE (`File` - `Open`, `Ctrl-O`).
 
-7. Select the right Teensy board: in the menu of the Arduino IDE go to
+6. Select the right Teensy board: in the menu of the Arduino IDE go to
    `Tools` - `Board` - `Teensyduino` and select your Teensy board.
 
-8. Connect the Teensy to the USB. Compile and upload the
+7. Connect the Teensy to the USB. Compile and upload the
    `8channel-logger.ino` sketch by pressing `Ctrl-U`.
 
 

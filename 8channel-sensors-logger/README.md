@@ -21,13 +21,17 @@ See the [documentation of the 8-channel logger](../8channel-logger).
 
 ## Dependencies and Installation
 
-The sketch depends in addition on
+Follow the [installation
+instructions](../8channel-logger/usage.md#installation) for the
+[8-channel logger](../8channel-logger).
+
+In addition to [TeeRec](https://github.com/janscience/TeRec), the
+`8channel-sensors-logger.ino` sketch depends on
 
 - [ESensors](https://github.com/janscience/ESensors) library.
 
-
 Install [ESensors library](https://github.com/janscience/ESensors)
-from the Library Manager of the Arduino IDE. See also the
+from the Library Manager of the Arduino IDE in step 3. See also the
 [installation
 instructions](https://github.com/janscience/ESensors/blob/main/docs/install.md).
 
