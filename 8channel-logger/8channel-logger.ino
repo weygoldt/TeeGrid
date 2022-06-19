@@ -7,7 +7,7 @@
 #include <TestSignals.h>
 
 
-// Default settings: -----------------------------------------------------------------------
+// Default settings: ----------------------------------------------------------
 // (may be overwritten by config file teegrid.cfg)
 
 uint32_t samplingRate = 20000;       // samples per second and channel in Hertz
@@ -27,13 +27,16 @@ float initialDelay = 1.0;            // seconds
 int pulseFrequency = 230;            // Hertz
 int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test signals
 
-// ------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-const char version[4] = "2.3";
+const char version[4] = "2.4";
 
 RTClock rtclock;
 Configurator config;
-ContinuousADC aidata;
+
+DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
+ContinuousADC aidata(AIBuffer, NAIBuffer);
+
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
@@ -167,7 +170,7 @@ void storeData() {
 }
 
 
-// ------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void setup() {
   blink.switchOn();

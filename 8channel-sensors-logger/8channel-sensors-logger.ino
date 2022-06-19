@@ -41,7 +41,10 @@ const char version[4] = "1.0";
 
 RTClock rtclock;
 Configurator config;
-ContinuousADC aidata;
+
+DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
+ContinuousADC aidata(AIBuffer, NAIBuffer);
+
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 Settings settings(path, fileName, fileSaveTime, 100.0,
