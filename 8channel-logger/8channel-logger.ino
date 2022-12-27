@@ -1,5 +1,5 @@
 #include <Configurator.h>
-#include <ContinuousADC.h>
+#include <TeensyADC.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Settings.h>
@@ -35,7 +35,7 @@ RTClock rtclock;
 Configurator config;
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
-ContinuousADC aidata(AIBuffer, NAIBuffer);
+TeensyADC aidata(AIBuffer, NAIBuffer);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
