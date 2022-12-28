@@ -38,7 +38,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "1.0"
+#define VERSION        "1.2"
 
 RTClock rtclock;
 
