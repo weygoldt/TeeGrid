@@ -1,10 +1,11 @@
-#include <Configurator.h>
 #include <TeensyADC.h>
 #include <SDWriter.h>
 #include <RTClock.h>
-#include <Settings.h>
 #include <Blink.h>
 #include <TestSignals.h>
+#include <Configurator.h>
+#include <Settings.h>
+#include <TeensyADCSettings.h>
 
 
 // Default settings: ----------------------------------------------------------
@@ -32,13 +33,15 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 const char version[4] = "2.4";
 
 RTClock rtclock;
-Configurator config;
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
 TeensyADC aidata(AIBuffer, NAIBuffer);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
+
+Configurator config;
+TeensyADCSettings aisettings;
 Settings settings(path, fileName, fileSaveTime, 100.0,
                   0.0, initialDelay);
 String prevname; // previous file name
@@ -185,6 +188,7 @@ void setup() {
   config.configure(sdcard);
   setupTestSignals(signalPins, pulseFrequency);
   setupStorage();
+  aidata.configure(aisettings);
   aidata.check();
   aidata.start();
   aidata.report();
