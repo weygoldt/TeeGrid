@@ -102,7 +102,7 @@ void setupStorage() {
   file.setMaxFileTime(settings.FileTime);
   char ss[30] = "TeeGrid 8channel-logger v";
   strcat(ss, VERSION);
-  file.setSoftware(ss);
+  file.header().setSoftware(ss);
 }
 
 
