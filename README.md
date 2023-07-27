@@ -8,6 +8,13 @@ inspired by Stefan Mucha's
 [EOD-Logger](https://github.com/muchaste/EOD-Logger).
 
 
+## R4-8-channel logger
+
+An 8-channel logger based on [TeensyAmp
+  R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0). [Read
+  more](R4-8channel-logger/).
+
+
 ## 8-channel logger
 
 Not really a grid yet, but a first step towards it. [Read
