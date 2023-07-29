@@ -1,4 +1,4 @@
-//#define SINGLE_FILE_MTP
+#define SINGLE_FILE_MTP
 
 #include <Wire.h>
 #include <ControlPCM186x.h>
@@ -13,29 +13,34 @@
 #endif
 
 // Default settings: ----------------------------------------------------------
-// (may be overwritten by config file teegrid.cfg)
-#define SAMPLING_RATE 48000  // samples per second and channel in Hertz
-#define GAIN 0.0            // dB
+// (may be overwritten by config file logger.cfg)
+#define PREGAIN 1.0           // gain factor of a preamplifier.
+#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
+#define GAIN 20.0            // dB
 
-#define PATH          "recordings"      // folder where to store the recordings
-//#define FILENAME      "grid1-SDATETIME" // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILENAME      "RECORDING" // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10.0  // seconds
-#define INITIAL_DELAY  2.0   // seconds
+#define PATH          "recordings" // folder where to store the recordings
+#ifdef SINGLE_FILE_MTP
+#define FILENAME      "recording"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#else
+#define FILENAME      "SDATELNUM"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#endif
+#define FILE_SAVE_TIME 10   // seconds
+#define INITIAL_DELAY  2.0  // seconds
 
 // ----------------------------------------------------------------------------
 
 #define VERSION        "1.0"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
-TeensyTDM aidata(AIBuffer, NAIBuffer);
 ControlPCM186x pcm1(PCM186x_I2C_ADDR1);
+ControlPCM186x pcm2(PCM186x_I2C_ADDR2);
+TeensyTDM aidata(AIBuffer, NAIBuffer);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 
 Configurator config;
-Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 100.0,
+Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 RTClock rtclock;
 String prevname; // previous file name
@@ -90,7 +95,6 @@ void openNextFile(const String &name) {
 
 
 void setupStorage() {
-  prevname = "";
   if (settings.FileTime > 30)
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(settings.Path))
@@ -140,11 +144,14 @@ void storeData() {
       file.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
       blink.clear();
+      Serial.println();
+      Serial.println("MTP file transfer.");
+      Serial.flush();
       MTP.begin();
-      MTP.addFilesystem(sdcard, "Grid");
+      MTP.addFilesystem(sdcard, "logger");
       while (true) {
         MTP.loop();
-	      yield();
+        yield();
       }
 #endif      
       String name = makeFileName();
@@ -166,47 +173,50 @@ void storeData() {
 }
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   rtclock.check();
+  prevname = "";
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
-  config.setConfigFile("teegrid.cfg");
+  config.setConfigFile("logger.cfg");
   config.configure(sdcard);
-  setupStorage();
-  //aidata.configure(aisettings);
+  aidata.setRate(SAMPLING_RATE);
+  aidata.setSwapLR();
+  aidata.begin();
   Wire.begin();
   pcm1.begin();
   pcm1.setMicBias(false, true);
-  //pcm1.setupTDM(ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
-  pcm1.setupTDM(ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
+  //pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
+  pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
   pcm1.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm1.setFilters(ControlPCM186x::FIR, false);
-  char ws[30];
-  pcm1.channelsStr(ws);
-  file.header().setChannels(ws);
-  pcm1.gainStr(ControlPCM186x::ADC1L, ws);
-  file.header().setGain(ws);
-  aidata.setResolution(32);
-  aidata.setRate(SAMPLING_RATE);
-  aidata.setNChannels(4);   // TODO: take it from pcm!
-  aidata.begin();
+  pcm2.begin();
+  pcm2.setMicBias(false, true);
+  //pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
+  pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
+  pcm2.setGain(ControlPCM186x::ADCLR, GAIN);
+  pcm1.setFilters(ControlPCM186x::FIR, false);
   aidata.check();
   aidata.start();
   aidata.report();
+  setupStorage();
   blink.switchOff();
   if (settings.InitialDelay >= 2.0) {
     delay(1000);
     blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.InitialDelay) - 1000);
+    blink.delay(uint32_t(1000.0*settings.InitialDelay)-1000);
   }
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
+  char gs[16];
+  pcm1.gainStr(ControlPCM186x::ADC1L, gs, PREGAIN);
+  file.header().setGain(gs);
   String name = makeFileName();
   file.start();
   openNextFile(name);
