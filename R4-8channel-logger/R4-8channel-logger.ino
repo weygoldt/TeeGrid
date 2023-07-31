@@ -16,14 +16,11 @@
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 1.0           // gain factor of a preamplifier.
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
-#define GAIN 20.0            // dB
+#define GAIN 0.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
-#ifdef SINGLE_FILE_MTP
-#define FILENAME      "recording"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#else
-#define FILENAME      "SDATELNUM"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#endif
+#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+//#define FILENAME      "SDATELNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 10   // seconds
 #define INITIAL_DELAY  2.0  // seconds
 
@@ -61,22 +58,17 @@ String makeFileName() {
     Serial.println("WARNING: failed to increment file name.");
     Serial.println("SD card probably not inserted.");
     Serial.println();
+    while (1) { yield(); };
     return "";
   }
   return name;
 }
 
 
-void openNextFile(const String &name) {
+void openNextFile(const String &fname) {
   blink.clear();
-  if (name.length() == 0) {
-    Serial.println();
-    Serial.println("WARNING: no file name.");
-    aidata.stop();
-    while (1) { yield(); };
+  if (fname.length() == 0)
     return;
-  }
-  String fname = name + ".wav";
   char dts[20];
   rtclock.dateTime(dts);
   if (! file.openWave(fname.c_str(), -1, dts)) {
@@ -95,6 +87,7 @@ void openNextFile(const String &name) {
 
 
 void setupStorage() {
+  prevname = "";
   if (settings.FileTime > 30)
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(settings.Path))
@@ -180,7 +173,6 @@ void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   rtclock.check();
-  prevname = "";
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
@@ -192,14 +184,14 @@ void setup() {
   Wire.begin();
   pcm1.begin();
   pcm1.setMicBias(false, true);
-  //pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
-  pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
+  pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
+  //pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
   pcm1.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm1.setFilters(ControlPCM186x::FIR, false);
   pcm2.begin();
   pcm2.setMicBias(false, true);
-  //pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
-  pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
+  pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, true);
+  //pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
   pcm2.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm1.setFilters(ControlPCM186x::FIR, false);
   aidata.check();
