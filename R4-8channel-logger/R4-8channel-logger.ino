@@ -14,9 +14,9 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define PREGAIN 1.0           // gain factor of a preamplifier.
+#define PREGAIN 20.0           // gain factor of preamplifier (1 or 20).
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
-#define GAIN 0.0            // dB
+#define GAIN 40.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
 #define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
@@ -184,14 +184,18 @@ void setup() {
   Wire.begin();
   pcm1.begin();
   pcm1.setMicBias(false, true);
-  pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
-  //pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
+  if (PREGAIN == 1.0)
+    pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
+  else
+    pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
   pcm1.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm1.setFilters(ControlPCM186x::FIR, false);
   pcm2.begin();
   pcm2.setMicBias(false, true);
-  pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, true);
-  //pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
+  if (PREGAIN == 1.0)
+    pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
+  else
+    pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, true);
   pcm2.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm1.setFilters(ControlPCM186x::FIR, false);
   aidata.check();
