@@ -14,9 +14,9 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define PREGAIN 20.0           // gain factor of preamplifier (1 or 20).
+#define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
-#define GAIN 40.0            // dB
+#define GAIN 0.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
 #define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
@@ -26,7 +26,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "1.0"
+#define VERSION        "1.1"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 ControlPCM186x pcm1(PCM186x_I2C_ADDR1);
@@ -166,6 +166,19 @@ void storeData() {
 }
 
 
+void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
+  pcm.begin();
+  pcm.setMicBias(false, true);
+  pcm.setRate(tdm, SAMPLING_RATE);
+  if (PREGAIN == 1.0)
+    pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs);
+  else
+    pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs);
+  pcm.setGain(ControlPCM186x::ADCLR, GAIN);
+  pcm.setFilters(ControlPCM186x::FIR, false);
+}
+
+
 // -----------------------------------------------------------------------------
 
 void setup() {
@@ -180,24 +193,10 @@ void setup() {
   config.configure(sdcard);
   aidata.setRate(SAMPLING_RATE);
   aidata.setSwapLR();
-  aidata.begin();
   Wire.begin();
-  pcm1.begin();
-  pcm1.setMicBias(false, true);
-  if (PREGAIN == 1.0)
-    pcm1.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, false);
-  else
-    pcm1.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, false);
-  pcm1.setGain(ControlPCM186x::ADCLR, GAIN);
-  pcm1.setFilters(ControlPCM186x::FIR, false);
-  pcm2.begin();
-  pcm2.setMicBias(false, true);
-  if (PREGAIN == 1.0)
-    pcm2.setupTDM(aidata, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, true);
-  else
-    pcm2.setupTDM(aidata, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, true);
-  pcm2.setGain(ControlPCM186x::ADCLR, GAIN);
-  pcm1.setFilters(ControlPCM186x::FIR, false);
+  setupPCM(aidata, pcm1, false);
+  setupPCM(aidata, pcm2, true);
+  aidata.begin();
   aidata.check();
   aidata.start();
   aidata.report();
