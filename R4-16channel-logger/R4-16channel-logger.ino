@@ -15,7 +15,7 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
-#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
+#define SAMPLING_RATE 16000 // samples per second and channel in Hertz
 #define GAIN 0.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
@@ -29,11 +29,11 @@
 #define VERSION        "1.0"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
-TeensyTDM aidata(AIBuffer, NAIBuffer, TeensyTDM::TDM1);
-ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1);
-ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2);
-ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1);
-ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2);
+TeensyTDM aidata(AIBuffer, NAIBuffer);
+ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, TeensyTDM::TDM1);
+ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, TeensyTDM::TDM1);
+ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1, TeensyTDM::TDM2);
+ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, TeensyTDM::TDM2);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -44,8 +44,11 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
 RTClock rtclock;
 String prevname; // previous file name
 Blink blink(LED_BUILTIN);
+//Blink blink(31, true);
 
 int restarts = 0;
+
+int counts = 0;
 
 
 String makeFileName() {
@@ -139,6 +142,7 @@ void storeData() {
       file.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
       blink.clear();
+      aidata.stop();
       Serial.println();
       Serial.println("MTP file transfer.");
       Serial.flush();
@@ -173,9 +177,11 @@ void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.setMicBias(false, true);
   pcm.setRate(tdm, SAMPLING_RATE);
   if (PREGAIN == 1.0)
-    pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R, ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs);
+    pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
+                 ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs, true);
   else
-    pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R, ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs);  
+    pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
+                 ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);  
   pcm.setGain(ControlPCM186x::ADCLR, GAIN);
   pcm.setFilters(ControlPCM186x::FIR, false);
 }
