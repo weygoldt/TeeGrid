@@ -1,4 +1,4 @@
-#define SINGLE_FILE_MTP
+//#define SINGLE_FILE_MTP
 
 #include <Wire.h>
 #include <ControlPCM186x.h>
@@ -15,13 +15,13 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
-#define SAMPLING_RATE 16000 // samples per second and channel in Hertz
+#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
 #define GAIN 0.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
-#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "CrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 //#define FILENAME      "SDATELNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10   // seconds
+#define FILE_SAVE_TIME 60   // seconds
 #define INITIAL_DELAY  2.0  // seconds
 
 // ----------------------------------------------------------------------------
@@ -97,7 +97,7 @@ void setupStorage() {
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(settings.Path))
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval();
+  file.setWriteInterval(0.01);
   file.setMaxFileTime(settings.FileTime);
   char ss[40] = "TeeGrid R4-8channel-logger v";
   strcat(ss, VERSION);
@@ -141,15 +141,17 @@ void storeData() {
     if (file.endWrite() || samples < 0) {
       file.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
-      blink.clear();
       aidata.stop();
+      delay(50);
       Serial.println();
       Serial.println("MTP file transfer.");
       Serial.flush();
+      blink.setTriple();
       MTP.begin();
       MTP.addFilesystem(sdcard, "logger");
       while (true) {
         MTP.loop();
+        blink.update();
         yield();
       }
 #endif      
