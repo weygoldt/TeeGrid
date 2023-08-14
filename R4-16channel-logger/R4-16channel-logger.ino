@@ -18,15 +18,15 @@
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
 #define GAIN 0.0            // dB
 
-#define PATH          "recordings" // folder where to store the recordings
-#define FILENAME      "CrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define PATH          "recordings"   // folder where to store the recordings
+#define FILENAME      "FrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 //#define FILENAME      "SDATELNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 60   // seconds
+#define FILE_SAVE_TIME 10*60   // seconds
 #define INITIAL_DELAY  2.0  // seconds
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "1.0"
+#define VERSION        "1.2"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 TeensyTDM aidata(AIBuffer, NAIBuffer);
@@ -48,8 +48,6 @@ Blink blink(LED_BUILTIN);
 
 int restarts = 0;
 
-int counts = 0;
-
 
 String makeFileName() {
   time_t t = now();
@@ -63,6 +61,7 @@ String makeFileName() {
     Serial.println("WARNING: failed to increment file name.");
     Serial.println("SD card probably not inserted.");
     Serial.println();
+    aidata.stop();
     while (1) { yield(); };
     return "";
   }
@@ -97,9 +96,9 @@ void setupStorage() {
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(settings.Path))
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval(0.01);
+  file.setWriteInterval(0.02);
   file.setMaxFileTime(settings.FileTime);
-  char ss[40] = "TeeGrid R4-8channel-logger v";
+  char ss[40] = "TeeGrid R4-16channel-logger v";
   strcat(ss, VERSION);
   file.header().setSoftware(ss);
 }
