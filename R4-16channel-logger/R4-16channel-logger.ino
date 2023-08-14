@@ -15,11 +15,11 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
-#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
+#define SAMPLING_RATE 96000 // samples per second and channel in Hertz
 #define GAIN 0.0            // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "FrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "HrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 //#define FILENAME      "SDATELNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 10*60   // seconds
 #define INITIAL_DELAY  2.0  // seconds
@@ -37,6 +37,7 @@ ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, TeensyTDM::TDM2);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
+String FileName = "";
 
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
@@ -75,6 +76,7 @@ void openNextFile(const String &fname) {
     return;
   char dts[20];
   rtclock.dateTime(dts);
+  Serial.println("new file");
   if (! file.openWave(fname.c_str(), -1, dts)) {
     Serial.println();
     Serial.println("WARNING: failed to open file on SD card.");
@@ -83,6 +85,7 @@ void openNextFile(const String &fname) {
     while (1) { yield(); };
     return;
   }
+  FileName = fname;
   file.write();
   Serial.println(fname);
   blink.setSingle();
@@ -96,7 +99,7 @@ void setupStorage() {
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(settings.Path))
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval(0.02);
+  file.setWriteInterval(2*aidata.DMABufferTime());
   file.setMaxFileTime(settings.FileTime);
   char ss[40] = "TeeGrid R4-16channel-logger v";
   strcat(ss, VERSION);
@@ -105,70 +108,83 @@ void setupStorage() {
 
 
 void storeData() {
-  if (file.pending()) {
-    ssize_t samples = file.write();
-    if (samples <= 0) {
-      blink.clear();
-      Serial.println();
-      Serial.println("ERROR in writing data to file:");
-      switch (samples) {
-        case 0:
-          Serial.println("  Nothing written into the file.");
-          Serial.println("  SD card probably full -> halt");
-          aidata.stop();
-          while (1) {};
-          break;
-        case -1:
-          Serial.println("  File not open.");
-          break;
-        case -2:
-          Serial.println("  File already full.");
-          break;
-        case -3:
-          Serial.println("  No data available, data acquisition probably not running.");
-          break;
-      }
-      if (samples == -3) {
+  if (!file.pending())
+    return;
+  ssize_t samples = file.write();
+  if (samples < 0) {
+    blink.clear();
+    Serial.println();
+    Serial.println("ERROR in writing data to file:");
+    char errorstr[20];
+    switch (samples) {
+      case -1:
+        Serial.println("  File not open.");
+        break;
+      case -2:
+        Serial.println("  File already full.");
+        break;
+      case -3:
         aidata.stop();
-        file.closeWave();
-        char mfs[30];
-        sprintf(mfs, "error%d-%d.msg", restarts+1, -samples);
-        File mf = sdcard.openWrite(mfs);
-        mf.close();
-      }
+        Serial.println("  No data available, data acquisition probably not running.");
+        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*aidata.DMABufferTime(), 1000.0*file.writeTime());
+        strcpy(errorstr, "nodata");
+        delay(20);
+        break;
+      case -4:
+        aidata.stop();
+        Serial.println("  Buffer overrun.");
+        strcpy(errorstr, "overrun");
+        break;
+      case -5:
+        Serial.println("  Nothing written into the file.");
+        Serial.println("  SD card probably full -> halt");
+        aidata.stop();
+        while (1) {};
+        break;
     }
-    if (file.endWrite() || samples < 0) {
+    if (samples <= -3) {
+      aidata.stop();
+      file.closeWave();
+      char mfs[100];
+      sprintf(mfs, "%s-error%d-%s.msg", FileName.substring(0, FileName.length()-4).c_str(), restarts+1, errorstr);
+      Serial.println(mfs);
+      File mf = sdcard.openWrite(mfs);
+      mf.close();
+      Serial.println();
+    }
+  }
+  if (file.endWrite() || samples < 0) {
+    if (samples < 0)
+      file.closeWave();
+    else
       file.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
-      aidata.stop();
-      delay(50);
-      Serial.println();
-      Serial.println("MTP file transfer.");
-      Serial.flush();
-      blink.setTriple();
-      MTP.begin();
-      MTP.addFilesystem(sdcard, "logger");
-      while (true) {
-        MTP.loop();
-        blink.update();
-        yield();
-      }
-#endif      
-      String name = makeFileName();
-      if (samples < 0) {
-        restarts++;
-        if (restarts >= 5) {
-          Serial.println("ERROR: Too many file errors -> halt.");
-          aidata.stop();
-          while (1) { yield(); };
-        }
-      }
-      if (samples == -3) {
-        aidata.start();
-        file.start();
-      }
-      openNextFile(name);
+    aidata.stop();
+    delay(50);
+    Serial.println();
+    Serial.println("MTP file transfer.");
+    Serial.flush();
+    blink.setTriple();
+    MTP.begin();
+    MTP.addFilesystem(sdcard, "logger");
+    while (true) {
+      MTP.loop();
+      blink.update();
+      yield();
     }
+#endif      
+    if (samples < 0) {
+      restarts++;
+      if (restarts >= 5) {
+        Serial.println("ERROR: Too many file errors -> halt.");
+        aidata.stop();
+        while (1) { yield(); };
+      }
+      aidata.start();
+      file.start();
+    }
+    String name = makeFileName();
+    openNextFile(name);
   }
 }
 
