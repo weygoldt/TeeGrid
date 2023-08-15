@@ -19,9 +19,9 @@
 #define GAIN 0.0            // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "HrecNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-//#define FILENAME      "SDATELNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10*60   // seconds
+//#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 2*60   // seconds
 #define INITIAL_DELAY  2.0  // seconds
 
 // ----------------------------------------------------------------------------
@@ -37,7 +37,6 @@ ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, TeensyTDM::TDM2);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
-String FileName = "";
 
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
@@ -85,9 +84,18 @@ void openNextFile(const String &fname) {
     while (1) { yield(); };
     return;
   }
-  FileName = fname;
-  file.write();
-  Serial.println(fname);
+  ssize_t samples = file.write();
+  if (samples == -4) {   // overrun
+    file.start(aidata.nbuffer()/2);   // skip half a buffer
+    file.write();                     // write all available data
+    // report overrun:
+    char mfs[100];
+    sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
+    Serial.println(mfs);
+    File mf = sdcard.openWrite(mfs);
+    mf.close();
+  }
+  Serial.println(file.name());
   blink.setSingle();
   blink.blinkSingle(0, 1000);
 }
@@ -131,7 +139,6 @@ void storeData() {
         delay(20);
         break;
       case -4:
-        aidata.stop();
         Serial.println("  Buffer overrun.");
         strcpy(errorstr, "overrun");
         break;
@@ -143,10 +150,9 @@ void storeData() {
         break;
     }
     if (samples <= -3) {
-      aidata.stop();
       file.closeWave();
       char mfs[100];
-      sprintf(mfs, "%s-error%d-%s.msg", FileName.substring(0, FileName.length()-4).c_str(), restarts+1, errorstr);
+      sprintf(mfs, "%s-error%d-%s.msg", file.baseName().c_str(), restarts+1, errorstr);
       Serial.println(mfs);
       File mf = sdcard.openWrite(mfs);
       mf.close();
@@ -154,10 +160,7 @@ void storeData() {
     }
   }
   if (file.endWrite() || samples < 0) {
-    if (samples < 0)
-      file.closeWave();
-    else
-      file.close();  // file size was set by openWave()
+    file.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
     aidata.stop();
     delay(50);
@@ -180,7 +183,8 @@ void storeData() {
         aidata.stop();
         while (1) { yield(); };
       }
-      aidata.start();
+      if (!aidata.running())
+        aidata.start();
       file.start();
     }
     String name = makeFileName();
