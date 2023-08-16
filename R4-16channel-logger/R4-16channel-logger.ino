@@ -15,8 +15,8 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
-#define SAMPLING_RATE 96000 // samples per second and channel in Hertz
-#define GAIN 0.0            // dB
+#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
+#define GAIN 10.0            // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
 //#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
@@ -26,7 +26,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "1.2"
+#define SOFTWARE      "TeeGrid R4-16channel-logger v1.2"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 TeensyTDM aidata(AIBuffer, NAIBuffer);
@@ -109,9 +109,7 @@ void setupStorage() {
     Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
   file.setWriteInterval(2*aidata.DMABufferTime());
   file.setMaxFileTime(settings.FileTime);
-  char ss[40] = "TeeGrid R4-16channel-logger v";
-  strcat(ss, VERSION);
-  file.header().setSoftware(ss);
+  file.header().setSoftware(SOFTWARE);
 }
 
 
