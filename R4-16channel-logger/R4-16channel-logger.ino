@@ -16,7 +16,7 @@
 // (may be overwritten by config file logger.cfg)
 #define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
-#define GAIN 10.0            // dB
+#define GAIN 20.0            // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
 //#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM

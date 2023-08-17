@@ -1,4 +1,4 @@
-//#define SINGLE_FILE_MTP
+#define SINGLE_FILE_MTP
 
 #include <Wire.h>
 #include <ControlPCM186x.h>
@@ -14,13 +14,14 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
+#define PREGAIN 10.0           // gain factor of preamplifier (1 or 10).
 #define SAMPLING_RATE 48000 // samples per second and channel in Hertz
 #define GAIN 20.0            // dB
 
 #define PATH          "recordings" // folder where to store the recordings
-#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10*60 // seconds
+//#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "test-NUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 10 // seconds
 #define INITIAL_DELAY  2.0   // seconds
 
 // ----------------------------------------------------------------------------
