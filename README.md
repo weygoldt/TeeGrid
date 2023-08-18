@@ -28,6 +28,16 @@ supports a variety of environmental sensors. [Read
 more](8channel-sensors-logger/).
 
 
+## Housings
+
+- [PVC-tube housings](doc/pvc-tube-housing)
+
+
+## Electrodes
+
+- [Stainless-steel electrodes](doc/steel-electrodes)
+
+
 ## Resources
 
 Ideas to solve the syncrhonization problem of multiple loggers:
