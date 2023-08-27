@@ -8,6 +8,7 @@
 #include <Blink.h>
 #include <Configurator.h>
 #include <Settings.h>
+#include <TeensyTDMSettings.h>
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
@@ -41,6 +42,7 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
+TeensyTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
 RTClock rtclock;
 String prevname; // previous file name
 Blink blink(LED_BUILTIN);
@@ -194,14 +196,14 @@ void storeData() {
 void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.begin();
   pcm.setMicBias(false, true);
-  pcm.setRate(tdm, SAMPLING_RATE);
+  pcm.setRate(tdm, aisettings.rate());
   if (PREGAIN == 1.0)
     pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
                  ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs, true);
   else
     pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
                  ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);  
-  pcm.setGain(ControlPCM186x::ADCLR, GAIN);
+  pcm.setGain(aisettings.gain());
   pcm.setFilters(ControlPCM186x::FIR, false);
 }
 
@@ -239,7 +241,7 @@ void setup() {
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
   char gs[16];
-  pcm1.gainStr(ControlPCM186x::ADC1L, gs, PREGAIN);
+  pcm1.gainStr(gs, PREGAIN);
   file.header().setGain(gs);
   String name = makeFileName();
   file.start();
