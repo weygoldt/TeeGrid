@@ -8,6 +8,13 @@ inspired by Stefan Mucha's
 [EOD-Logger](https://github.com/muchaste/EOD-Logger).
 
 
+## R4-16-channel logger
+
+An 16-channel logger based on [TeensyAmp
+  R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1). [Read
+  more](R4-16channel-logger/).
+
+
 ## R4-8-channel logger
 
 An 8-channel logger based on [TeensyAmp
@@ -36,6 +43,12 @@ more](8channel-sensors-logger/).
 ## Electrodes
 
 - [Stainless-steel electrodes](doc/steel-electrodes)
+
+
+## Installation
+
+- [Installation instructions](doc/installation)
+
 
 
 ## Resources
