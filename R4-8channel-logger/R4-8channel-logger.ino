@@ -12,6 +12,7 @@
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
+#include <FileStorage.h>
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
@@ -42,153 +43,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 TeensyTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
 RTClock rtclock;
-String prevname; // previous file name
 Blink blink(LED_BUILTIN);
-
-int restarts = 0;
-
-
-String makeFileName() {
-  time_t t = now();
-  String name = rtclock.makeStr(settings.FileName, t, true);
-  if (name != prevname) {
-    file.sdcard()->resetFileCounter();
-    prevname = name;
-  }
-  name = file.sdcard()->incrementFileName(name);
-  if (name.length() == 0) {
-    Serial.println("WARNING: failed to increment file name.");
-    Serial.println("SD card probably not inserted.");
-    Serial.println();
-    aidata.stop();
-    while (1) { yield(); };
-    return "";
-  }
-  return name;
-}
-
-
-void openNextFile(const String &fname) {
-  blink.clear();
-  if (fname.length() == 0)
-    return;
-  char dts[20];
-  rtclock.dateTime(dts);
-  Serial.println("new file");
-  if (! file.openWave(fname.c_str(), -1, dts)) {
-    Serial.println();
-    Serial.println("WARNING: failed to open file on SD card.");
-    Serial.println("SD card probably not inserted or full -> halt");
-    aidata.stop();
-    while (1) { yield(); };
-    return;
-  }
-  ssize_t samples = file.write();
-  if (samples == -4) {   // overrun
-    file.start(aidata.nbuffer()/2);   // skip half a buffer
-    file.write();                     // write all available data
-    // report overrun:
-    char mfs[100];
-    sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
-    Serial.println(mfs);
-    File mf = sdcard.openWrite(mfs);
-    mf.close();
-  }
-  Serial.println(file.name());
-  blink.setSingle();
-  blink.blinkSingle(0, 1000);
-}
-
-
-void setupStorage() {
-  prevname = "";
-  if (settings.FileTime > 30)
-    blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.Path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval(2*aidata.DMABufferTime());
-  file.setMaxFileTime(settings.FileTime);
-  file.header().setSoftware(SOFTWARE);
-}
-
-
-void storeData() {
-  if (!file.pending())
-    return;
-  ssize_t samples = file.write();
-  if (samples < 0) {
-    blink.clear();
-    Serial.println();
-    Serial.println("ERROR in writing data to file:");
-    char errorstr[20];
-    switch (samples) {
-      case -1:
-        Serial.println("  File not open.");
-        break;
-      case -2:
-        Serial.println("  File already full.");
-        break;
-      case -3:
-        aidata.stop();
-        Serial.println("  No data available, data acquisition probably not running.");
-        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*aidata.DMABufferTime(), 1000.0*file.writeTime());
-        strcpy(errorstr, "nodata");
-        delay(20);
-        break;
-      case -4:
-        Serial.println("  Buffer overrun.");
-        strcpy(errorstr, "overrun");
-        break;
-      case -5:
-        Serial.println("  Nothing written into the file.");
-        Serial.println("  SD card probably full -> halt");
-        aidata.stop();
-        while (1) {};
-        break;
-    }
-    if (samples <= -3) {
-      file.closeWave();
-      char mfs[100];
-      sprintf(mfs, "%s-error%d-%s.msg", file.baseName().c_str(), restarts+1, errorstr);
-      Serial.println(mfs);
-      File mf = sdcard.openWrite(mfs);
-      mf.close();
-      Serial.println();
-    }
-  }
-  if (file.endWrite() || samples < 0) {
-    file.close();  // file size was set by openWave()
-#ifdef SINGLE_FILE_MTP
-    aidata.stop();
-    delay(50);
-    Serial.println();
-    Serial.println("MTP file transfer.");
-    Serial.flush();
-    blink.setTriple();
-    MTP.begin();
-    MTP.addFilesystem(sdcard, "logger");
-    while (true) {
-      MTP.loop();
-      blink.update();
-      yield();
-    }
-#endif      
-    if (samples < 0) {
-      restarts++;
-      if (restarts >= 5) {
-        Serial.println("ERROR: Too many file errors -> halt.");
-        aidata.stop();
-        while (1) { yield(); };
-      }
-      if (!aidata.running())
-        aidata.start();
-      file.start();
-    }
-    String name = makeFileName();
-    openNextFile(name);
-  }
-}
-
 
 void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.begin();
@@ -225,7 +80,7 @@ void setup() {
   aidata.check();
   aidata.start();
   aidata.report();
-  setupStorage();
+  setupStorage(SOFTWARE);
   blink.switchOff();
   if (settings.InitialDelay >= 2.0) {
     delay(1000);
@@ -237,9 +92,8 @@ void setup() {
   char gs[16];
   pcm1.gainStr(gs, PREGAIN);
   file.header().setGain(gs);
-  String name = makeFileName();
   file.start();
-  openNextFile(name);
+  openNextFile();
 }
 
 
