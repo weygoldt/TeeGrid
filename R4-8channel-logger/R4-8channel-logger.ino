@@ -80,7 +80,7 @@ void setup() {
   aidata.check();
   aidata.start();
   aidata.report();
-  setupStorage(SOFTWARE);
+  setupStorage(SOFTWARE, aidata);
   blink.switchOff();
   if (settings.InitialDelay >= 2.0) {
     delay(1000);

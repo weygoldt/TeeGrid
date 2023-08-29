@@ -6,6 +6,7 @@
 #include <Configurator.h>
 #include <Settings.h>
 #include <InputADCSettings.h>
+#include <FileStorage.h>
 
 
 // Default settings: ----------------------------------------------------------
@@ -30,7 +31,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "2.6"
+#define SOFTWARE      "TeeGrid 8channel-logger v2.6"
 
 RTClock rtclock;
 
@@ -41,125 +42,11 @@ SDCard sdcard;
 SDWriter file(sdcard, aidata);
 
 Configurator config;
-InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
+InputADCSettings aisettings(&aidata, SAMPLING_RATE, BITS, AVERAGING,
 			    CONVERSION, SAMPLING, REFERENCE);
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY);
-String prevname; // previous file name
 Blink blink(LED_BUILTIN);
-
-int restarts = 0;
-
-
-String makeFileName() {
-  time_t t = now();
-  String name = rtclock.makeStr(settings.FileName, t, true);
-  if (name != prevname) {
-    file.sdcard()->resetFileCounter();
-    prevname = name;
-  }
-  name = file.sdcard()->incrementFileName(name);
-  if (name.length() == 0) {
-    Serial.println("WARNING: failed to increment file name.");
-    Serial.println("SD card probably not inserted.");
-    Serial.println();
-    return "";
-  }
-  return name;
-}
-
-
-bool openNextFile(const String &name) {
-  blink.clear();
-  if (name.length() == 0)
-    return false;
-  String fname = name + ".wav";
-  char dts[20];
-  rtclock.dateTime(dts);
-  if (! file.openWave(fname.c_str(), -1, dts)) {
-    Serial.println();
-    Serial.println("WARNING: failed to open file on SD card.");
-    Serial.println("SD card probably not inserted or full -> halt");
-    aidata.stop();
-    while (1) {};
-    return false;
-  }
-  file.write();
-  Serial.println(fname);
-  blink.setSingle();
-  blink.blinkSingle(0, 1000);
-  return true;
-}
-
-
-void setupStorage() {
-  prevname = "";
-  if (settings.FileTime > 30)
-    blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.Path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval();
-  file.setMaxFileTime(settings.FileTime);
-  char ss[30] = "TeeGrid 8channel-logger v";
-  strcat(ss, VERSION);
-  file.header().setSoftware(ss);
-}
-
-
-void storeData() {
-  if (file.pending()) {
-    ssize_t samples = file.write();
-    if (samples <= 0) {
-      blink.clear();
-      Serial.println();
-      Serial.println("ERROR in writing data to file:");
-      switch (samples) {
-        case 0:
-          Serial.println("  Nothing written into the file.");
-          Serial.println("  SD card probably full -> halt");
-          aidata.stop();
-          while (1) {};
-          break;
-        case -1:
-          Serial.println("  File not open.");
-          break;
-        case -2:
-          Serial.println("  File already full.");
-          break;
-        case -3:
-          Serial.println("  No data available, data acquisition probably not running.");
-          Serial.println("  sampling rate probably too high,");
-          Serial.println("  given the number of channels, averaging, sampling and conversion speed.");
-          break;
-      }
-      if (samples == -3) {
-        aidata.stop();
-        file.closeWave();
-        char mfs[20];
-        sprintf(mfs, "error%d-%d.msg", restarts+1, -samples);
-        File mf = sdcard.openWrite(mfs);
-        mf.close();
-      }
-    }
-    if (file.endWrite() || samples < 0) {
-      file.close();  // file size was set by openWave()
-      String name = makeFileName();
-      if (samples < 0) {
-        restarts++;
-        if (restarts >= 5) {
-          Serial.println("ERROR: Too many file errors -> halt.");
-          aidata.stop();
-          while (1) {};
-        }
-      }
-      if (samples == -3) {
-        aidata.start();
-        file.start();
-      }
-      openNextFile(name);
-    }
-  }
-}
 
 
 // ----------------------------------------------------------------------------
@@ -175,8 +62,7 @@ void setup() {
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
   setupTestSignals(signalPins, settings.PulseFrequency);
-  setupStorage();
-  aidata.configure(aisettings);
+  setupStorage(SOFTWARE, aidata);
   aidata.check();
   aidata.start();
   aidata.report();
@@ -188,14 +74,8 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
-  String name = makeFileName();
-  if (name.length() == 0) {
-    Serial.println("-> halt");
-    aidata.stop();
-    while (1) {};
-  }
   file.start();
-  openNextFile(name);
+  openNextFile();
 }
 
 

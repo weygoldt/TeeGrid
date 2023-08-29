@@ -38,7 +38,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 // ----------------------------------------------------------------------------
 
-#define VERSION        "1.2"
+#define SOFTWARE      "TeeGrid 8channel-sensors-logger v1.2"
 
 RTClock rtclock;
 
@@ -94,6 +94,18 @@ void setupSensors() {
 }
 
 
+void setupStorage() {
+  prevname = "";
+  if (settings.FileTime > 30)
+    blink.setTiming(5000);
+  if (file.sdcard()->dataDir(settings.Path))
+    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
+  file.setWriteInterval();
+  file.setMaxFileTime(settings.FileTime);
+  file.header().setSoftware(SOFTWARE);
+}
+
+
 String makeFileName() {
   time_t t = now();
   String name = rtclock.makeStr(settings.FileName, t, true);
@@ -132,20 +144,6 @@ bool openNextFile(const String &name) {
   blink.setSingle();
   blink.blinkSingle(0, 1000);
   return true;
-}
-
-
-void setupStorage() {
-  prevname = "";
-  if (settings.FileTime > 30)
-    blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.Path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
-  file.setWriteInterval();
-  file.setMaxFileTime(settings.FileTime);
-  char ss[40] = "TeeGrid 8channel-sensors-logger v";
-  strcat(ss, VERSION);
-  file.header().setSoftware(ss);
 }
 
 
