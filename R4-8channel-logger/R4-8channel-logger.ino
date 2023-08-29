@@ -2,13 +2,13 @@
 
 #include <Wire.h>
 #include <ControlPCM186x.h>
-#include <TeensyTDM.h>
+#include <InputTDM.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Blink.h>
 #include <Configurator.h>
 #include <Settings.h>
-#include <TeensyTDMSettings.h>
+#include <InputTDMSettings.h>
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
@@ -33,7 +33,7 @@
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 ControlPCM186x pcm1(PCM186x_I2C_ADDR1);
 ControlPCM186x pcm2(PCM186x_I2C_ADDR2);
-TeensyTDM aidata(AIBuffer, NAIBuffer);
+InputTDM aidata(AIBuffer, NAIBuffer);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -41,11 +41,11 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-TeensyTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
+InputTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
 RTClock rtclock;
 Blink blink(LED_BUILTIN);
 
-void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
+void setupPCM(InputTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.begin();
   pcm.setMicBias(false, true);
   pcm.setRate(tdm, aisettings.rate());

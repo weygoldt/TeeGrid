@@ -2,13 +2,13 @@
 
 #include <Wire.h>
 #include <ControlPCM186x.h>
-#include <TeensyTDM.h>
+#include <InputTDM.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Blink.h>
 #include <Configurator.h>
 #include <Settings.h>
-#include <TeensyTDMSettings.h>
+#include <InputTDMSettings.h>
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
@@ -31,11 +31,11 @@
 #define SOFTWARE      "TeeGrid R4-16channel-logger v1.2"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
-TeensyTDM aidata(AIBuffer, NAIBuffer);
-ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, TeensyTDM::TDM1);
-ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, TeensyTDM::TDM1);
-ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1, TeensyTDM::TDM2);
-ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, TeensyTDM::TDM2);
+InputTDM aidata(AIBuffer, NAIBuffer);
+ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, InputTDM::TDM1);
+ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, InputTDM::TDM1);
+ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1, InputTDM::TDM2);
+ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, InputTDM::TDM2);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -43,13 +43,13 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-TeensyTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
+InputTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
 RTClock rtclock;
 Blink blink(LED_BUILTIN);
 //Blink blink(31, true);
 
 
-void setupPCM(TeensyTDM &tdm, ControlPCM186x &pcm, bool offs) {
+void setupPCM(InputTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.begin();
   pcm.setMicBias(false, true);
   pcm.setRate(tdm, aisettings.rate());

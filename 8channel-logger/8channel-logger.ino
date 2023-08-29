@@ -1,11 +1,11 @@
-#include <TeensyADC.h>
+#include <InputADC.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Blink.h>
 #include <TestSignals.h>
 #include <Configurator.h>
 #include <Settings.h>
-#include <TeensyADCSettings.h>
+#include <InputADCSettings.h>
 
 
 // Default settings: ----------------------------------------------------------
@@ -35,14 +35,14 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 RTClock rtclock;
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
-TeensyADC aidata(AIBuffer, NAIBuffer, channels0, channels1);
+InputADC aidata(AIBuffer, NAIBuffer, channels0, channels1);
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 
 Configurator config;
-TeensyADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
-			     CONVERSION, SAMPLING, REFERENCE);
+InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
+			    CONVERSION, SAMPLING, REFERENCE);
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY);
 String prevname; // previous file name
