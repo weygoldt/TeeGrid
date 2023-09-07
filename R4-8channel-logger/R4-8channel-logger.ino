@@ -1,5 +1,3 @@
-#define SINGLE_FILE_MTP
-
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
@@ -9,9 +7,6 @@
 #include <Configurator.h>
 #include <Settings.h>
 #include <InputTDMSettings.h>
-#ifdef SINGLE_FILE_MTP
-#include <MTP_Teensy.h>
-#endif
 #include <FileStorage.h>
 
 // Default settings: ----------------------------------------------------------
