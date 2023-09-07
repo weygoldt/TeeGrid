@@ -11,14 +11,14 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define PREGAIN 10.0           // gain factor of preamplifier (1 or 20).
-#define SAMPLING_RATE 48000 // samples per second and channel in Hertz
-#define GAIN 20.0            // dB
+#define NCHANNELS     8        // number of channels (4, 8, 12, 16)
+#define PREGAIN       10.0     // gain factor of preamplifier (1 or 10).
+#define SAMPLING_RATE 48000    // samples per second and channel in Hertz
+#define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-//#define FILENAME      "recNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 2*60   // seconds
+#define FILE_SAVE_TIME 10   // seconds
 #define INITIAL_DELAY  2.0  // seconds
 
 // ----------------------------------------------------------------------------
@@ -27,10 +27,12 @@
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 InputTDM aidata(AIBuffer, NAIBuffer);
+#define NPCMS 4
 ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, InputTDM::TDM1);
 ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, InputTDM::TDM1);
 ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1, InputTDM::TDM2);
 ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, InputTDM::TDM2);
+ControlPCM186x *pcms[NPCMS] = {&pcm1, &pcm2, &pcm3, &pcm4};
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -44,18 +46,30 @@ Blink blink(LED_BUILTIN);
 //Blink blink(31, true);
 
 
-void setupPCM(InputTDM &tdm, ControlPCM186x &pcm, bool offs) {
+bool setupPCM(InputTDM &tdm, ControlPCM186x &pcm, bool offs) {
   pcm.begin();
-  pcm.setMicBias(false, true);
+  bool r = pcm.setMicBias(false, true);
+  Serial.printf("setMic %d\n", r);
+  if (!r)
+    return false;
   pcm.setRate(tdm, aisettings.rate());
-  if (PREGAIN == 1.0)
-    pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
-                 ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs, true);
-  else
-    pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
-                 ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);  
+  if (tdm.nchannels() < NCHANNELS) {
+    if (PREGAIN == 1.0)
+      pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
+                   ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs, true);
+    else
+      pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
+                   ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);
+  }
+  else {
+    // channels not recorded:
+    pcm.setupTDM(ControlPCM186x::CH1L, ControlPCM186x::CH1R,
+                 ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);
+    // need to shutdown this PCM
+  }
   pcm.setGain(aisettings.gain());
   pcm.setFilters(ControlPCM186x::FIR, false);
+  return true;
 }
 
 
@@ -74,10 +88,10 @@ void setup() {
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
-  setupPCM(aidata, pcm1, false);
-  setupPCM(aidata, pcm2, true);
-  setupPCM(aidata, pcm3, false);
-  setupPCM(aidata, pcm4, true);
+  for (int k=0;k < NPCMS; k++) {
+    Serial.printf("Set up PCM %d\n", k);
+    setupPCM(aidata, *pcms[k], k%2==1);
+  }
   aidata.begin();
   aidata.check();
   aidata.start();

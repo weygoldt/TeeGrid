@@ -8,18 +8,11 @@ inspired by Stefan Mucha's
 [EOD-Logger](https://github.com/muchaste/EOD-Logger).
 
 
-## R4-16-channel logger
+## R4 logger
 
-An 16-channel logger based on [TeensyAmp
-  R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1). [Read
-  more](R4-16channel-logger/).
-
-
-## R4-8-channel logger
-
-An 8-channel logger based on [TeensyAmp
-  R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0). [Read
-  more](R4-8channel-logger/).
+Logger for 4 to 16 channels based on [TeensyAmp
+  R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0), [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1), or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2). [Read
+  more](R4-logger/).
 
 
 ## 8-channel logger
