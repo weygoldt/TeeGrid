@@ -1,6 +1,6 @@
-# R4 logger
+# R4.x logger
 
-Logger for 4 to 16 channels based on [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
+Logger for 2 to 16 channels based on [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
   connected to a [Teensy 4.1](https://www.pjrc.com/store/teensy41.html).
 
 Designed by Jan Benda in September 2023.

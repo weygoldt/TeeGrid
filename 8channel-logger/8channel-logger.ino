@@ -62,7 +62,6 @@ void setup() {
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
   setupTestSignals(signalPins, settings.PulseFrequency);
-  setupStorage(SOFTWARE, aidata);
   aidata.check();
   aidata.start();
   aidata.report();
@@ -74,7 +73,7 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*settings.InitialDelay));
-  file.start();
+  setupStorage(SOFTWARE, aidata);
   openNextFile();
 }
 

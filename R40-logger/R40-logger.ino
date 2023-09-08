@@ -11,9 +11,9 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define NCHANNELS     8        // number of channels (2, 4, 8)
-#define PREGAIN       10.0     // gain factor of preamplifier (1 or 10).
-#define SAMPLING_RATE 96000    // samples per second and channel in Hertz
+#define NCHANNELS     8        // number of channels (2, 4, 6, 8)
+#define PREGAIN       1.0     // gain factor of preamplifier (1 or 10).
+#define SAMPLING_RATE 48000    // samples per second and channel in Hertz
 #define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
@@ -26,12 +26,13 @@
 #define SOFTWARE      "TeeGrid R40-logger v1.4"
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
-//EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 32*512*256)
+//EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
 InputTDM aidata(AIBuffer, NAIBuffer);
 #define NPCMS 2
 ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, InputTDM::TDM1);
 ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, InputTDM::TDM1);
 ControlPCM186x *pcms[NPCMS] = {&pcm1, &pcm2};
+ControlPCM186x *pcm = 0;
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -45,35 +46,50 @@ Blink blink(LED_BUILTIN);
 //Blink blink(31, true);
 
 
-bool setupPCM(InputTDM &tdm, ControlPCM186x &pcm, bool offs) {
-  pcm.begin();
-  bool r = pcm.setMicBias(false, true);
-  if (!r)
+bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
+  cpcm.begin();
+  bool r = cpcm.setMicBias(false, true);
+  if (!r) {
+    Serial.println("not available");
     return false;
-  pcm.setRate(tdm, aisettings.rate());
+  }
+  cpcm.setRate(tdm, aisettings.rate());
   if (tdm.nchannels() < NCHANNELS) {
     if (NCHANNELS - tdm.nchannels() == 2) {
-      // two channels:
-      if (PREGAIN == 1.0)
-        pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R, offs, true);
-      else
-        pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R, offs, true);
+      if (PREGAIN == 1.0) {
+        cpcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
+	              offs, ControlPCM186x::INVERTED);
+        Serial.println("configured for 2 channels without preamplifier");
+      }
+      else {
+        cpcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
+	              offs, ControlPCM186x::INVERTED);
+        Serial.printf("configured for 2 channels with preamplifier x%.0f\n", PREGAIN);
+      }
     }
     else {
-      // all four channels:
-      if (PREGAIN == 1.0)
-        pcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
-                     ControlPCM186x::CH4L, ControlPCM186x::CH4R, offs, true);
-      else
-        pcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
-                     ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs, true);
+      if (PREGAIN == 1.0) {
+        cpcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
+                      ControlPCM186x::CH4L, ControlPCM186x::CH4R,
+		      offs, ControlPCM186x::INVERTED);
+        Serial.println("configured for 4 channels without preamplifier");
+      }
+      else {
+        cpcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
+                      ControlPCM186x::CH2L, ControlPCM186x::CH2R,
+		      offs, ControlPCM186x::INVERTED);
+        Serial.printf("configured for 4 channels with preamplifier x%.0f\n", PREGAIN);
+      }
     }
-    pcm.setGain(aisettings.gain());
-    pcm.setFilters(ControlPCM186x::FIR, false);
+    cpcm.setSmoothGainChange(false);
+    cpcm.setGain(aisettings.gain());
+    cpcm.setFilters(ControlPCM186x::FIR, false);
+    pcm = &cpcm;
   }
   else {
     // channels not recorded:
-    pcm.powerdown();
+    cpcm.powerdown();
+    Serial.println("powered down");
   }
   return true;
 }
@@ -94,13 +110,15 @@ void setup() {
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
-  for (int k=0;k < NPCMS; k++)
+  for (int k=0;k < NPCMS; k++) {
+    Serial.printf("Setup PCM186x %d: ", k);
     setupPCM(aidata, *pcms[k], k%2==1);
+  }
+  Serial.println();
   aidata.begin();
   aidata.check();
   aidata.start();
   aidata.report();
-  setupStorage(SOFTWARE, aidata);
   blink.switchOff();
   if (settings.InitialDelay >= 2.0) {
     delay(1000);
@@ -111,8 +129,7 @@ void setup() {
     delay(uint32_t(1000.0*settings.InitialDelay));
   char gs[16];
   pcm1.gainStr(gs, PREGAIN);
-  file.header().setGain(gs);
-  file.start();
+  setupStorage(SOFTWARE, aidata, gs);
   openNextFile();
 }
 

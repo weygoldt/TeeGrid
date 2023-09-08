@@ -7,7 +7,7 @@
 #define FileStorage_h
 
 
-void setupStorage(const char *software, Input &aidata);
+void setupStorage(const char *software, Input &aidata, char *gainstr=0);
 void openNextFile();
 void storeData();
 

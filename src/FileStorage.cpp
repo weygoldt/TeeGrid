@@ -23,7 +23,7 @@ String prevname; // previous file name
 Input *aiinput = 0;
 
 
-void setupStorage(const char *software, Input &aidata) {
+void setupStorage(const char *software, Input &aidata, char *gainstr) {
   prevname = "";
   restarts = 0;
   aiinput = &aidata;
@@ -34,6 +34,9 @@ void setupStorage(const char *software, Input &aidata) {
   file.setWriteInterval(2*aiinput->DMABufferTime());
   file.setMaxFileTime(settings.FileTime);
   file.header().setSoftware(software);
+  if (gainstr != 0)
+    file.header().setGain(gainstr);
+  file.start();
 }
 
 
@@ -56,7 +59,6 @@ void openNextFile() {
   }
   char dts[20];
   rtclock.dateTime(dts, t);
-  Serial.println("new file");
   if (! file.openWave(fname.c_str(), -1, dts)) {
     Serial.println();
     Serial.println("WARNING: failed to open file on SD card.");
