@@ -10,9 +10,17 @@ inspired by Stefan Mucha's
 
 ## R4 logger
 
-Logger for 4 to 16 channels based on [TeensyAmp
-  R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0), [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1), or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2). [Read
-  more](R4-logger/).
+Logger for 2 to 16 channels based on
+[R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or
+[R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2). [Read
+more](R4-logger/).
+
+
+## R40 logger
+
+Logger for 2 to 8 channels based on [TeensyAmp
+  R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0). [Read
+  more](R40-logger/).
 
 
 ## 8-channel logger
