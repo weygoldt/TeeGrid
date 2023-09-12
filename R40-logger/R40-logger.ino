@@ -10,7 +10,7 @@
 #include <FileStorage.h>
 
 // Default settings: ----------------------------------------------------------
-// (may be overwritten by config file logger.cfg)
+// (may be overwritten by config file teegrid.cfg)
 #define NCHANNELS     8        // number of channels (2, 4, 6, 8)
 #define PREGAIN       10.0     // gain factor of preamplifier (1 or 10).
 #define SAMPLING_RATE 48000    // samples per second and channel in Hertz
@@ -40,7 +40,7 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-InputTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
+InputTDMSettings aisettings(&aidata, SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
 Blink blink(LED_BUILTIN);
 //Blink blink(31, true);
@@ -54,8 +54,8 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
     return false;
   }
   cpcm.setRate(tdm, aisettings.rate());
-  if (tdm.nchannels() < NCHANNELS) {
-    if (NCHANNELS - tdm.nchannels() == 2) {
+  if (tdm.nchannels() < aisettings.nchannels()) {
+    if (aisettings.nchannels() - tdm.nchannels() == 2) {
       if (PREGAIN == 1.0) {
         cpcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
 	              offs, ControlPCM186x::INVERTED);
@@ -105,7 +105,7 @@ void setup() {
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
-  config.setConfigFile("logger.cfg");
+  config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
   aidata.setSwapLR();
   Wire.begin();
