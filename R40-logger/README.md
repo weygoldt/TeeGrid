@@ -115,7 +115,7 @@ The content of the configuration file should look like this:
 
 Settings:
   Path           : recordings  # path where to store data
-  FileName       : grid1-SDATETIME  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM; the wav extension is added by the sketch.
+  FileName       : grid1-SDATETIME.wav  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM.
   FileTime       : 10min       # s, min, or h
   InitialDelay   : 10s         # ms, s, or min
 
