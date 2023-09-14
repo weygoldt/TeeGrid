@@ -5,10 +5,6 @@
 //FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> can;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> can;
 
-CAN_message_t msg;
-int msg_id = 0;
-elapsedMillis time_passed;
-
 
 //void canSniff(const CANFD_message_t &msg) {
 void canSniff(const CAN_message_t &msg) {
@@ -42,14 +38,4 @@ void setup() {
 
 void loop() {
   can.events();
-  if (time_passed > 2000) {
-    msg.id = msg_id;
-    sprintf((char *)msg.buf, "ID%d", msg_id);
-    int r = can.write(msg);
-    Serial.printf("write message id=%d, r=%d\n", msg_id, r);
-    msg_id++;
-    if (msg_id > 4)
-      msg_id = 0;
-    time_passed = 0;
-  }
 }
