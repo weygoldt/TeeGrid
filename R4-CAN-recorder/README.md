@@ -6,4 +6,4 @@ R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1),
 optionally expanded by [Teensy_amp
 R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2).  This
 is the code for each of the recorders. For controlling the recorders,
-see [CAN-controller](../CAN-controller).
+see [R4-CAN-controller](../R4-CAN-controller).
