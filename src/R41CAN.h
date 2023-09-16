@@ -3,8 +3,8 @@
 
 #include <CANBase.h>
 
-#define CAN_IO_UP_PIN 41
-#define CAN_IO_DOWN_PIN 40
+#define CAN_IO_UP_PIN 40
+#define CAN_IO_DOWN_PIN 41
 
 
 class R41CAN :
@@ -26,8 +26,14 @@ R41CAN::R41CAN() :
   
 void R41CAN::begin() {
   CANBase<FlexCAN_T4FD, CAN3, CANFD_message_t>::begin();
-  //Can.setBaudRate(1000000);
-  #warning need to implement baud rate
+  CANFD_timings_t config;
+  config.clock = CLK_24MHz;
+  config.baudrate = 1000000;
+  config.baudrateFD = 2000000;
+  config.propdelay = 190;
+  config.bus_length = 1;
+  config.sample = 70;
+  Can.setBaudRate(config);
 }
 
 

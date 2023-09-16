@@ -101,6 +101,7 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::detectDevices() {
   Serial.printf("  write got devices message, r=%d\n", r);
   digitalWrite(DownPin, LOW);
   Serial.printf("  got %d devices\n", id-1);
+  Serial.println();
   while (1) {};
   return id - 1;
 }
@@ -123,8 +124,11 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
     delay(10);
   };
   Serial.printf("  got message 0x%02x\n", msg.id);
-  if (msg.id != CAN_ID_CLEAR_DEVICES)
+  if (msg.id != CAN_ID_CLEAR_DEVICES) {
+    Serial.println("  timeout");
+    Serial.println();
     return;
+  }
   DeviceID = 0;
   digitalWrite(DownPin, LOW);
 
@@ -161,6 +165,7 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   };
   digitalWrite(DownPin, LOW);
   Serial.println("  done");
+  Serial.println();
 }
 
 
