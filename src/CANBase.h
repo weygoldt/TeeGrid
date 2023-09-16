@@ -57,6 +57,7 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 void CANBase<CANCLASS, BUS, CAN_MSG>::begin() {
   pinMode(UpPin, INPUT);
   pinMode(DownPin, OUTPUT);
+  digitalWrite(DownPin, LOW);
   Can.begin();
 }
 

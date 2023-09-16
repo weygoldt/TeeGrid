@@ -8,6 +8,7 @@
 #include <Settings.h>
 #include <InputTDMSettings.h>
 #include <FileStorage.h>
+#include <R41CAN.h>
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
@@ -36,6 +37,8 @@ ControlPCM186x pcm3(Wire1, PCM186x_I2C_ADDR1, InputTDM::TDM2);
 ControlPCM186x pcm4(Wire1, PCM186x_I2C_ADDR2, InputTDM::TDM2);
 ControlPCM186x *pcms[NPCMS] = {&pcm1, &pcm2, &pcm3, &pcm4};
 ControlPCM186x *pcm = 0;
+
+R41CAN can;
 
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
@@ -86,6 +89,7 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
 // -----------------------------------------------------------------------------
 
 void setup() {
+  can.powerDown();
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
