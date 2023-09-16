@@ -11,15 +11,22 @@ void R41CAN::begin() {
   pinMode(CAN_SHDN_PIN, OUTPUT);
   digitalWrite(CAN_STB_PIN, LOW);
   digitalWrite(CAN_SHDN_PIN, LOW);
-  CANBase<FlexCAN_T4FD, CAN3, CANFD_message_t>::begin();
+  CAN_BASE::begin();
   CANFD_timings_t config;
   config.clock = CLK_24MHz;
-  config.baudrate = 1000000;
+  config.baudrate = 500000;
   config.baudrateFD = 2000000;
   config.propdelay = 190;
   config.bus_length = 1;
   config.sample = 70;
   Can.setBaudRate(config);
+}
+
+
+int R41CAN::write20(CANFD_message_t &msg) {
+  msg.brs = false;
+  msg.edl = false;
+  return Can.write(msg);
 }
 
 

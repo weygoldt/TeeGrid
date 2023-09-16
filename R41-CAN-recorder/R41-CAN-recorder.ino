@@ -13,6 +13,15 @@ void setup() {
   blink.switchOff();
   can.begin();
   can.assignDevice();
+  if (can.id() == 3)
+    blink.setTriple();
+  else if (can.id() == 2)
+    blink.setDouble();
+  else
+    blink.setSingle();
+  while (1) {
+    blink.update();
+  };
   /*
   can.setMBFilter(REJECT_ALL);
   can.enableMBInterrupts();

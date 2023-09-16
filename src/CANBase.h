@@ -23,6 +23,9 @@ public:
   void begin();
 
   int id() const { return DeviceID; };
+
+  // write CAN2.0 messages (brs = edl = false)
+  virtual int write20(CAN_MSG &msg);
   
   int detectDevices();
   void assignDevice();
@@ -61,6 +64,15 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::begin() {
   Can.begin();
 }
 
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+int CANBase<CANCLASS, BUS, CAN_MSG>::write20(CAN_MSG &msg) {
+  return Can.write(msg);
+}
+
   
 template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
@@ -74,16 +86,17 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::detectDevices() {
   digitalWrite(DownPin, HIGH);
   // clear device IDs:
   msg.id = CAN_ID_CLEAR_DEVICES;
-  int r = Can.write(msg);
+  int r = write20(msg);
   Serial.printf("  write clear message, r=%d\n", r);
-  delay(1000);
+  delay(10);
 
   // assign device IDs:
   int id;
   for (id=1; ; id++) {
     Serial.printf("  check for ID=%d\n", id);
     msg.id = CAN_ID_FIND_DEVICES;
-    int r = Can.write(msg);
+    *(int *)(&msg.buf[0]) = id;
+    int r = write20(msg);
     Serial.printf("    write find message, r=%d\n", r);
     timeout = 0;
     msg.id = 0;
@@ -94,16 +107,19 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::detectDevices() {
       Serial.println("    no device responded");
       break;
     }
-    Serial.printf("    device reported id %d\n", id);
-    delay(100);
+    int devid = *(int *)(&msg.buf[0]);
+    Serial.printf("    device reported id %d\n", devid);
+    if (devid != id)
+      Serial.println("WARNING reported device id does not match expectation!");
+    delay(10);
   }
   msg.id = CAN_ID_GOT_DEVICES;
-  r = Can.write(msg);
+  r = write20(msg);
   Serial.printf("  write got devices message, r=%d\n", r);
   digitalWrite(DownPin, LOW);
+  delay(10);
   Serial.printf("  got %d devices\n", id-1);
   Serial.println();
-  while (1) {};
   return id - 1;
 }
 
@@ -118,7 +134,7 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
 
   Serial.println("Setting up device ID:");
   // clear device IDs:
-  Serial.println("  wait for clear devices command");
+  Serial.printf("  wait for clear devices command 0x%02x\n", CAN_ID_CLEAR_DEVICES);
   timeout = 0;
   msg.id = 0;
   while (!Can.read(msg) && timeout < 100000) {
@@ -134,23 +150,23 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   digitalWrite(DownPin, LOW);
 
   // assign device ID:
-  for (int id=1; ; id++) {
-    Serial.printf("  check for ID=%d\n", id);
+  while (true) {
     timeout = 0;
     msg.id = 0;
-    Serial.printf("    wait for find devices\n");
-    while ((!Can.read(msg) || msg.id == CAN_ID_REPORT_DEVICE) && timeout < 10000) {
+    Serial.printf("  wait for find devices command 0x%02x\n", CAN_ID_FIND_DEVICES);
+    while ((!Can.read(msg) || msg.id == CAN_ID_REPORT_DEVICE) && timeout < 1000) {
       delay(10);
     };
     Serial.printf("    got message 0x%02x\n", msg.id);
     if (msg.id != CAN_ID_FIND_DEVICES)
       break;
     if (digitalRead(UpPin)) {
-      DeviceID = id;
+      DeviceID = *(int *)(&msg.buf[0]);
       Serial.printf("    assign ID %d\n", DeviceID);
       msg.id = CAN_ID_REPORT_DEVICE;
-      int r = Can.write(msg);
-      Serial.printf("    write found message, r=%d\n", r);
+      *(int *)(&msg.buf[0]) = DeviceID;
+      int r = write20(msg);
+      Serial.printf("    write report device message, r=%d\n", r);
       delay(10);
       digitalWrite(DownPin, HIGH);
       break;

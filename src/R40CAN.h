@@ -7,9 +7,10 @@
 #define CAN_IO_UP_PIN 24
 #define CAN_IO_DOWN_PIN 25
 
+#define CAN_BASE CANBase<FlexCAN_T4, CAN2, CAN_message_t>
 
-class R40CAN :
-  public CANBase<FlexCAN_T4, CAN2, CAN_message_t> {
+
+class R40CAN : public CAN_BASE {
   
 public:
 

@@ -9,6 +9,7 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   can.begin();
   can.detectDevices();
+  while (1) {};
   /*
   can.setMBFilter(REJECT_ALL);
   can.enableMBInterrupts();

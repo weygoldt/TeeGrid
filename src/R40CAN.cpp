@@ -7,7 +7,7 @@ R40CAN::R40CAN() :
 
 
 void R40CAN::begin() {
-  CANBase<FlexCAN_T4, CAN2, CAN_message_t>::begin();
+  CAN_BASE::begin();
   Can.setBaudRate(1000000);
 }
 
