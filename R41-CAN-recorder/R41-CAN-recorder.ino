@@ -1,8 +1,10 @@
 #include <Arduino.h>
+#include <RTClock.h>
 #include <Blink.h>
 #include <R41CAN.h>
 
 R41CAN can;
+RTClock rtclock;
 Blink blink(LED_BUILTIN);
 
 
@@ -17,23 +19,16 @@ void setup() {
     blink.setTriple();
   else if (can.id() == 2)
     blink.setDouble();
-  else
+  else if (can.id() == 1)
     blink.setSingle();
-  while (1) {
-    blink.update();
-  };
-  /*
-  can.setMBFilter(REJECT_ALL);
-  can.enableMBInterrupts();
-  can.onReceive(canSniff);
-  can.setMBFilter(MB0, 0x01);
-  can.setMBFilter(MB1, 0x02);
-  can.setMBFilter(MB2, 0x03);
-  can.mailboxStatus();
-  */
+  else
+    blink.switchOff();
+  //can.setupRecorderMBs();
+  can.receiveTime();
 }
 
 
 void loop() {
-  //can.events();
+  can.events();
+  blink.update();
 }

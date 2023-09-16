@@ -1,27 +1,24 @@
 #include <Arduino.h>
+#include <RTClock.h>
 #include <R41CAN.h>
 
 R41CAN can;
+RTClock rtclock;
 
 
 void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
+  char dts[] = "2024-09-16T23:20:42";
+  rtclock.set(dts);
   can.begin();
   can.detectDevices();
-  while (1) {};
-  /*
-  can.setMBFilter(REJECT_ALL);
-  can.enableMBInterrupts();
-  can.onReceive(canSniff);
-  can.setMBFilter(MB0, 0x01);
-  can.setMBFilter(MB1, 0x02);
-  can.setMBFilter(MB2, 0x03);
-  can.mailboxStatus();
-  */
+  //can.setupControllerMBs();
+  delay(100);
+  can.sendTime();
 }
 
 
 void loop() {
-  //can.events();
+  can.events();
 }

@@ -3,11 +3,18 @@
 
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
+#include <RTClock.h>
 
 #define CAN_ID_CLEAR_DEVICES 0x01
 #define CAN_ID_FIND_DEVICES  0x02
 #define CAN_ID_REPORT_DEVICE 0x03
 #define CAN_ID_GOT_DEVICES   0x04
+
+#define CAN_ID_SET_DATE      0x0A
+#define CAN_ID_SET_TIME      0x0B
+
+
+extern RTClock rtclock;
 
 
 template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
@@ -28,12 +35,20 @@ public:
   virtual int write20(CAN_MSG &msg);
   
   int detectDevices();
-  void assignDevice();
+  int assignDevice();
 
+  void setupControllerMBs();
+  void setupRecorderMBs();
 
+  void sendTime();
+  void receiveTime();
+
+  uint64_t events() { return Can.events(); };
+
+  
 protected:
 
-  CANCLASS<BUS, RX_SIZE_256, TX_SIZE_16> Can;
+  CANCLASS<BUS, RX_SIZE_16, TX_SIZE_8> Can;
   uint8_t UpPin;
   uint8_t DownPin;
 
@@ -128,7 +143,7 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
 	  CAN_DEV_TABLE BUS,
 	  typename CAN_MSG>
-void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
+int CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   CAN_MSG msg;
   elapsedMillis timeout;
 
@@ -144,7 +159,7 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   if (msg.id != CAN_ID_CLEAR_DEVICES) {
     Serial.println("  timeout");
     Serial.println();
-    return;
+    return 0;
   }
   DeviceID = 0;
   digitalWrite(DownPin, LOW);
@@ -183,6 +198,118 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   digitalWrite(DownPin, LOW);
   Serial.println("  done");
   Serial.println();
+  return DeviceID;
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::setupControllerMBs() {
+  // Can.setMaxMB(10); only for CAN2.0
+  int i;
+  for (i=0; i<5; i++)
+    Can.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+  /*
+  for (; i<10; i++)
+    Can.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+  */
+  Can.setMBFilter(REJECT_ALL);
+  Can.enableMBInterrupts();
+  //Can.onReceive(MB0, canSniff);
+  //Can.setMBFilter(MB0, 0x001);
+  Can.mailboxStatus();
+}
+
+
+template <typename CAN_MSG>
+void setTime(const CAN_MSG &msg) {
+  time_t t = *(time_t *)(&msg.buf[0]);
+  rtclock.set(t);
+  rtclock.report();
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::setupRecorderMBs() {
+  int i;
+  for (i=0; i<5; i++)
+    Can.setMB((FLEXCAN_MAILBOX)i, RX, STD);
+  /*
+  for (; i<10; i++)
+    Can.setMB((FLEXCAN_MAILBOX)i, TX, STD);
+  */
+  Can.setMBFilter(REJECT_ALL);
+  Can.enableMBInterrupts();
+  Can.onReceive(MB0, setTime);
+  Can.setMBFilter(MB0, CAN_ID_SET_TIME);
+  Can.mailboxStatus();
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::sendTime() {
+  CAN_MSG msg;
+  time_t t = now();
+  char ds[10];
+  rtclock.date(ds, t, true);
+  char ts[10];
+  rtclock.time(ts, t, true);
+  msg.id = CAN_ID_SET_DATE;
+  memcpy((void *)msg.buf, (void *)ds, 8);
+  Can.write(msg);
+  delay(5);
+  msg.id = CAN_ID_SET_TIME;
+  memcpy((void *)msg.buf, (void *)ts, 6);
+  Can.write(msg);
+  Serial.printf("sent date %s and time %s\n", ds, ts);
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::receiveTime() {
+  CAN_MSG msg;
+  elapsedMillis timeout = 0;
+  msg.id = 0;
+  Serial.println("wait for date and time messages");
+  while ((!Can.read(msg) || msg.id != CAN_ID_SET_DATE) && timeout < 1000) {
+    delay(1);
+  };
+  if (msg.id != CAN_ID_SET_DATE)
+    return;
+  char datetime[20];
+  memcpy((void *)&datetime[0], (void *)&msg.buf[0], 4);
+  datetime[4] = '-';
+  memcpy((void *)&datetime[5], (void *)&msg.buf[4], 2);
+  datetime[7] = '-';
+  memcpy((void *)&datetime[8], (void *)&msg.buf[6], 2);
+  timeout = 0;
+  msg.id = 0;
+  while ((!Can.read(msg) || msg.id != CAN_ID_SET_TIME) && timeout < 1000) {
+    delay(1);
+  };
+  if (msg.id != CAN_ID_SET_TIME)
+    return;
+  datetime[10] = 'T';
+  memcpy((void *)&datetime[11], (void *)&msg.buf[0], 2);
+  datetime[13] = ':';
+  memcpy((void *)&datetime[14], (void *)&msg.buf[2], 2);
+  datetime[16] = ':';
+  memcpy((void *)&datetime[17], (void *)&msg.buf[4], 2);
+  datetime[19] = '\0';
+  Serial.printf("received time %s\n", datetime);
+  rtclock.set(datetime);
+  rtclock.report();
 }
 
 
