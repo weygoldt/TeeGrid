@@ -4,8 +4,8 @@
 #include <R41CAN.h>
 
 
-#define GRID              "grid"     // unique name of the grid
-#define SAMPLING_RATE     48000      // sampling rate in Hz
+#define GRID              "gridA"     // unique name of the grid
+#define SAMPLING_RATE     96000      // sampling rate in Hz
 #define GAIN              20.0       // gain in dB
 #define FILE_TIME         10.0       // seconds
 #define INITIAL_DELAY      2.0       // seconds
@@ -22,6 +22,7 @@ void setup() {
   rtclock.set(dts);
   can.begin();
   can.detectDevices();
+  // stop if no device have been found
   //can.setupControllerMBs();
   delay(100);
   can.sendGrid(GRID);
@@ -37,6 +38,9 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*INITIAL_DELAY));
+  can.sendStart();
+  blink.setSingle();
+  blink.delay(5000);
 }
 
 

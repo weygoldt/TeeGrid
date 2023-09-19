@@ -15,6 +15,9 @@
 #define CAN_ID_SET_GRID      0x0C
 #define CAN_ID_SET_RATE      0x0D
 #define CAN_ID_SET_GAIN      0x0E
+#define CAN_ID_SET_FILE_TIME 0x0F
+
+#define CAN_ID_START_REC     0x10
 
 
 extern RTClock rtclock;
@@ -60,6 +63,9 @@ public:
 
   void sendFileTime(float filetime);
   float receiveFileTime();
+
+  void sendStart();
+  void receiveStart();
 
   uint64_t events() { return Can.events(); };
 
@@ -116,7 +122,8 @@ bool CANBase<CANCLASS, BUS, CAN_MSG>::read(CAN_MSG &msg, unsigned int id,
   elapsedMillis timepassed = 0;
   msg.id = 0;
   memset(msg.buf, 0, 8);
-  while ((!Can.read(msg) || msg.id != id) && timepassed < timeout) {
+  while ((!Can.read(msg) || msg.id != id) &&
+	 (timepassed < timeout || timeout == 0)) {
     delay(1);
   };
   return (msg.id == id);
@@ -345,7 +352,6 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::sendGrid(const char gs[8]) {
   msg.id = CAN_ID_SET_GRID;
   strncpy((char *)msg.buf, gs, 7);
   Can.write(msg);
-  delay(5);
   Serial.printf("sent grid name %s\n", gs);
 }
 
@@ -371,7 +377,6 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::sendSamplingRate(int rate) {
   msg.id = CAN_ID_SET_RATE;
   *(int *)(&msg.buf[0]) = rate;
   Can.write(msg);
-  delay(5);
   Serial.printf("sent sampling rate %dHz\n", rate);
 }
 
@@ -398,7 +403,6 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::sendGain(float gain) {
   msg.id = CAN_ID_SET_GAIN;
   *(float *)(&msg.buf[0]) = gain;
   Can.write(msg);
-  delay(5);
   Serial.printf("sent gain %.1fdB\n", gain);
 }
 
@@ -422,10 +426,9 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 	  typename CAN_MSG>
 void CANBase<CANCLASS, BUS, CAN_MSG>::sendFileTime(float filetime) {
   CAN_MSG msg;
-  msg.id = CAN_ID_SET_GAIN;
+  msg.id = CAN_ID_SET_FILE_TIME;
   *(float *)(&msg.buf[0]) = filetime;
   Can.write(msg);
-  delay(5);
   Serial.printf("sent file time %.0fs\n", filetime);
 }
 
@@ -437,9 +440,32 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 float CANBase<CANCLASS, BUS, CAN_MSG>::receiveFileTime() {
   CAN_MSG msg;
   Serial.println("wait for file time message");
-  read(msg, CAN_ID_SET_GAIN);
+  read(msg, CAN_ID_SET_FILE_TIME);
   float filetime = *(float *)(&msg.buf[0]);
   return filetime;
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::sendStart() {
+  CAN_MSG msg;
+  msg.id = CAN_ID_START_REC;
+  Can.write(msg);
+  Serial.println("sent start recording");
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::receiveStart() {
+  CAN_MSG msg;
+  Serial.println("wait for start recording message");
+  read(msg, CAN_ID_START_REC, 0);
 }
 
 

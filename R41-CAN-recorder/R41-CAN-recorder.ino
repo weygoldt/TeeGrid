@@ -126,6 +126,7 @@ void setup() {
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
   setupGridStorage(PATH, SOFTWARE, aidata, gs);
+  can.receiveStart();
   openNextGridFile();
 }
 

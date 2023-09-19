@@ -37,7 +37,8 @@ void setupGridStorage(const char *path, const char *software,
 
 
 void openNextGridFile() {
-  blink.clear();
+  blink.setSingle();
+  blink.blinkSingle(0, 1000);
   time_t t = now();
   String fname = rtclock.makeStr(FileName, t, true);
   if (fname != can_prevname) {
@@ -46,6 +47,7 @@ void openNextGridFile() {
   }
   fname = file.sdcard()->incrementFileName(fname);
   if (fname.length() == 0) {
+    blink.clear();
     Serial.println("WARNING: failed to increment file name.");
     Serial.println("SD card probably not inserted.");
     Serial.println();
@@ -56,6 +58,7 @@ void openNextGridFile() {
   char dts[20];
   rtclock.dateTime(dts, t);
   if (! file.openWave(fname.c_str(), -1, dts)) {
+    blink.clear();
     Serial.println();
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted or full -> halt");
@@ -75,8 +78,6 @@ void openNextGridFile() {
     mf.close();
   }
   Serial.println(file.name());
-  blink.setSingle();
-  blink.blinkSingle(0, 1000);
 }
 
 
