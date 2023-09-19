@@ -14,6 +14,8 @@ R41CAN can;
 RTClock rtclock;
 Blink blink(LED_BUILTIN);
 
+elapsedMillis Time;
+
 
 void setup() {
   Serial.begin(9600);
@@ -38,13 +40,19 @@ void setup() {
   }
   else
     delay(uint32_t(1000.0*INITIAL_DELAY));
+  Time = 0;
   can.sendStart();
   blink.setSingle();
-  blink.delay(5000);
 }
 
 
 void loop() {
   can.events();
   blink.update();
+  if (0.001*Time > FILE_TIME - 0.05) {
+    can.receiveEndFile();
+    can.sendStart();
+    Time = 0;
+    blink.setSingle();
+  }
 }

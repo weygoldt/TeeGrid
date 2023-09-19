@@ -2,9 +2,10 @@
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Blink.h>
+#include <R41CAN.h>
 #include <CANFileStorage.h>
 
-
+extern R41CAN can;
 extern SDCard sdcard;
 extern SDWriter file;
 extern RTClock rtclock;
@@ -32,13 +33,13 @@ void setupGridStorage(const char *path, const char *software,
   file.header().setSoftware(software);
   if (gainstr != 0)
     file.header().setGain(gainstr);
-  file.start();
 }
 
 
 void openNextGridFile() {
-  blink.setSingle();
-  blink.blinkSingle(0, 1000);
+  file.start();
+  blink.setSingle(true);
+  blink.blinkSingle(0, 1000, true);
   time_t t = now();
   String fname = rtclock.makeStr(FileName, t, true);
   if (fname != can_prevname) {
@@ -127,6 +128,7 @@ void storeGridData() {
   }
   if (file.endWrite() || samples < 0) {
     file.close();  // file size was set by openWave()
+    can.sendEndFile();
     if (samples < 0) {
       can_restarts++;
       if (can_restarts >= 5) {
@@ -136,8 +138,8 @@ void storeGridData() {
       }
       if (!can_aiinput->running())
         can_aiinput->start();
-      file.start();
     }
+    can.receiveStart();
     openNextGridFile();
   }
 }

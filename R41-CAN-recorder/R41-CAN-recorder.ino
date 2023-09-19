@@ -127,6 +127,7 @@ void setup() {
   pcm->gainStr(gs, PREGAIN);
   setupGridStorage(PATH, SOFTWARE, aidata, gs);
   can.receiveStart();
+  blink.setSingle();
   openNextGridFile();
 }
 

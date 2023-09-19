@@ -18,6 +18,7 @@
 #define CAN_ID_SET_FILE_TIME 0x0F
 
 #define CAN_ID_START_REC     0x10
+#define CAN_ID_END_FILE      0x11
 
 
 extern RTClock rtclock;
@@ -67,6 +68,9 @@ public:
   void sendStart();
   void receiveStart();
 
+  void sendEndFile();
+  void receiveEndFile();
+
   uint64_t events() { return Can.events(); };
 
   
@@ -77,6 +81,7 @@ protected:
   uint8_t DownPin;
 
   int DeviceID;
+  int NumDevices;
   
 };
 
@@ -88,7 +93,8 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 CANBase<CANCLASS, BUS, CAN_MSG>::CANBase(uint8_t up_pin, uint8_t down_pin) :
   UpPin(up_pin),
   DownPin(down_pin),
-  DeviceID(0) {
+  DeviceID(0),
+  NumDevices(0) {
 }
 
 
@@ -176,7 +182,8 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::detectDevices() {
   delay(10);
   Serial.printf("  got %d devices\n", id-1);
   Serial.println();
-  return id - 1;
+  NumDevices = id - 1;
+  return NumDevices;
 }
 
 
@@ -322,23 +329,30 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::receiveTime() {
   CAN_MSG msg;
   if (!read(msg, CAN_ID_SET_DATE))
     return;
-  char datetime[20];
-  memcpy((void *)&datetime[0], (void *)&msg.buf[0], 4);
-  datetime[4] = '-';
-  memcpy((void *)&datetime[5], (void *)&msg.buf[4], 2);
-  datetime[7] = '-';
-  memcpy((void *)&datetime[8], (void *)&msg.buf[6], 2);
+  char s[8];
+  memcpy((void *)s, (void *)&msg.buf[0], 4);
+  s[4] = '\0';
+  int year = atoi(s);
+  memcpy((void *)s, (void *)&msg.buf[4], 2);
+  s[2] = '\0';
+  int month = atoi(s);
+  memcpy((void *)s, (void *)&msg.buf[6], 2);
+  s[2] = '\0';
+  int day = atoi(s);
   if (!read(msg, CAN_ID_SET_TIME))
     return;
-  datetime[10] = 'T';
-  memcpy((void *)&datetime[11], (void *)&msg.buf[0], 2);
-  datetime[13] = ':';
-  memcpy((void *)&datetime[14], (void *)&msg.buf[2], 2);
-  datetime[16] = ':';
-  memcpy((void *)&datetime[17], (void *)&msg.buf[4], 2);
-  datetime[19] = '\0';
-  Serial.printf("received time %s\n", datetime);
-  rtclock.set(datetime);
+  memcpy((void *)s, (void *)&msg.buf[0], 2);
+  s[2] = '\0';
+  int hour = atoi(s);
+  memcpy((void *)s, (void *)&msg.buf[2], 2);
+  s[2] = '\0';
+  int min = atoi(s);
+  memcpy((void *)s, (void *)&msg.buf[4], 2);
+  s[2] = '\0';
+  int sec = atoi(s);
+  Serial.printf("received time %04d-%02d-02dT%02d:$02d:%02d\n",
+		year, month, day, hour, min, sec);
+  rtclock.set(year, month, day, hour, min, sec, false, false);
   rtclock.report();
 }
 
@@ -466,6 +480,46 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::receiveStart() {
   CAN_MSG msg;
   Serial.println("wait for start recording message");
   read(msg, CAN_ID_START_REC, 0);
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::sendEndFile() {
+  CAN_MSG msg;
+  msg.id = CAN_ID_END_FILE;
+  *(int *)(&msg.buf[0]) = DeviceID;
+  Can.write(msg);
+  Serial.println("sent end file");
+}
+
+
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+void CANBase<CANCLASS, BUS, CAN_MSG>::receiveEndFile() {
+  CAN_MSG msg;
+  elapsedMillis timepassed = 0;
+  Serial.println("wait for end file messages");
+  int ndevices = 0;
+  for (int k=0; k<NumDevices; k++) {
+    msg.id = 0;
+    memset(msg.buf, 0, 8);
+    while ((!Can.read(msg) || msg.id != CAN_ID_END_FILE) &&
+	   timepassed < 1000) {
+      delay(1);
+    };
+    if (msg.id != CAN_ID_END_FILE) {
+      Serial.printf("no end file message from device %d\n", k);
+      break;
+    }
+    int devid = *(int *)(&msg.buf[0]);
+    ndevices++;
+  }
+  Serial.printf("Got end of file message from %d devices\n", ndevices);
 }
 
 
