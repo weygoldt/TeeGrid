@@ -36,6 +36,12 @@ supports a variety of environmental sensors. [Read
 more](8channel-sensors-logger/).
 
 
+## SdFormatter
+
+The SDFat SDFormatter sketch without the interaction on the Serial
+console.  [Read more](SdFormatter/)
+
+
 ## Housings
 
 - [PVC-tube housings](doc/pvc-tube-housing)
