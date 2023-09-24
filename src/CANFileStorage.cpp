@@ -45,7 +45,6 @@ void openNextGridFile() {
   String fname(FileName);
   char cs[16];
   sprintf(cs, "%04d", FileCounter+1);
-  Serial.printf("%d %s\n", FileCounter, FileName.c_str());
   fname.replace("COUNT", cs);
   time_t t = now();
   fname = rtclock.makeStr(fname, t, true);
