@@ -15,7 +15,7 @@ int     SamplingRate = 48000;   // samples per second and channel in Hertz
 float   Gain         = 20.0;    // dB
 
 #define PATH           "recordings"   // folder where to store the recordings
-String  FileName     = "GRIDDEV-SDATETIME.wav";  // may include GRID, DEV, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+String  FileName     = "GRID-SDATETIME-RECCOUNT-DEV.wav";  // may include GRID, DEV, COUNT, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 float   FileTime     = 10.0;  // seconds
 
 // ----------------------------------------------------------------------------
@@ -44,12 +44,8 @@ Blink blink(LED_BUILTIN);
 void setupCAN() {
   can.begin();
   can.assignDevice();
-  if (can.id() == 3)
-    blink.setTriple();
-  else if (can.id() == 2)
-    blink.setDouble();
-  else if (can.id() == 1)
-    blink.setSingle();
+  if (can.id() > 0 )
+    blink.setMultiple(can.id());
   else
     blink.switchOff();
   //can.setupRecorderMBs();
@@ -60,8 +56,9 @@ void setupCAN() {
   Gain = can.receiveGain();
   FileTime = can.receiveFileTime();
   FileName.replace("GRID", gs);
-  char devs[8];
-  sprintf(devs, "%02d", can.id());
+  char devs[2];
+  devs[1] = '\0';
+	devs[0] = char('A' + can.id() - 1);
   FileName.replace("DEV", devs);
 }
 
@@ -104,8 +101,10 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
 
 void setup() {
   blink.switchOn();
+  blink.setTiming(3000);
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
+  blink.switchOff();
   setupCAN();  
   rtclock.check();
   sdcard.begin();
@@ -122,12 +121,10 @@ void setup() {
   aidata.check();
   aidata.start();
   aidata.report();
-  blink.switchOff();
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
   setupGridStorage(PATH, SOFTWARE, aidata, gs);
   can.receiveStart();
-  blink.setSingle();
   openNextGridFile();
 }
 

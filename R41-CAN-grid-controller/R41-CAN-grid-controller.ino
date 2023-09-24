@@ -4,11 +4,11 @@
 #include <R41CAN.h>
 
 
-#define GRID              "gridA"     // unique name of the grid
+#define GRID              "grid1"     // unique name of the grid
 #define SAMPLING_RATE     96000      // sampling rate in Hz
 #define GAIN              20.0       // gain in dB
-#define FILE_TIME         10.0       // seconds
-#define INITIAL_DELAY      2.0       // seconds
+#define FILE_TIME         20.0       // seconds
+#define INITIAL_DELAY     20.0       // seconds
 
 R41CAN can;
 RTClock rtclock;

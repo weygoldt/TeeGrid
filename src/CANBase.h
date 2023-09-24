@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <FlexCAN_T4.h>
 #include <RTClock.h>
+#include <Blink.h>
 
 #define CAN_ID_CLEAR_DEVICES 0x01
 #define CAN_ID_FIND_DEVICES  0x02
@@ -22,6 +23,7 @@
 
 
 extern RTClock rtclock;
+extern Blink blink;
 
 
 template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
@@ -131,6 +133,7 @@ bool CANBase<CANCLASS, BUS, CAN_MSG>::read(CAN_MSG &msg, unsigned int id,
   while ((!Can.read(msg) || msg.id != id) &&
 	 (timepassed < timeout || timeout == 0)) {
     delay(1);
+    blink.update();
   };
   return (msg.id == id);
 }
@@ -430,6 +433,7 @@ float CANBase<CANCLASS, BUS, CAN_MSG>::receiveGain() {
   Serial.println("wait for gain message");
   read(msg, CAN_ID_SET_GAIN);
   float gain = *(float *)(&msg.buf[0]);
+  Serial.printf("  got %.1fdB\n", gain);
   return gain;
 }
 
@@ -456,6 +460,7 @@ float CANBase<CANCLASS, BUS, CAN_MSG>::receiveFileTime() {
   Serial.println("wait for file time message");
   read(msg, CAN_ID_SET_FILE_TIME);
   float filetime = *(float *)(&msg.buf[0]);
+  Serial.printf("  got %.0fs\n", filetime);
   return filetime;
 }
 

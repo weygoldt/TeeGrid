@@ -17,6 +17,7 @@ extern String FileName;
 int can_restarts = 0;
 String can_prevname; // previous file name
 Input *can_aiinput = 0;
+int FileCounter = 0;
 
 
 void setupGridStorage(const char *path, const char *software,
@@ -24,6 +25,7 @@ void setupGridStorage(const char *path, const char *software,
   can_prevname = "";
   can_restarts = 0;
   can_aiinput = &aidata;
+  FileCounter = 0;
   if (FileTime > 30)
     blink.setTiming(5000);
   if (file.sdcard()->dataDir(path))
@@ -40,8 +42,13 @@ void openNextGridFile() {
   file.start();
   blink.setSingle(true);
   blink.blinkSingle(0, 1000, true);
+  String fname(FileName);
+  char cs[16];
+  sprintf(cs, "%04d", FileCounter+1);
+  Serial.printf("%d %s\n", FileCounter, FileName.c_str());
+  fname.replace("COUNT", cs);
   time_t t = now();
-  String fname = rtclock.makeStr(FileName, t, true);
+  fname = rtclock.makeStr(fname, t, true);
   if (fname != can_prevname) {
     file.sdcard()->resetFileCounter();
     can_prevname = fname;
@@ -67,6 +74,7 @@ void openNextGridFile() {
     while (1) { yield(); };
     return;
   }
+  FileCounter++;
   ssize_t samples = file.write();
   if (samples == -4) {   // overrun
     file.start(can_aiinput->nbuffer()/2);   // skip half a buffer
