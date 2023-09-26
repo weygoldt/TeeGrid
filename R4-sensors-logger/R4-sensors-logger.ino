@@ -154,6 +154,10 @@ void setup() {
 void loop() {
   storeData();
   blink.update();
+  if (sensors.update()) {
+    sensors.print(symbols);
+    Serial.println();
+  }
   if (sensors.pendingCSV())
     sensors.writeCSV();
 }
