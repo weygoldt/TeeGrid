@@ -19,9 +19,9 @@
 
 #define PATH          "recordings"   // folder where to store the recordings
 //#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILENAME      "recFNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "testA-NUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 10   // seconds
-#define INITIAL_DELAY  2.0  // seconds
+#define INITIAL_DELAY  10.0  // seconds
 
 // ----------------------------------------------------------------------------
 

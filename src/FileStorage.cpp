@@ -42,7 +42,7 @@ void setupStorage(const char *software, Input &aidata, char *gainstr) {
 
 void openNextFile() {
   blink.setSingle();
-  blink.blinkSingle(0, 1000);
+  blink.blinkSingle(0, 2000);
   time_t t = now();
   String fname = rtclock.makeStr(settings.FileName, t, true);
   if (fname != prevname) {

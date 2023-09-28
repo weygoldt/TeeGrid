@@ -20,7 +20,7 @@
 #define INITIAL_DELAY     20.0       // seconds
 
 #define PATH              "recordings"   // folder where to store the sensor recordings
-#define TEMP_PIN          10         // pin for DATA line of DS18x20 themperature sensor
+#define TEMP_PIN          2         // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL  10.0       // interval between sensors readings in seconds
 
 R41CAN can;
@@ -45,11 +45,11 @@ IlluminanceTSL2591 illum(&tsl, &sensors);
 
 void setupSensors() {
   temp.begin(TEMP_PIN);
-  Wire.begin();
-  bme.beginI2C(Wire, 0x77);
+  Wire1.begin();
+  bme.beginI2C(Wire1, 0x77);
   hum.setPercent();
-  pres.setHecto();
-  tsl.begin(Wire);
+  pres.setMilliBar();
+  tsl.begin(Wire1);
   tsl.setGain(LightTSL2591::AUTO_GAIN);
   irratio.setPercent();
   sensors.setInterval(SENSORS_INTERVAL);
@@ -115,9 +115,12 @@ void loop() {
     sensors.writeCSV();
 #endif
   if (0.001*Time > FILE_TIME - 0.05) {
-    can.receiveEndFile();
+    if (can.receiveEndFile())
+      blink.setSingle();
+    else
+      blink.setDouble();
     can.sendStart();
     Time = 0;
-    blink.setSingle();
+    blink.blinkSingle(0, 2000);
   }
 }

@@ -71,7 +71,7 @@ public:
   void receiveStart();
 
   void sendEndFile();
-  void receiveEndFile();
+  bool receiveEndFile();
 
   uint64_t events() { return Can.events(); };
 
@@ -505,7 +505,7 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
 	  CAN_DEV_TABLE BUS,
 	  typename CAN_MSG>
-void CANBase<CANCLASS, BUS, CAN_MSG>::receiveEndFile() {
+bool CANBase<CANCLASS, BUS, CAN_MSG>::receiveEndFile() {
   CAN_MSG msg;
   elapsedMillis timepassed = 0;
   Serial.println("wait for end file messages");
@@ -525,6 +525,7 @@ void CANBase<CANCLASS, BUS, CAN_MSG>::receiveEndFile() {
     ndevices++;
   }
   Serial.printf("Got end of file message from %d devices\n", ndevices);
+  return (ndevices == NumDevices);
 }
 
 

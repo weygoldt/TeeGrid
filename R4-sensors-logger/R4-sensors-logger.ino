@@ -16,15 +16,17 @@
 // (may be overwritten by config file logger.cfg)
 #define NCHANNELS     16       // number of channels (even, from 2 to 16)
 #define PREGAIN       10.0     // gain factor of preamplifier
-#define SAMPLING_RATE 48000    // samples per second and channel in Hertz
+#define SAMPLING_RATE 96000    // samples per second and channel in Hertz
 #define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
 #define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10      // seconds
-#define INITIAL_DELAY  2.0     // seconds
+#define FILE_SAVE_TIME 60      // seconds
+#define INITIAL_DELAY  60.0    // seconds
 
-#define TEMP_PIN         10    // pin for DATA line of DS18x20 themperature sensor
+#define LED_PIN          26    // LED_BUILTIN
+
+#define TEMP_PIN         2     // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL 10.0  // interval between sensors readings in seconds
 
 
@@ -53,8 +55,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
 RTClock rtclock;
-Blink blink(LED_BUILTIN);
-//Blink blink(31, true);
+Blink blink(LED_PIN, true);
 
 ESensors sensors;
 
@@ -97,6 +98,8 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
 
 void setupSensors() {
   temp.begin(TEMP_PIN);
+  temp.setName("water-temperature");
+  temp.setSymbol("T_water");
   sensors.setInterval(SENSORS_INTERVAL);
   sensors.setPrintTime(ESensors::ISO_TIME);
   sensors.report();
@@ -155,9 +158,8 @@ void loop() {
   storeData();
   blink.update();
   if (sensors.update()) {
-    sensors.print(symbols);
+    sensors.writeCSV();
+    sensors.print();
     Serial.println();
   }
-  if (sensors.pendingCSV())
-    sensors.writeCSV();
 }

@@ -166,7 +166,6 @@ void printConfig(SdioConfig config) {
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
-  char c;
   Serial.begin(9600);
 
   // Wait for USB Serial
@@ -200,6 +199,7 @@ void setup() {
   } else {
     cout << F("FAT16\n");
   }
+  eraseCard();
   formatCard();
 }
 void loop() {}
