@@ -12,11 +12,15 @@
 #define NCHANNELS      16       // number of channels (even, from 2 to 16)
 #define PREGAIN        10.0     // gain factor of preamplifier
 int     SamplingRate = 48000;   // samples per second and channel in Hertz
-float   Gain         = 20.0;    // dB
+float   Gain         = 40.0;    // dB
 
 #define PATH           "recordings"   // folder where to store the recordings
 String  FileName     = "GRID-SDATETIME-RECCOUNT-DEV.wav";  // may include GRID, DEV, COUNT, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-float   FileTime     = 10.0;  // seconds
+String LoggerFileName = "loggergrid-RECNUM4-DEV.wav";
+float   FileTime     = 30.0;  // seconds
+#define GRID           "grid1"
+#define DEV            "D"
+#define INITIAL_DELAY  20.0    // seconds
 
 // ----------------------------------------------------------------------------
 
@@ -51,15 +55,35 @@ void setupCAN() {
   //can.setupRecorderMBs();
   char gs[32];
   can.receiveGrid(gs);
+  if (strlen(gs) == 0 || can.id() > 0)
+    strncpy(gs, GRID, 32);
+  else
+    Serial.printf("  got grid name %s\n", gs);
   can.receiveTime();
-  SamplingRate = can.receiveSamplingRate();
-  Gain = can.receiveGain();
-  FileTime = can.receiveFileTime();
+  int rate = can.receiveSamplingRate();
+  if (rate > 0 || can.id() > 0) {
+    SamplingRate = rate;
+    Serial.printf("  got %.0fHz sampling rate\n", SamplingRate);
+  }
+  float gain = can.receiveGain();
+  if (gain > -1000 || can.id() > 0) {
+    Gain = gain;
+    Serial.printf("  got gain of %.1fdB\n", Gain);
+  }
+  float time = can.receiveFileTime();
+  if (time > 0.0 && can.id() > 0)
+    FileTime = time;
+  if (can.id() == 0)
+    FileName = LoggerFileName;
   FileName.replace("GRID", gs);
-  char devs[2];
-  devs[1] = '\0';
-	devs[0] = char('A' + can.id() - 1);
-  FileName.replace("DEV", devs);
+  if (can.id() == 0)
+    FileName.replace("DEV", DEV);
+  else {
+    char devs[2];
+    devs[1] = '\0';
+	  devs[0] = char('A' + can.id() - 1);
+    FileName.replace("DEV", devs);
+  }
 }
 
 
@@ -124,10 +148,20 @@ void setup() {
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
   setupGridStorage(PATH, SOFTWARE, aidata, gs);
-  can.receiveStart();
+  if (can.id() > 0)
+    can.receiveStart();
+  else {
+    blink.switchOff();
+    if (INITIAL_DELAY >= 2.0) {
+      delay(1000);
+      blink.setDouble();
+      blink.delay(uint32_t(1000.0*INITIAL_DELAY)-1000);
+    }
+    else
+      delay(uint32_t(1000.0*INITIAL_DELAY));
+  }
   openNextGridFile();
 }
-
 
 void loop() {
   storeGridData();

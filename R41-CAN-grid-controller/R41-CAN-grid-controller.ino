@@ -13,9 +13,9 @@
 #include <DewPoint.h>
 #endif
 
-#define GRID              "grid1"    // unique name of the grid
-#define SAMPLING_RATE     96000      // sampling rate in Hz
-#define GAIN              20.0       // gain in dB
+#define GRID              "grid2"    // unique name of the grid
+#define SAMPLING_RATE     48000      // sampling rate in Hz
+#define GAIN              40.0       // gain in dB
 #define FILE_TIME         20.0       // seconds
 #define INITIAL_DELAY     20.0       // seconds
 
@@ -45,10 +45,14 @@ IlluminanceTSL2591 illum(&tsl, &sensors);
 
 void setupSensors() {
   temp.begin(TEMP_PIN);
+  temp.setName("water-temperature");
+  temp.setSymbol("T_w");
   Wire1.begin();
   bme.beginI2C(Wire1, 0x77);
   hum.setPercent();
   pres.setMilliBar();
+  tempbme.setName("air-temperature");
+  tempbme.setSymbol("T_a");
   tsl.begin(Wire1);
   tsl.setGain(LightTSL2591::AUTO_GAIN);
   irratio.setPercent();
@@ -58,7 +62,7 @@ void setupSensors() {
   char date_time[24];
   rtclock.dateTime(date_time, 0, true);
   char file_name[64];
-  sprintf(file_name, "%s-%s-sensors.csv", GRID, date_time);
+  sprintf(file_name, "%s-%s-sensors", GRID, date_time);
   sensors.openCSV(sdcard, file_name);
   sensors.start();
   sensors.read();
@@ -70,18 +74,17 @@ void setupSensors() {
 
 
 void setup() {
+  blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
-  char dts[] = "2024-09-16T23:20:42";
-  rtclock.set(dts);
-#ifdef SENSORS
   sdcard.begin();
+  rtclock.setFromFile(sdcard);
+  rtclock.report();
+#ifdef SENSORS
   setupSensors();
 #endif
   can.begin();
   can.detectDevices();
-  // stop if no device have been found
-  //can.setupControllerMBs();
   delay(100);
   can.sendGrid(GRID);
   can.sendTime();
@@ -98,7 +101,16 @@ void setup() {
     delay(uint32_t(1000.0*INITIAL_DELAY));
   Time = 0;
   can.sendStart();
-  blink.setSingle();
+  Serial.println();
+  if (can.numDevices() > 0) {
+    Serial.printf("Start recording with %d devices\n", can.numDevices());
+    blink.setSingle();
+  }
+  else {
+    Serial.println("Start recording in logger mode");
+    blink.setTriple();
+  }
+  Serial.println();
 }
 
 
@@ -114,7 +126,7 @@ void loop() {
   if (sensors.pendingCSV())
     sensors.writeCSV();
 #endif
-  if (0.001*Time > FILE_TIME - 0.05) {
+  if (can.numDevices() > 0 && 0.001*Time > FILE_TIME - 0.05) {
     if (can.receiveEndFile())
       blink.setSingle();
     else

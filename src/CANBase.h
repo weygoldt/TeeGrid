@@ -39,6 +39,7 @@ public:
   void begin();
 
   int id() const { return DeviceID; };
+  int numDevices() const { return NumDevices; };
 
   // write CAN2.0 messages (brs = edl = false)
   virtual int write20(CAN_MSG &msg);
@@ -203,7 +204,7 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   Serial.printf("  wait for clear devices command 0x%02x\n", CAN_ID_CLEAR_DEVICES);
   timeout = 0;
   msg.id = 0;
-  while (!Can.read(msg) && timeout < 100000) {
+  while (!Can.read(msg) && timeout < 1000) {
     delay(10);
   };
   Serial.printf("  got message 0x%02x\n", msg.id);
@@ -431,9 +432,11 @@ template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 float CANBase<CANCLASS, BUS, CAN_MSG>::receiveGain() {
   CAN_MSG msg;
   Serial.println("wait for gain message");
-  read(msg, CAN_ID_SET_GAIN);
-  float gain = *(float *)(&msg.buf[0]);
-  Serial.printf("  got %.1fdB\n", gain);
+  float gain = -1000.0;
+  if (read(msg, CAN_ID_SET_GAIN)) {
+    gain = *(float *)(&msg.buf[0]);
+    Serial.printf("  got %.1fdB\n", gain);
+  }
   return gain;
 }
 
@@ -521,11 +524,11 @@ bool CANBase<CANCLASS, BUS, CAN_MSG>::receiveEndFile() {
       Serial.printf("no end file message from device %d\n", k);
       break;
     }
-    int devid = *(int *)(&msg.buf[0]);
+    //int devid = *(int *)(&msg.buf[0]);
     ndevices++;
   }
   Serial.printf("Got end of file message from %d devices\n", ndevices);
-  return (ndevices == NumDevices);
+  return ((NumDevices > 0) && (ndevices == NumDevices));
 }
 
 

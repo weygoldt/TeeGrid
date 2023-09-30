@@ -41,7 +41,7 @@ void setupGridStorage(const char *path, const char *software,
 void openNextGridFile() {
   file.start();
   blink.setSingle(true);
-  blink.blinkSingle(0, 1000, true);
+  blink.blinkSingle(0, 2000, true);
   String fname(FileName);
   char cs[16];
   sprintf(cs, "%04d", FileCounter+1);
@@ -94,15 +94,16 @@ void storeGridData() {
     return;
   ssize_t samples = file.write();
   if (samples < 0) {
-    blink.clear();
     Serial.println();
     Serial.println("ERROR in writing data to file:");
     char errorstr[20];
     switch (samples) {
       case -1:
+	blink.clear();
         Serial.println("  File not open.");
         break;
       case -2:
+	blink.clear();
         Serial.println("  File already full.");
         break;
       case -3:
@@ -113,10 +114,12 @@ void storeGridData() {
         delay(20);
         break;
       case -4:
+	blink.clear();
         Serial.println("  Buffer overrun.");
         strcpy(errorstr, "overrun");
         break;
       case -5:
+	blink.clear();
         Serial.println("  Nothing written into the file.");
         Serial.println("  SD card probably full -> halt");
         can_aiinput->stop();
@@ -146,7 +149,8 @@ void storeGridData() {
       if (!can_aiinput->running())
         can_aiinput->start();
     }
-    can.receiveStart();
+    if (can.id() > 0)
+      can.receiveStart();
     openNextGridFile();
   }
 }
