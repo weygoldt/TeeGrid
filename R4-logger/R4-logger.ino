@@ -19,7 +19,7 @@
 
 #define PATH          "recordings"   // folder where to store the recordings
 //#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILENAME      "test-RECNUM-A.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME      "test-RECNUM4-C.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 30   // seconds
 #define INITIAL_DELAY  10.0  // seconds
 
@@ -48,7 +48,7 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-InputTDMSettings aisettings(&aidata, SAMPLING_RATE, GAIN);                  
+InputTDMSettings aisettings(&aidata, SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
 Blink blink(LED_PIN);
 

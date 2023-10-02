@@ -89,7 +89,7 @@ void openNextGridFile() {
 }
 
 
-void storeGridData() {
+void storeGridData(bool master) {
   if (!file.pending())
     return;
   ssize_t samples = file.write();
@@ -138,7 +138,8 @@ void storeGridData() {
   }
   if (file.endWrite() || samples < 0) {
     file.close();  // file size was set by openWave()
-    can.sendEndFile();
+    if (!master)
+      can.sendEndFile();
     if (samples < 0) {
       can_restarts++;
       if (can_restarts >= 5) {
@@ -149,7 +150,9 @@ void storeGridData() {
       if (!can_aiinput->running())
         can_aiinput->start();
     }
-    if (can.id() > 0)
+    if (master)
+      can.sendStart();
+    else if (can.id() > 0)
       can.receiveStart();
     openNextGridFile();
   }

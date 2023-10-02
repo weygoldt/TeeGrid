@@ -48,6 +48,7 @@ public:
   bool read(CAN_MSG &msg, unsigned int id, unsigned int timeout=1000);
   
   int detectDevices();
+  int detectOtherDevices();
   int assignDevice();
 
   void setupControllerMBs();
@@ -190,6 +191,59 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::detectDevices() {
   return NumDevices;
 }
 
+  
+template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
+		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
+	  CAN_DEV_TABLE BUS,
+	  typename CAN_MSG>
+int CANBase<CANCLASS, BUS, CAN_MSG>::detectOtherDevices() {
+  CAN_MSG msg;
+  elapsedMillis timeout;
+
+  Serial.println("Detect all devices:");
+  digitalWrite(DownPin, HIGH);
+  // clear device IDs:
+  msg.id = CAN_ID_CLEAR_DEVICES;
+  int r = write20(msg);
+  Serial.printf("  write clear message, r=%d\n", r);
+  delay(10);
+  // set own ID:
+  DeviceID = 1;
+
+  // assign device IDs:
+  int id;
+  for (id=2; ; id++) {
+    Serial.printf("  check for ID=%d\n", id);
+    msg.id = CAN_ID_FIND_DEVICES;
+    *(int *)(&msg.buf[0]) = id;
+    int r = write20(msg);
+    Serial.printf("    write find message, r=%d\n", r);
+    timeout = 0;
+    msg.id = 0;
+    while (!Can.read(msg) && timeout < 1000) {
+      delay(10);
+    };
+    if (msg.id != CAN_ID_REPORT_DEVICE) {
+      Serial.println("    no device responded");
+      break;
+    }
+    int devid = *(int *)(&msg.buf[0]);
+    Serial.printf("    device reported id %d\n", devid);
+    if (devid != id)
+      Serial.println("WARNING reported device id does not match expectation!");
+    delay(10);
+  }
+  msg.id = CAN_ID_GOT_DEVICES;
+  r = write20(msg);
+  Serial.printf("  write got devices message, r=%d\n", r);
+  digitalWrite(DownPin, LOW);
+  delay(10);
+  Serial.printf("  got %d devices\n", id-1);
+  Serial.println();
+  NumDevices = id - 1;
+  return NumDevices;
+}
+
 
 template <template<CAN_DEV_TABLE, FLEXCAN_RXQUEUE_TABLE,
 		   FLEXCAN_TXQUEUE_TABLE> typename CANCLASS,
@@ -204,7 +258,7 @@ int CANBase<CANCLASS, BUS, CAN_MSG>::assignDevice() {
   Serial.printf("  wait for clear devices command 0x%02x\n", CAN_ID_CLEAR_DEVICES);
   timeout = 0;
   msg.id = 0;
-  while (!Can.read(msg) && timeout < 1000) {
+  while (!Can.read(msg) && timeout < 2000) {
     delay(10);
   };
   Serial.printf("  got message 0x%02x\n", msg.id);

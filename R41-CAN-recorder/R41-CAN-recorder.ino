@@ -129,10 +129,10 @@ void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   blink.switchOff();
-  setupCAN();  
   rtclock.check();
   sdcard.begin();
   rtclock.report();
+  setupCAN();  
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
