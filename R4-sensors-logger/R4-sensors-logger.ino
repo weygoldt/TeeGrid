@@ -20,10 +20,9 @@
 #define GAIN          40.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-//#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILENAME      "RECXNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10      // seconds
-#define INITIAL_DELAY  10.0    // seconds
+#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 60      // seconds
+#define INITIAL_DELAY  20.0    // seconds
 
 #define LED_PIN          26    // LED_BUILTIN
 
