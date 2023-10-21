@@ -25,7 +25,8 @@
 #define FILE_SAVE_TIME 60      // seconds
 #define INITIAL_DELAY  20.0    // seconds
 
-#define LED_PIN          26    // LED_BUILTIN
+#define LED_PIN        26    // R4.1
+//#define LED_PIN        27    // R4.2
 
 #define TEMP_PIN         2     // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL 10.0  // interval between sensors readings in seconds
@@ -56,7 +57,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(&aidata, SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
-Blink blink(LED_PIN, true);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 ESensors sensors;
 

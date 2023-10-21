@@ -23,9 +23,12 @@
 #define TEMP_PIN          2         // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL  10.0       // interval between sensors readings in seconds
 
+#define LED_PIN        26    // R4.1
+
+
 R41CAN can;
 RTClock rtclock;
-Blink blink(LED_BUILTIN);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 elapsedMillis Time;
 

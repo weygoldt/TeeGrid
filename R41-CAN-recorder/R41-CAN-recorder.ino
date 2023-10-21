@@ -25,6 +25,7 @@ float   FileTime     = 30.0;  // seconds
 
 // ----------------------------------------------------------------------------
 
+#define LED_PIN        26    // R4.1
 #define SOFTWARE      "TeeGrid R41-CAN-recorder v1.0"
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
@@ -42,8 +43,7 @@ R41CAN can;
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 RTClock rtclock;
-Blink blink(LED_BUILTIN);
-//Blink blink(31, true);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 
 void setupCAN() {
