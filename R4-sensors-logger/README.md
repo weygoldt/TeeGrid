@@ -4,3 +4,8 @@ Logger for 2 to 16 channels based on [Teensy_Amp R4.1](https://github.com/jansci
   connected to a [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with additional sensors.
 
 Designed by Jan Benda in September 2023.
+
+
+# Notes
+
+- Add sensor for illumination and water conductivity. Make a PCB for this!
