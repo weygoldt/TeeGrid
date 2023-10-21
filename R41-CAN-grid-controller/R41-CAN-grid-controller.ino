@@ -13,9 +13,9 @@
 #include <DewPoint.h>
 #endif
 
-#define GRID              "grid2"    // unique name of the grid
+#define GRID              "grid1"    // unique name of the grid
 #define SAMPLING_RATE     48000      // sampling rate in Hz
-#define GAIN              40.0       // gain in dB
+#define GAIN              20.0       // gain in dB
 #define FILE_TIME         20.0       // seconds
 #define INITIAL_DELAY     20.0       // seconds
 

@@ -4,6 +4,7 @@
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <Blink.h>
+#include <SetupPCM.h>
 #include <CANFileStorage.h>
 #include <R41CAN.h>
 
@@ -87,40 +88,6 @@ void setupCAN() {
 }
 
 
-bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
-  cpcm.begin();
-  bool r = cpcm.setMicBias(false, true);
-  if (!r) {
-    Serial.println("not available");
-    return false;
-  }
-  cpcm.setRate(tdm, SamplingRate);
-  if (tdm.nchannels() < NCHANNELS) {
-    if (NCHANNELS - tdm.nchannels() == 2) {
-      cpcm.setupTDM(tdm, ControlPCM186x::CH2L, ControlPCM186x::CH2R,
-                    offs, ControlPCM186x::INVERTED);
-      Serial.println("configured for 2 channels");
-    }
-    else {
-      cpcm.setupTDM(tdm, ControlPCM186x::CH2L, ControlPCM186x::CH2R,
-                    ControlPCM186x::CH3L, ControlPCM186x::CH3R,
-                    offs, ControlPCM186x::INVERTED);
-      Serial.println("configured for 4 channels");
-    }
-    cpcm.setSmoothGainChange(false);
-    cpcm.setGain(Gain);
-    cpcm.setFilters(ControlPCM186x::FIR, false);
-    pcm = &cpcm;
-  }
-  else {
-    // channels not recorded:
-    cpcm.powerdown();
-    Serial.println("powered down");
-  }
-  return true;
-}
-
-
 // -----------------------------------------------------------------------------
 
 void setup() {
@@ -138,7 +105,7 @@ void setup() {
   Wire1.begin();
   for (int k=0;k < NPCMS; k++) {
     Serial.printf("Setup PCM186x %d on TDM %d: ", k, pcms[k]->TDMBus());
-    setupPCM(aidata, *pcms[k], k%2==1);
+    R4setupPCM(aidata, *pcms[k], k%2==1);
   }
   Serial.println();
   aidata.begin();

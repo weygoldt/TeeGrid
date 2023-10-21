@@ -7,6 +7,7 @@
 #include <Configurator.h>
 #include <Settings.h>
 #include <InputTDMSettings.h>
+#include <SetupPCM.h>
 #include <FileStorage.h>
 
 // Default settings: ----------------------------------------------------------
@@ -46,56 +47,6 @@ RTClock rtclock;
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 
-bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
-  cpcm.begin();
-  bool r = cpcm.setMicBias(false, true);
-  if (!r) {
-    Serial.println("not available");
-    return false;
-  }
-  cpcm.setRate(tdm, aisettings.rate());
-  if (tdm.nchannels() < aisettings.nchannels()) {
-    if (aisettings.nchannels() - tdm.nchannels() == 2) {
-      if (PREGAIN == 1.0) {
-        cpcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
-	              offs, ControlPCM186x::INVERTED);
-        Serial.println("configured for 2 channels without preamplifier");
-      }
-      else {
-        cpcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
-	              offs, ControlPCM186x::INVERTED);
-        Serial.printf("configured for 2 channels with preamplifier x%.0f\n", PREGAIN);
-      }
-    }
-    else {
-      if (PREGAIN == 1.0) {
-        cpcm.setupTDM(tdm, ControlPCM186x::CH3L, ControlPCM186x::CH3R,
-                      ControlPCM186x::CH4L, ControlPCM186x::CH4R,
-		      offs, ControlPCM186x::INVERTED);
-        Serial.println("configured for 4 channels without preamplifier");
-      }
-      else {
-        cpcm.setupTDM(tdm, ControlPCM186x::CH1L, ControlPCM186x::CH1R,
-                      ControlPCM186x::CH2L, ControlPCM186x::CH2R,
-		      offs, ControlPCM186x::INVERTED);
-        Serial.printf("configured for 4 channels with preamplifier x%.0f\n", PREGAIN);
-      }
-    }
-    cpcm.setSmoothGainChange(false);
-    cpcm.setGain(aisettings.gain());
-    cpcm.setFilters(ControlPCM186x::FIR, false);
-    pcm = &cpcm;
-  }
-  else {
-    // channels not recorded, but need to be configured to not corupt TDM bus:
-    cpcm.setupTDM(ControlPCM186x::CH1L, ControlPCM186x::CH1R, offs);
-    cpcm.powerdown();
-    Serial.println("powered down");
-  }
-  return true;
-}
-
-
 // -----------------------------------------------------------------------------
 
 void setup() {
@@ -113,7 +64,7 @@ void setup() {
   Wire.begin();
   for (int k=0;k < NPCMS; k++) {
     Serial.printf("Setup PCM186x %d: ", k);
-    setupPCM(aidata, *pcms[k], k%2==1);
+    R40setupPCM(aidata, *pcms[k], k%2==1);
   }
   Serial.println();
   aidata.begin();
