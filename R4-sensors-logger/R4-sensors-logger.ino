@@ -17,13 +17,13 @@
 // (may be overwritten by config file logger.cfg)
 #define NCHANNELS     16       // number of channels (even, from 2 to 16)
 #define PREGAIN       10.0     // gain factor of preamplifier
-#define SAMPLING_RATE 96000    // samples per second and channel in Hertz
-#define GAIN          30.0     // dB
+#define SAMPLING_RATE 48000    // samples per second and channel in Hertz
+#define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "longlogger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 60      // seconds
-#define INITIAL_DELAY  20.0    // seconds
+#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 5*60    // seconds
+#define INITIAL_DELAY  10.0    // seconds
 
 #define LED_PIN        26    // R4.1
 //#define LED_PIN        27    // R4.2
