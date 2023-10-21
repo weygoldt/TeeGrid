@@ -18,15 +18,15 @@
 #define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "logger1-RECNUM4.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 60   // seconds
+#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 5*60   // seconds
 #define INITIAL_DELAY  10.0  // seconds
 
 // ----------------------------------------------------------------------------
 
-#define LED_PIN        26
-
 #define SOFTWARE      "TeeGrid R4-logger v1.6"
+#define LED_PIN        26    // R4.1
+//#define LED_PIN        27    // R4.2
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -78,7 +78,8 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
     pcm = &cpcm;
   }
   else {
-    // channels not recorded:
+    // channels not recorded, but need to be configured to not corupt TDM bus:
+    cpcm.setupTDM(ControlPCM186x::CH2L, ControlPCM186x::CH2R, offs);
     cpcm.powerdown();
     Serial.println("powered down");
   }
@@ -93,6 +94,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
+  Serial.println("\n=======================================================================\n");
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
