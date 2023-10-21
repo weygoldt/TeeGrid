@@ -98,7 +98,7 @@ void setup() {
   Wire1.begin();
   for (int k=0;k < NPCMS; k++) {
     Serial.printf("Setup PCM186x %d on TDM %d: ", k, pcms[k]->TDMBus());
-    R4setupPCM(aidata, *pcms[k], k%2==1);
+    R4SetupPCM(aidata, *pcms[k], k%2==1, aisettings, &pcm);
   }
   Serial.println();
   aidata.begin();

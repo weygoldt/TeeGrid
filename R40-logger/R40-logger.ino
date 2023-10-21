@@ -64,7 +64,7 @@ void setup() {
   Wire.begin();
   for (int k=0;k < NPCMS; k++) {
     Serial.printf("Setup PCM186x %d: ", k);
-    R40setupPCM(aidata, *pcms[k], k%2==1);
+    R40SetupPCM(aidata, *pcms[k], k%2==1, PREGAIN, aisettings, &pcm);
   }
   Serial.println();
   aidata.begin();

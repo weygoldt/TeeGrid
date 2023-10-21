@@ -1,8 +1,9 @@
 #include <SetupPCM.h>
 
 
-bool R40setupPCM(InputTDM &tdm, ControlPCM186x &cpcm,
-		 bool offs, float pregain) {
+bool R40SetupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs,
+		 float pregain, const InputTDMSettings &aisettings,
+		 ControlPCM186x **pcm) {
   cpcm.begin();
   bool r = cpcm.setMicBias(false, true);
   if (!r) {
@@ -40,7 +41,7 @@ bool R40setupPCM(InputTDM &tdm, ControlPCM186x &cpcm,
     cpcm.setSmoothGainChange(false);
     cpcm.setGain(aisettings.gain());
     cpcm.setFilters(ControlPCM186x::FIR, false);
-    pcm = &cpcm;
+    *pcm = &cpcm;
   }
   else {
     // channels not recorded, but need to be configured to not corupt TDM bus:
@@ -52,16 +53,18 @@ bool R40setupPCM(InputTDM &tdm, ControlPCM186x &cpcm,
 }
 
 
-bool R4setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
+bool R4SetupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs,
+		uint32_t rate, int nchannels, float gain,
+		ControlPCM186x **pcm) {
   cpcm.begin();
   bool r = cpcm.setMicBias(false, true);
   if (!r) {
     Serial.println("not available");
     return false;
   }
-  cpcm.setRate(tdm, aisettings.rate());
-  if (tdm.nchannels() < NCHANNELS) {
-    if (NCHANNELS - tdm.nchannels() == 2) {
+  cpcm.setRate(tdm, rate);
+  if (tdm.nchannels() < nchannels) {
+    if (nchannels - tdm.nchannels() == 2) {
       cpcm.setupTDM(tdm, ControlPCM186x::CH2L, ControlPCM186x::CH2R,
                     offs, ControlPCM186x::INVERTED);
       Serial.println("configured for 2 channels");
@@ -73,9 +76,9 @@ bool R4setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
       Serial.println("configured for 4 channels");
     }
     cpcm.setSmoothGainChange(false);
-    cpcm.setGain(aisettings.gain());
+    cpcm.setGain(gain);
     cpcm.setFilters(ControlPCM186x::FIR, false);
-    pcm = &cpcm;
+    *pcm = &cpcm;
   }
   else {
     // channels not recorded, but need to be configured to not corupt TDM bus:
@@ -84,6 +87,13 @@ bool R4setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
     Serial.println("powered down");
   }
   return true;
+}
+
+
+bool R4SetupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs,
+		const InputTDMSettings &aisettings, ControlPCM186x **pcm) {
+  return R4SetupPCM(tdm, cpcm, offs, aisettings.rate(),
+		    aisettings.nchannels(), aisettings.gain(), pcm);
 }
 
 
