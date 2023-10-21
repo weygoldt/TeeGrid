@@ -17,17 +17,17 @@
 #define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-//#define FILENAME      "grid1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILENAME      "testNUM.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10   // seconds
+#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 5*60   // seconds
 #define INITIAL_DELAY  10.0  // seconds
 
 // ----------------------------------------------------------------------------
 
-#define SOFTWARE      "TeeGrid R40-logger v1.4"
+#define SOFTWARE      "TeeGrid R40-logger v1.6"
+#define LED_PIN       31
 
-DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
-//EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
+//DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
+EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
 InputTDM aidata(AIBuffer, NAIBuffer);
 #define NPCMS 2
 ControlPCM186x pcm1(Wire, PCM186x_I2C_ADDR1, InputTDM::TDM1);
@@ -43,8 +43,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(&aidata, SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
-Blink blink(LED_BUILTIN);
-//Blink blink(31, true);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 
 bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
@@ -88,7 +87,8 @@ bool setupPCM(InputTDM &tdm, ControlPCM186x &cpcm, bool offs) {
     pcm = &cpcm;
   }
   else {
-    // channels not recorded:
+    // channels not recorded, but need to be configured to not corupt TDM bus:
+    cpcm.setupTDM(ControlPCM186x::CH1L, ControlPCM186x::CH1R, offs);
     cpcm.powerdown();
     Serial.println("powered down");
   }
@@ -102,6 +102,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
+  Serial.println("\n=======================================================================\n");
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
@@ -110,7 +111,6 @@ void setup() {
   config.configure(sdcard);
   aidata.setSwapLR();
   Wire.begin();
-  Wire1.begin();
   for (int k=0;k < NPCMS; k++) {
     Serial.printf("Setup PCM186x %d: ", k);
     setupPCM(aidata, *pcms[k], k%2==1);
