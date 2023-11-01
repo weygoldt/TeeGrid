@@ -6,12 +6,17 @@
 #ifndef CANFileStorage_h
 #define CANFileStorage_h
 
+#include <TeensyBoard.h>
+
+#ifdef TEENSY4
 
 void setupGridStorage(const char *path, const char *software,
 		      Input &aidata, char *gainstr=0);
 void openNextGridFile();
 void storeGridData(bool master=false);
 
+
+#endif
 
 #endif
 

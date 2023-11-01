@@ -5,6 +5,8 @@
 #include <R41CAN.h>
 #include <CANFileStorage.h>
 
+#ifdef TEENSY4
+
 extern R41CAN can;
 extern SDCard sdcard;
 extern SDWriter file;
@@ -157,3 +159,6 @@ void storeGridData(bool master) {
     openNextGridFile();
   }
 }
+
+#endif
+

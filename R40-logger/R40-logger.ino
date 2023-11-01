@@ -42,7 +42,7 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-InputTDMSettings aisettings(&aidata, SAMPLING_RATE, NCHANNELS, GAIN);                  
+InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
@@ -58,8 +58,14 @@ void setup() {
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
+  settings.disable("PulseFrequency");
+  settings.disable("DisplayTime");
+  settings.disable("SensorsInterval");
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
+  if (Serial)
+    config.configure(Serial);
+  config.report();
   aidata.setSwapLR();
   Wire.begin();
   for (int k=0;k < NPCMS; k++) {
@@ -72,13 +78,13 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.InitialDelay >= 2.0) {
+  if (settings.initialDelay() >= 2.0) {
     delay(1000);
     blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.InitialDelay)-1000);
+    blink.delay(uint32_t(1000.0*settings.initialDelay())-1000);
   }
   else
-    delay(uint32_t(1000.0*settings.InitialDelay));
+    delay(uint32_t(1000.0*settings.initialDelay()));
   char gs[16];
   pcm1.gainStr(gs, PREGAIN);
   setupStorage(SOFTWARE, aidata, gs);

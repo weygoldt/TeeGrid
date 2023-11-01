@@ -2,6 +2,9 @@
 #define R41_CAN_h
 
 #include <CANBase.h>
+#include <TeensyBoard.h>
+
+#ifdef TEENSY4
 
 #define CAN_STB_PIN 36
 #define CAN_SHDN_PIN 37
@@ -28,5 +31,7 @@ public:
   
 };
 
+
+#endif
 
 #endif

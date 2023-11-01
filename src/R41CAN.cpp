@@ -1,5 +1,6 @@
 #include <R41CAN.h>
 
+#ifdef TEENSY4
 
 R41CAN::R41CAN() :
   CANBase(CAN_IO_UP_PIN, CAN_IO_DOWN_PIN) {
@@ -39,3 +40,4 @@ void R41CAN::powerUp() {
   digitalWrite(CAN_SHDN_PIN, LOW);
 }
 
+#endif

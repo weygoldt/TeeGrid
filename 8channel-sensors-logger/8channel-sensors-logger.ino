@@ -81,7 +81,7 @@ void setupSensors() {
   tsl.begin(Wire1);
   tsl.setGain(LightTSL2591::AUTO_GAIN);
   irratio.setPercent();
-  sensors.setInterval(settings.SensorsInterval);
+  sensors.setInterval(settings.sensorsInterval());
   sensors.setPrintTime(ESensors::ISO_TIME);
   sensors.report();
   Serial.println();
@@ -96,19 +96,19 @@ void setupSensors() {
 
 void setupStorage() {
   prevname = "";
-  if (settings.FileTime > 30)
+  if (settings.fileTime() > 30)
     blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.Path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
+  if (file.sdcard()->dataDir(settings.path()))
+    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.path());
   file.setWriteInterval();
-  file.setMaxFileTime(settings.FileTime);
+  file.setMaxFileTime(settings.fileTime());
   file.header().setSoftware(SOFTWARE);
 }
 
 
 String makeFileName() {
   time_t t = now();
-  String name = rtclock.makeStr(settings.FileName, t, true);
+  String name = rtclock.makeStr(settings.fileName(), t, true);
   if (name != prevname) {
     file.sdcard()->resetFileCounter();
     prevname = name;
@@ -177,7 +177,7 @@ void storeData() {
         aidata.stop();
         file.closeWave();
         sensors.closeCSV();
-        char mfs[20];
+        char mfs[30];
         sprintf(mfs, "error%d-%d.msg", restarts+1, -samples);
         File mf = sdcard.openWrite(mfs);
         mf.close();
@@ -196,7 +196,7 @@ void storeData() {
       }
       if (samples == -3) {
         String sname = name + "-sensors";
-        sensors.openCSV(sdcard.sdcard(), sname.c_str());
+        sensors.openCSV(sdcard, sname.c_str());
         aidata.start();
         file.start();
       }
@@ -216,23 +216,28 @@ void setup() {
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
+  settings.disable("DisplayTime");
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
-  setupTestSignals(signalPins, settings.PulseFrequency);
+  if (Serial)
+    config.configure(Serial);
+  config.report();
+  aisettings.configure(&aidata);
+  setupTestSignals(signalPins, settings.pulseFrequency());
   setupStorage();
   setupSensors();
-  aidata.configure(aisettings);
+  aisettings.configure(&aidata);
   aidata.check();
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.InitialDelay >= 2.0) {
+  if (settings.initialDelay() >= 2.0) {
     delay(1000);
     blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.InitialDelay) - 1000);
+    blink.delay(uint32_t(1000.0*settings.initialDelay()) - 1000);
   }
   else
-    delay(uint32_t(1000.0*settings.InitialDelay));
+    delay(uint32_t(1000.0*settings.initialDelay()));
   String name = makeFileName();
   if (name.length() == 0) {
     Serial.println("-> halt");
@@ -240,7 +245,7 @@ void setup() {
     while (1) {};
   }
   String sname = name + "-sensors";
-  sensors.openCSV(sdcard.sdcard(), sname.c_str());
+  sensors.openCSV(sdcard, sname.c_str());
   sensors.start();
   file.start();
   openNextFile(name);

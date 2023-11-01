@@ -27,12 +27,12 @@ void setupStorage(const char *software, Input &aidata, char *gainstr) {
   prevname = "";
   restarts = 0;
   aiinput = &aidata;
-  if (settings.FileTime > 30)
+  if (settings.fileTime() > 30)
     blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.Path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.Path);
+  if (file.sdcard()->dataDir(settings.path()))
+    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.path());
   file.setWriteInterval(2*aiinput->DMABufferTime());
-  file.setMaxFileTime(settings.FileTime);
+  file.setMaxFileTime(settings.fileTime());
   file.header().setSoftware(software);
   if (gainstr != 0)
     file.header().setGain(gainstr);
@@ -44,7 +44,7 @@ void openNextFile() {
   blink.setSingle();
   blink.blinkSingle(0, 2000);
   time_t t = now();
-  String fname = rtclock.makeStr(settings.FileName, t, true);
+  String fname = rtclock.makeStr(settings.fileName(), t, true);
   if (fname != prevname) {
     file.sdcard()->resetFileCounter();
     prevname = fname;

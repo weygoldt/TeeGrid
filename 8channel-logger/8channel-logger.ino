@@ -42,10 +42,10 @@ SDCard sdcard;
 SDWriter file(sdcard, aidata);
 
 Configurator config;
-InputADCSettings aisettings(&aidata, SAMPLING_RATE, BITS, AVERAGING,
-			    CONVERSION, SAMPLING, REFERENCE);
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY);
+InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
+			    CONVERSION, SAMPLING, REFERENCE);
 Blink blink(LED_BUILTIN);
 
 
@@ -59,20 +59,26 @@ void setup() {
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
+  settings.disable("DisplayTime");
+  settings.disable("SensorsInterval");
   config.setConfigFile("teegrid.cfg");
   config.configure(sdcard);
-  setupTestSignals(signalPins, settings.PulseFrequency);
+  if (Serial)
+    config.configure(Serial);
+  config.report();
+  aisettings.configure(&aidata);
+  setupTestSignals(signalPins, settings.pulseFrequency());
   aidata.check();
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.InitialDelay >= 2.0) {
+  if (settings.initialDelay() >= 2.0) {
     delay(1000);
     blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.InitialDelay) - 1000);
+    blink.delay(uint32_t(1000.0*settings.initialDelay()) - 1000);
   }
   else
-    delay(uint32_t(1000.0*settings.InitialDelay));
+    delay(uint32_t(1000.0*settings.initialDelay()));
   setupStorage(SOFTWARE, aidata);
   openNextFile();
 }
