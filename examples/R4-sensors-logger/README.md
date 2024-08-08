@@ -13,9 +13,9 @@ Designed by Jan Benda in September 2023.
 
 Connect the wires from the [electrodes](../../doc/steel-electrodes) to the screw terminals of the amplifier...
 
-![channels]{https://github.com/janscience/Teensy_Amp/blob/main/R4.1-R4.2/images/Teensy_Amp-R41-R42-front.png}
+![channels](https://github.com/janscience/Teensy_Amp/blob/main/R4.1-R4.2/images/Teensy_Amp-R41-R42-front.png)
 
-using this [color code]{https://github.com/janscience/TeeGrid/tree/main/doc/steel-electrodes#international-color-code)
+using this [color code](https://github.com/janscience/TeeGrid/tree/main/doc/steel-electrodes#international-color-code)
 
 
 ## Installation
@@ -58,7 +58,7 @@ The first section is about the data acquisition:
   then set it to 16.
 - `SAMPLING_RATE`: the sampling rate you want to use (48000 or 96000 Hertz).
 - `PREGAIN`: the gain of the preamplifier, either 10 (default) or 1
-  (for recording electric eels).
+  (for recording electric eels). *Make sure this is is set to the right number!*
 - `GAIN`: additional gain of the ADC in dB. 0: x1, 20: x10, 40: x100.
 
 For wavefish use an amplifier with a pregain of 10 and set the gain
@@ -79,7 +79,10 @@ card.
 - `INITIAL_DELAY`: after startup, wait for the specified time in
   seconds before writing data to files.
 
- The following special strings in the file name are replaced by
+
+#### Special strings for the file name
+
+The following special strings in the file name are replaced by
 the current date, time, or a number:
 
 - `DATE`: the current date as ISO string (YYYY-MM-DD)
@@ -96,14 +99,14 @@ the current date, time, or a number:
 
 ### Pins and Sensors
 
-- `LED_PIN`: the Teensy pin to which the LED on the amplifier is connected to.
-- `TEMP_PIN`: the Teensy pin to which the DATA wire of the [Dallas
+- `LED_PIN`: the [Teensy pin](https://github.com/janscience/Teensy_Amp/blob/main/R4.1/images/teensy41-R41-pinout.png) to which the LED on the amplifier is connected to.
+- `TEMP_PIN`: the [Teensy pin](https://github.com/janscience/Teensy_Amp/blob/main/R4.1/images/teensy41-R41-pinout.png) to which the DATA wire of the [Dallas
   DS18x20](https://github.com/janscience/ESensors/blob/main/docs/chips/ds18x20.md)
   temperature sensor is connected to.
 - `SENSORS_INTERVAL`: interval between sensor readings in seconds
 
 
-## Configuration
+## Configuration file
 
 Most of the settings described above can be configured via a
 configuration file. Simply place a configuration file named
@@ -139,7 +142,8 @@ settings.
 For proper naming of files, the real-time clock needs to be set to the
 right time. The easiest way to achieve this, is to compile and upload
 the [`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch from the
-Arduino IDE.
+Arduino IDE. Use the serial monitor to check the output of the
+sketch. At the beginning it reports the time.
 
 Alternatively, you may copy a file named `settime.cfg` into the root
 folder of the SD card. This file contains a single line with a date
@@ -149,7 +153,7 @@ YYYY-MM-DDTHH:MM:SS
 ```
 
 In a shell you might generate this file via
-``` sh
+```sh
 date +%FT%T > settime.cfg
 ```
 and then edit this file to some time in the near future.
