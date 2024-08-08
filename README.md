@@ -13,33 +13,33 @@ inspired by Stefan Mucha's
 Logger for 2 to 16 channels based on
 [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or
 [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2). [Read
-more](R4-logger/).
+more](examples/R4-logger/).
 
 
 ## R40 logger
 
 Logger for 2 to 8 channels based on [TeensyAmp
   R4.0](https://github.com/janscience/Teensy_Amp/tree/main/R4.0). [Read
-  more](R40-logger/).
+  more](examples/R40-logger/).
 
 
 ## 8-channel logger
 
 Not really a grid yet, but a first step towards it. [Read
-more](8channel-logger/).
+more](examples/8channel-logger/).
 
 
 ## 8-channel logger with sensors
 
 A variant of the [8-channel logger](8channel-logger/) that
 supports a variety of environmental sensors. [Read
-more](8channel-sensors-logger/).
+more](examples/8channel-sensors-logger/).
 
 
 ## SdFormatter
 
 The SDFat SDFormatter sketch without the interaction on the Serial
-console.  [Read more](SdFormatter/)
+console.  [Read more](examples/SdFormatter/)
 
 
 ## Housings

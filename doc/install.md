@@ -6,7 +6,7 @@ Install the [Arduino IDE](https://www.arduino.cc/en/software) with
 [Teensy
 support](https://www.pjrc.com/arduino-ide-2-0-0-teensy-support/) as
 described
-[here](https://github.com/janscience/TeeRec/blob/main/docs/install.md#requirements).
+[here](https://github.com/janscience/TeeRec/blob/main/docs/install.md).
 
 
 ## TeeRec library
