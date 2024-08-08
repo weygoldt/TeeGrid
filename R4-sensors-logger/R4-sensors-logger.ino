@@ -16,19 +16,19 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define NCHANNELS     16       // number of channels (even, from 2 to 16)
-#define PREGAIN       10.0     // gain factor of preamplifier
+#define PREGAIN       1.0     // gain factor of preamplifier
 #define SAMPLING_RATE 48000    // samples per second and channel in Hertz
-#define GAIN          20.0     // dB
+#define GAIN          0.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 5*60    // seconds
+#define FILENAME      "eellogger2-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 20 // 5*60    // seconds
 #define INITIAL_DELAY  10.0    // seconds
 
 #define LED_PIN        26    // R4.1
 //#define LED_PIN        27    // R4.2
 
-#define TEMP_PIN         2     // pin for DATA line of DS18x20 themperature sensor
+#define TEMP_PIN         35     // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL 10.0  // interval between sensors readings in seconds
 
 
@@ -94,8 +94,8 @@ void setup() {
   settings.disable("DisplayTime");
   config.setConfigFile("logger.cfg");
   config.configure(sdcard);
-  if (Serial)
-    config.configure(Serial);
+  //if (Serial)
+  //  config.configure(Serial);
   config.report();
   aidata.setSwapLR();
   setupSensors();
