@@ -1,9 +1,21 @@
 # R4.x sensors logger
 
-Logger for 2 to 16 channels based on [Teensy_Amp R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
+Logger for 2 to 16 channels based on [Teensy_Amp R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) and/or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
   connected to a [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with additional sensors.
 
 Designed by Jan Benda in September 2023.
+
+
+![submerged logger](submergedlogger.jpg)
+
+
+## Assembly
+
+Connect the wires from the [electrodes](../../doc/steel-electrodes) to the screw terminals of the amplifier...
+
+![channels]{https://github.com/janscience/Teensy_Amp/blob/main/R4.1-R4.2/images/Teensy_Amp-R41-R42-front.png}
+
+using this [color code]{https://github.com/janscience/TeeGrid/tree/main/doc/steel-electrodes#international-color-code)
 
 
 ## Installation
@@ -12,7 +24,7 @@ See the [installation instructions](../../doc/install.md) for the
 TeeGrid library.
 
 
-## Setup
+## Software setup
 
 The behavior of the logger sketch can be modfied in various
 ways. Either by editing some variables directly in the sketch, as
@@ -24,12 +36,14 @@ described in the next section.
 
 For editing the sketch, open the
 [`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch in the Arduino
-IDE (`File` - `Open`, `Ctrl-O`) and edit it appropriately.  In the top
-section marked as `Default settings` you may adapt some settings
-according to your needs as described in the next sections.
+IDE (`File` - `Open`, `Ctrl-O`, or `File` - `Examples` - `TeeGrid` -
+`R4-senosrs-logger`) and edit it appropriately.  In the top section
+marked as `Default settings` you may adapt some settings according to
+your needs as described in the next sections.
 
 Once you modified the sketch to your needs, compile and upload it to
-the Teensy (`Ctrl-U`).
+the Teensy (`Ctrl-U`). Open the serial monitor (`Ctrl-Shift-M`) and
+check the output of the sketch.
 
 
 ### Data acquisition
@@ -86,8 +100,7 @@ the current date, time, or a number:
 - `TEMP_PIN`: the Teensy pin to which the DATA wire of the [Dallas
   DS18x20](https://github.com/janscience/ESensors/blob/main/docs/chips/ds18x20.md)
   temperature sensor is connected to.
-
-
+- `SENSORS_INTERVAL`: interval between sensor readings in seconds
 
 
 ## Configuration
@@ -95,28 +108,28 @@ the current date, time, or a number:
 Most of the settings described above can be configured via a
 configuration file. Simply place a configuration file named
 [`logger.cfg`](logger.cfg) into the root folder of the SD card. If
-present, this file is read once on startup.
+present, this file is read once on startup. The configuration file
+will overwrite the settings made in the
+[`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch.
 
 The content of the configuration file should look like this:
 
 ```txt
-# Configuration file for TeeGrid logger unit.
-
 Settings:
-  Path           : recordings  # path where to store data
-  FileName       : logger1-SDATETIME.wav  # may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-  FileTime       : 10min       # s, min, or h
-  InitialDelay   : 10s         # ms, s, or min
-
+  Path:            recordings
+  FileName:        logger1-SDATETIME.wav
+  FileTime:        5min
+  InitialDelay:    10s
+  SensorsInterval: 10.0s
 ADC:
-  SamplingRate: 48kHz          # Hz, kHz, MHz
-  NChannels: 16
-  Gain: 20                     #dB
+  SamplingRate: 48.0kHz
+  NChannels:    16
+  Gain:         20.0dB
 ``` 
 
 Everything behind '#' is a comment. All lines without a colon are
 ignored.  Unknown keys are ignored but reported. Times and frequencies
-understand various units as indicated in the comments. Check the
+understand various units (s, min, h, kHz, MHz). Check the
 serial monitor of the Arduino IDE (`Ctrl+Shif+M`) to confirm the right
 settings.
 

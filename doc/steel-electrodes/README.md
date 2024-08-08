@@ -16,7 +16,7 @@ wire outlet:
 - 16 wire cable: [kabeltronik UL-LiYCY 16 x AWG 26](https://www.kabeltronik.de/de/electronics-industry/contol-cables-acc-to-ul/art/ul-cul-control-cable-shielded-ul-liycy-style-2464-1061-16/)
 
 
-## International Color code
+## International color code
 
 | core | color        |
 | ---: | :----------- |
