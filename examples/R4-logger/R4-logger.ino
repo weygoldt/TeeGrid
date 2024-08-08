@@ -70,8 +70,8 @@ void setup() {
   settings.disable("SensorsInterval");
   config.setConfigFile("logger.cfg");
   config.configure(sdcard);
-  if (Serial)
-    config.configure(Serial);
+  //if (Serial)
+  //  config.configure(Serial);
   config.report();
   aidata.setSwapLR();
   Wire.begin();
