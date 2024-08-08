@@ -8,6 +8,13 @@ inspired by Stefan Mucha's
 [EOD-Logger](https://github.com/muchaste/EOD-Logger).
 
 
+## R4 logger with sensors
+
+Logger for 2 to 16 channels based on
+[R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or
+[R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2) with additional environmental sensors. [Read more](examples/R4-sensors-logger/).
+
+
 ## R4 logger
 
 Logger for 2 to 16 channels based on
