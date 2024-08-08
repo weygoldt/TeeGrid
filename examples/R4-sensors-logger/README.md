@@ -184,6 +184,49 @@ deletes the file from the SD card to avoid resetting the time at the
 next start up.
 
 
+## Check logger function
+
+Run the logger from the Arduino IDE and check the output on the serial
+monitor (`Ctrl+Shif+M`). You should then see something like the
+following. The comments after `#` have been inserted afterwards to
+explain what is important:
+
+```txt
+=======================================================================
+
+RTC (on-board) current time: 2024-07-23T10:24:08      # this should be the current time and not 2019-01-01T00:00:02
+
+Configuration file "logger.cfg" not found or empty.   # if you use a configuration file, it should be reported here
+
+Settings:                                             # check whether these configuration settings are right
+  Path:         recordings
+  FileName:     logger1-SDATETIME.wav
+  FileTime:     20s
+  PulseFreq:    0Hz
+  InitialDelay: 10s
+ADC:
+  SamplingRate: 48.0kHz
+  NChannels:    16
+  Gain:         0.0dB
+Setup PCM186x 0 on TDM 0: configured for 4 channels  # make sure all 4 chips are detected and configured for 4 channels
+Setup PCM186x 1 on TDM 0: configured for 4 channels
+Setup PCM186x 2 on TDM 1: configured for 4 channels
+Setup PCM186x 3 on TDM 1: configured for 4 channels
+
+TDM settings:                                        # check the sampling rate
+  rate:       48.0kHz
+  resolution: 32bits
+  channels:   16
+  swap l/r:   1
+  buffer:     2.73s (2097152 samples)
+  DMA time:   1.3ms
+
+Save recorded data in folder "recordings".
+
+logger1-2024-07-23T10:24:21.wav                     # this is the first file for storing recorded data
+```
+
+
 ## Logging
 
 1. *Format the SD card.* (see section below)
