@@ -3,7 +3,7 @@
 Logger for 2 to 16 channels based on [Teensy_Amp R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) and/or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
   connected to a [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with additional sensors.
 
-Designed by Jan Benda in September 2023.
+Designed by Jan Benda and Patrick Weygoldt in September 2023.
 
 
 ![submerged logger](submergedlogger.jpg)
@@ -15,7 +15,21 @@ Connect the wires from the [electrodes](../../doc/steel-electrodes) to the screw
 
 ![channels](https://github.com/janscience/Teensy_Amp/blob/main/R4.1-R4.2/images/Teensy_Amp-R41-R42-front.png)
 
-using this [color code](https://github.com/janscience/TeeGrid/tree/main/doc/steel-electrodes#international-color-code)
+... using this [color code](https://github.com/janscience/TeeGrid/tree/main/doc/steel-electrodes#international-color-code)
+
+Connect the coin battery and the temperature sensor:
+
+![periphery](logger-periphery-overview.png)
+
+![connections](logger-periphery-connections.png)
+
+- Coin battery: make sure the +3.3V (hopefully red) is on the side,
+  and ground (hopefully black) is in the center of the Teensy. Better
+  is to check the polarity of the coin battery using a multimeter.
+
+- Temperature sensor: the data wire goes on third pin (counted from
+  the SD card end of the Teensy, pin 35). Power is the red cable,
+  ground is the red cable with the black line on the outside.
 
 
 ## Installation

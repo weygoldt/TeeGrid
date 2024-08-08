@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg2"
+   width="1364.0588"
+   height="813.84479"
+   viewBox="0 0 1364.0589 813.84479"
+   sodipodi:docname="logger-periphery-connections.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:export-filename="/home/benda/Arduino/libraries/TeeGrid/examples/R4-sensors-logger/logger-periphery-connections.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath17226">
+      <rect
+         style="fill:#ffffff;fill-opacity:0.666667"
+         id="rect17228"
+         width="1364.0588"
+         height="813.84479"
+         x="1.2744403"
+         y="210.15523"
+         ry="4.12498"
+         rx="4.12498" />
+    </clipPath>
+  </defs>
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.2222451"
+     inkscape:cx="680.71453"
+     inkscape:cy="301.90344"
+     inkscape:window-width="3840"
+     inkscape:window-height="2035"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g8" />
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g8"
+     transform="translate(-1.2744403,-210.15523)">
+    <image
+       width="1365.3333"
+       height="1024"
+       preserveAspectRatio="none"
+       xlink:href="logger-periphery-connections.jpg"
+       id="image10"
+       clip-path="url(#clipPath17226)" />
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="26.985014"
+       y="272.62003"
+       id="text5514"><tspan
+         sodipodi:role="line"
+         id="tspan5512"
+         x="26.985014"
+         y="272.62003">Coin battery</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="120.09899"
+       y="336.87485"
+       id="text7982"><tspan
+         sodipodi:role="line"
+         id="tspan7980"
+         x="120.09899"
+         y="336.87485">3.3V</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="119.57816"
+       y="497.81821"
+       id="text8976"><tspan
+         sodipodi:role="line"
+         id="tspan8974"
+         x="119.57816"
+         y="497.81821">GND</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="624.07446"
+       y="909.86102"
+       id="text12280"><tspan
+         sodipodi:role="line"
+         id="tspan12278"
+         x="624.07446"
+         y="909.86102">GND</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="795.37457"
+       y="909.86102"
+       id="text13840"><tspan
+         sodipodi:role="line"
+         id="tspan13838"
+         x="795.37457"
+         y="909.86102">3.3V</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="461.56519"
+       y="909.86102"
+       id="text16176"><tspan
+         sodipodi:role="line"
+         id="tspan16174"
+         x="461.56519"
+         y="909.86102">Data</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.6667px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb"
+       x="130.49779"
+       y="909.86102"
+       id="text17038"><tspan
+         sodipodi:role="line"
+         id="tspan17036"
+         x="130.49779"
+         y="909.86102">Temperature</tspan><tspan
+         sodipodi:role="line"
+         x="130.49779"
+         y="963.1944"
+         id="tspan17040">sensor</tspan></text>
+  </g>
+</svg>
