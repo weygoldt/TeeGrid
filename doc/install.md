@@ -1,29 +1,38 @@
 # Installation
 
-## Arduino IDE
+## INstallation via library manager of the Arduino IDE
 
-Install the [Arduino IDE](https://www.arduino.cc/en/software) with
-[Teensy
-support](https://www.pjrc.com/arduino-ide-2-0-0-teensy-support/) as
-described
-[here](https://github.com/janscience/TeeRec/blob/main/docs/install.md).
+You can install the TeeGrid library via the Library manager of the
+Arduino IDE (Tools menu). Let it install all its dependencies (in
+particular the [TeeRec library](https://github.com/janscience/TeeRec)
+and the [ESensors
+library](https://github.com/janscience/ESensors)). That's it!
 
-
-## TeeRec library
-
-Install the [TeeRec library](https://github.com/janscience/TeeRec) and
-its dependencies directly from the [library
-manager](https://docs.arduino.cc/software/ide-v2/tutorials/ide-v2-installing-a-library)
-of the [Arduino IDE](https://docs.arduino.cc/software/ide-v2).
-
-If you prefer to install the [TeeRec
-library](https://github.com/janscience/TeeRec) from its [github
-repository](https://github.com/janscience/TeeRec), because you want to
-get the latest updates, follow the [TeeRec installation
-instructions](https://github.com/janscience/TeeRec/blob/main/docs/install.md).
+Make sure that you have a recent [Arduino
+IDE](https://www.arduino.cc/en/software) (version > 2.0) and the
+corresponding [Teensy
+support](https://www.pjrc.com/arduino-ide-2-0-0-teensy-support/) (> 1.58).
+See [here](https://github.com/janscience/TeeRec/blob/main/docs/install.md)
+for installation instructions for the Arduino IDE with Teensy support.
 
 
-## TeeGrid installation
+## Installation from github repositories
+
+### TeeRec and ESensors library
+
+As an alternative to the installation via the library manager, you may
+want to install the [TeeRec
+library](https://github.com/janscience/TeeRec) and the [ESensors
+library](https://github.com/janscience/ESensors) from their github
+repositories,, because you want to get the latest updates. Simply clone these repositories into the `Arduino/libraries` folder. See the
+[TeeRec installation
+instructions](https://github.com/janscience/TeeRec/blob/main/docs/install.md)
+and the [ESensors installation
+instructions](https://github.com/janscience/ESensors/blob/main/docs/install.md)
+for details.
+
+
+### TeeGrid
 
 Clone the [TeeGrid](https://github.com/janscience/TeeGrid) repository
 directly into 'Arduino/libraries':
@@ -48,4 +57,12 @@ touch .development
 
 Close the Arduino IDE and open it again. Then the Arduino IDE knows
 about the TeeGrid library.
+
+
+## Upload new TeeGrid version to Arduino library manager
+
+See
+[TeeRec](https://github.com/janscience/TeeRec/blob/main/docs/install.md#arduino-ide-and-teensyduino)
+for instructions on how to upload a new TeeGrid version to the Arduino
+library manager.
 

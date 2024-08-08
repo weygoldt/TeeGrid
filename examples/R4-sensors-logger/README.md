@@ -23,6 +23,13 @@ Connect the coin battery and the temperature sensor:
 
 ![connections](logger-periphery-connections.png)
 
+- Status LED: plug onto the two pins on the
+  [R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) PCB
+  top left corner. When running the
+  [`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch, and this
+  LED does not light up, then unplug, turn by 180 degrees, and plug in
+  again.
+
 - Coin battery: make sure the +3.3V (hopefully red) is on the side,
   and ground (hopefully black) is in the center of the Teensy. Better
   is to check the polarity of the coin battery using a multimeter.
@@ -272,7 +279,7 @@ Formatting from a computer also helps, but this omits the erasing
 part.
 
 
-### LED
+### Status LED
 
 The on-board LED of the Teensy and the LED of the [Teensy_Amp
 R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) or
