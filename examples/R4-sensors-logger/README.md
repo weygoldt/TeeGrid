@@ -132,9 +132,8 @@ ADC:
 
 Everything behind '#' is a comment. All lines without a colon are
 ignored.  Unknown keys are ignored but reported. Times and frequencies
-understand various units (s, min, h, kHz, MHz). Check the
-serial monitor of the Arduino IDE (`Ctrl+Shif+M`) to confirm the right
-settings.
+understand various units (s, min, h, kHz, MHz). Check the serial
+monitor of the Arduino IDE (`Ctrl+Shif+M`) to confirm the settings.
 
 
 ## Real-time clock
@@ -142,8 +141,12 @@ settings.
 For proper naming of files, the real-time clock needs to be set to the
 right time. The easiest way to achieve this, is to compile and upload
 the [`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch from the
-Arduino IDE. Use the serial monitor to check the output of the
-sketch. At the beginning it reports the time.
+Arduino IDE. The upload also sets the on-bard real-time clock to the
+time of the computer. Use the serial monitor to check the output of
+the sketch. At the beginning it reports the time. Disconnect the
+Teensy from the USB and simply reconnect it. If it then reports on the
+serial monitor the right time, the real time clock is properly set and
+is properly powered by the coin battery.
 
 Alternatively, you may copy a file named `settime.cfg` into the root
 folder of the SD card. This file contains a single line with a date
@@ -158,32 +161,58 @@ date +%FT%T > settime.cfg
 ```
 and then edit this file to some time in the near future.
 
-Insert the SD card into the Teensy. Start the Teensy by connecting it
-to power. On start up the [`R4-sensors-logger.ino`](R4-sensors-logger.ino)
-sketch reads in the `settime.cfg` file, sets the real-time clock to
-this time, and then deletes the file from the SD card to avoid
-resetting the time at the next start up.
+Insert the SD card into the Teensy. Start the Teensy exactly at the
+time that is written into the `settime.cfg` file by connecting it to
+power. On start up the
+[`R4-sensors-logger.ino`](R4-sensors-logger.ino) sketch reads in the
+`settime.cfg` file, sets the real-time clock to this time, and then
+deletes the file from the SD card to avoid resetting the time at the
+next start up.
 
 
 ## Logging
 
-1. *Format the SD card.*
+1. *Format the SD card.* (see section below)
 2. Optional: Copy your logger.cfg file onto the SD card.
 3. Insert the SD card into the Teensy.
-4. Connect the Teensy to a battery/power bank and let it record the data.
+4. Connect the Teensy to a battery/power bank.
+5. Close the housing.
+6. Place the logger whereever you want to record electric fishes.
+7. Let the logger record the data.
+8. Check the status LED whether it blinks every 5 secods. If it is not
+   blinking, then something is wrong.
+9. After many hours (or days, depending on the capacity of your powerbanks),
+   collect the logger.
+10. Open it, and disconnect the Teensy from the powerbank.
+11. Optionally repeat 4. - 10. with a freshly charged powerbank
+    until the SD card is full.
+12. Take out the SD card and store the data on a harddrive.
+    Don't forget to backup the data.
 
-The SD card needs to be *reformatted* once in a while. The logger runs
+
+### Formatting the SD card
+
+The SD card needs to be reformatted once in a while. The logger runs
 until the battery is drained and therefore cannot properly close the
 last files. This leaves the file system in a corrupted state, which
 apparently results in very long delays when writing to the SD card
 again.
 
 You may use the sketch provided by the SdFat library for formatting
-the SD card directly on the Teensy: In the Arduino IDE menu select
-File - Examples, browse to the last section ("Examples from custom
-libraries"), select "SdFat" and then "SdFormatter". Upload the script
+the SD card directly on a Teensy: In the Arduino IDE menu select
+`File` - `Examples`, browse to the last section ("Examples from custom
+libraries"), select `SdFat` and then `SdFormatter`. Upload the script
 on Teensy and open the serial monitor. Follow the instructions on the
 serial monitor.
+
+Or use the `SdFormatter` script provided in TeeGrid. This is the same
+script as the one described above, but without user interaction. When
+running it will erase and format the SD card inserted into the Teensy.
+You find this script under `File` - `Examples` - `TeeGrid` -
+`SdFormatter`.
+
+Formatting from a computer also helps, but this omits the erasing
+part.
 
 
 ### LED
@@ -201,7 +230,9 @@ indicate the following events:
   a double-blink every 2s is emitted.
 
 - Normal operation, i.e. data acquisition is running and data are
-  written to SD card: the LED briefly flashes every 5 seconds.
+  written to SD card: the LED briefly flashes every 5 seconds (file
+  time larger than 30s) or every 2 seconds (file time smaller than
+  30s).
 
 - Whenever a file is closed and the next one opened, the LED lights for
   1 second. Then it continues with flashes every 5 seconds.
@@ -220,6 +251,16 @@ Analog input data are stored on the SD card as wave files in the
 directory specified by `PATH` with names `FILENAME`.wav . The metadata
 in these files indicate the time when the file was created and the
 overall gain of the hardware.
+
+You may use the Python
+[audioio](https://github.com/janscience/audioio) package to read the
+recorded channels and the metadata. Or use the
+[DataLoader](https://github.com/bendalab/thunderlab/blob/main/src/thunderlab/dataloader.py)
+from the [thunderlab](https://github.com/bendalab/thunderlab)
+package. The latter applies the gain setings directly to the data.
+
+For viewing the data, you may use any audio tool. Or check out
+[audian](https://github.com/bendalab/audian).
 
 The sensor data are stored as a csv file with the very same name as
 the first data file, but with `-sensors.csv` added to it.
