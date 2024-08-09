@@ -194,20 +194,25 @@ explain what is important:
 ```txt
 =======================================================================
 
-RTC (on-board) current time: 2024-07-23T10:24:08      # this should be the current time and not 2019-01-01T00:00:02
+RTC (on-board) current time: 2024-07-23T10:24:08      # this should be the current time and not 2019-01-01T00:00:00
 
 Configuration file "logger.cfg" not found or empty.   # if you use a configuration file, it should be reported here
 
 Settings:                                             # check whether these configuration settings are right
-  Path:         recordings
-  FileName:     logger1-SDATETIME.wav
-  FileTime:     20s
-  PulseFreq:    0Hz
-  InitialDelay: 10s
+  Path:            recordings
+  FileName:        logger1-SDATETIME.wav
+  FileTime:        300s
+  PulseFreq:       0Hz
+  InitialDelay:    10s
+  SensorsInterval: 10.0s
 ADC:
   SamplingRate: 48.0kHz
   NChannels:    16
   Gain:         0.0dB
+  
+1 of 1 environmental sensor available, read every 10s:  # check whether the temperature sensor is detected
+  water-temperature T_water (ºC):	 on DS18B20 device (ID: 28 43 AA 67 B2 23 06 10) at a resolution of 0.06ºC.
+  
 Setup PCM186x 0 on TDM 0: configured for 4 channels  # make sure all 4 chips are detected and configured for 4 channels
 Setup PCM186x 1 on TDM 0: configured for 4 channels
 Setup PCM186x 2 on TDM 1: configured for 4 channels
@@ -223,7 +228,10 @@ TDM settings:                                        # check the sampling rate
 
 Save recorded data in folder "recordings".
 
-logger1-2024-07-23T10:24:21.wav                     # this is the first file for storing recorded data
+logger1-2024-07-23T10:24:21.wav                     # this is the first file in which recorded data are stored
+
+Timestamp = 2019-01-01T00:00:14
+water-temperature = 26.25ºC                         # this is the measured temperature
 ```
 
 
@@ -305,7 +313,7 @@ indicate the following events:
 ## Files
 
 Analog input data are stored on the SD card as wave files in the
-directory specified by `PATH` with names `FILENAME`.wav . The metadata
+directory specified by `PATH` with names `FILENAME`. The metadata
 in these files indicate the time when the file was created and the
 overall gain of the hardware.
 
