@@ -1,10 +1,20 @@
 # R4.x sensors logger
 
-Logger for 2 to 16 channels based on [Teensy_Amp R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) and/or [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
-  connected to a [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) with additional sensors.
+Logger for 2 to 16 channels based on
+
+- [Teensy_Amp R4.1](https://github.com/janscience/Teensy_Amp/tree/main/R4.1) and/or
+- [R4.2](https://github.com/janscience/Teensy_Amp/tree/main/R4.2)
+  connected to a
+- [Teensy 4.1](https://www.pjrc.com/store/teensy41.html)
+
+with additional sensors.
+
+Software based on the
+
+- [TeeRec](https://github.com/janscience/TeeRec) and the
+- [ESensors](https://github.com/janscience/ESensors) libraries.
 
 Designed by Jan Benda and Patrick Weygoldt in September 2023.
-
 
 ![submerged logger](submergedlogger.jpg)
 
