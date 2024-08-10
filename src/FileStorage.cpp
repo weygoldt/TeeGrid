@@ -73,7 +73,7 @@ void openNextFile() {
   ssize_t samples = file.write();
   if (samples == -4) {   // overrun
     file.start(aiinput->nbuffer()/2);   // skip half a buffer
-    file.write();                     // write all available data
+    file.write();                       // write all available data
     // report overrun:
     char mfs[100];
     sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
