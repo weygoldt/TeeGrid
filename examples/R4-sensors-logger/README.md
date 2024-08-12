@@ -211,7 +211,7 @@ explain what is important:
 ```txt
 =======================================================================
 
-RTC (on-board) current time: 2024-07-23T10:24:08      # this should be the current time and not 2019-01-01T00:00:00
+RTC (on-board) current time: 2024-08-12T10:43:13      # this should be the current time and not 2019-01-01T00:00:00
 
 Configuration file "logger.cfg" not found or empty.   # if you use a configuration file, it should be reported here
 
@@ -226,16 +226,16 @@ ADC:
   SamplingRate: 48.0kHz
   NChannels:    16
   Gain:         0.0dB
-  
-1 of 1 environmental sensor available, read every 10s:  # check whether the temperature sensor is detected
+
+1 of 1 environmental sensor available, read every 10s:  # check whether all sensors are detected
   water-temperature T_water (ºC):	 on DS18B20 device (ID: 28 43 AA 67 B2 23 06 10) at a resolution of 0.06ºC.
-  
+
 Setup PCM186x 0 on TDM 0: configured for 4 channels  # make sure all 4 chips are detected and configured for 4 channels
 Setup PCM186x 1 on TDM 0: configured for 4 channels
 Setup PCM186x 2 on TDM 1: configured for 4 channels
 Setup PCM186x 3 on TDM 1: configured for 4 channels
 
-TDM settings:                                        # check the sampling rate
+TDM settings:                                        # check sampling rate and channels
   rate:       48.0kHz
   resolution: 32bits
   channels:   16
@@ -245,10 +245,11 @@ TDM settings:                                        # check the sampling rate
 
 Save recorded data in folder "recordings".
 
-logger1-2024-07-23T10:24:21.wav                     # this is the first file in which recorded data are stored
-
-Timestamp = 2019-01-01T00:00:14
-water-temperature = 26.25ºC                         # this is the measured temperature
+logger1-20240812T104327.wav                         # this is the first file in which recorded data are stored
+2024-08-12T10:43:27: T_water = 27.12ºC              # this is the measured temperature
+2024-08-12T10:43:35: T_water = 27.12ºC
+2024-08-12T10:43:45: T_water = 27.12ºC
+...
 ```
 
 

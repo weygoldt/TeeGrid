@@ -97,6 +97,7 @@ void setup() {
   //if (Serial)
   //  config.configure(Serial);
   config.report();
+  Serial.println();
   aidata.setSwapLR();
   setupSensors();
   Wire.begin();
@@ -120,7 +121,6 @@ void setup() {
     delay(uint32_t(1000.0*settings.initialDelay()));
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
-  Serial.println(gs);
   setupStorage(SOFTWARE, aidata, gs);
   openNextFile();
   String sfile = file.baseName();
@@ -134,7 +134,6 @@ void loop() {
   blink.update();
   if (sensors.update()) {
     sensors.writeCSV();
-    sensors.print();
-    Serial.println();
+    sensors.print(true, true);
   }
 }
