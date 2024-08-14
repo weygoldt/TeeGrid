@@ -1,3 +1,5 @@
+![arduino-lint](https://github.com/janscience/TeeGrid/actions/workflows/arduino-lint.yml/badge.svg)
+
 # TeeGrid
 
 Record electric fish with electrode arrays based on
