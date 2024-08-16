@@ -96,7 +96,10 @@ void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   blink.switchOff();
-  rtclock.check();
+ Serial.println("\n=======================================================================\n");
+  Serial.println(SOFTWARE);
+  Serial.println();
+   rtclock.check();
   sdcard.begin();
   rtclock.report();
   setupCAN();  

@@ -24,6 +24,7 @@
 #define SENSORS_INTERVAL  10.0       // interval between sensors readings in seconds
 
 #define LED_PIN        26    // R4.1
+#define SOFTWARE      "TeeGrid R41-CAN-grid-controller v1.0"
 
 
 R41CAN can;
@@ -80,6 +81,9 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
+  Serial.println("\n=======================================================================\n");
+  Serial.println(SOFTWARE);
+  Serial.println();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();
