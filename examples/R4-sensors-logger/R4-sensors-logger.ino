@@ -6,6 +6,7 @@
 #include <RTClock.h>
 #include <Blink.h>
 #include <Configurator.h>
+#include <ToolActions.h>
 #include <Settings.h>
 #include <InputTDMSettings.h>
 #include <SetupPCM.h>
@@ -35,7 +36,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define SOFTWARE      "TeeGrid R4-senors-logger v1.0"
+#define SOFTWARE      "TeeGrid R4-senors-logger v2.0"
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -50,6 +51,8 @@ ControlPCM186x *pcm = 0;
 
 R41CAN can;
 
+RTClock rtclock;
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
 
@@ -57,8 +60,24 @@ Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
-RTClock rtclock;
-Blink blink(LED_PIN, true, LED_BUILTIN, false);
+Configurable datetime_menu("Date & time", Action::StreamInput);
+ReportRTCAction report_rtc_act(datetime_menu, "Print date & time", rtclock);
+SetRTCAction set_rtc_act(datetime_menu, "Set date & time", rtclock);
+Configurable config_menu("Configuration", Action::StreamInput);
+ReportConfigAction report_act(config_menu, "Print configuration");
+SaveConfigAction save_act(config_menu,"Save configuration", sdcard);
+LoadConfigAction load_act(config_menu, "Load configuration", sdcard);
+RemoveConfigAction remove_act(config_menu, "Erase configuration", sdcard);
+Configurable sdcard_menu("SD card", Action::StreamInput);
+SDInfoAction sdinfo_act(sdcard_menu, "SD card info", sdcard);
+SDFormatAction format_act(sdcard_menu, "Format SD card", sdcard);
+SDListAction list_act(sdcard_menu, "List all recordings", sdcard, settings);
+SDRemoveAction erase_act(sdcard_menu, "Erase all recordings", sdcard, settings);
+#ifdef FIRMWARE_UPDATE
+Configurable firmware_menu("Firmware", Action::StreamInput);
+ListFirmwareAction listfirmware_act(firmware_menu, "List available updates", sdcard);
+UpdateFirmwareAction updatefirmware_act(firmware_menu, "Update firmware", sdcard);
+#endif
 
 ESensors sensors;
 
@@ -90,15 +109,15 @@ void setup() {
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
-  rtclock.report();
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
   config.setConfigFile("logger.cfg");
   config.load(sdcard);
-  //if (Serial)
-  //  config.configure(Serial);
+  if (Serial)
+    config.configure(Serial, 10000);
   config.report();
   Serial.println();
+  rtclock.report();
   aidata.setSwapLR();
   setupSensors();
   Wire.begin();
@@ -109,7 +128,11 @@ void setup() {
   }
   Serial.println();
   aidata.begin();
-  aidata.check();
+  if (!aidata.check()) {
+    Serial.println("Fix ADC settings and check your hardware.");
+    Serial.println("HALT");
+    while (true) { yield(); };
+  }
   aidata.start();
   aidata.report();
   blink.switchOff();
