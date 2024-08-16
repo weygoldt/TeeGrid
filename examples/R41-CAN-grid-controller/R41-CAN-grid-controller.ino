@@ -1,6 +1,7 @@
 #define SENSORS
 
 #include <Arduino.h>
+#include <Banner.h>
 #include <RTClock.h>
 #include <Blink.h>
 #include <R41CAN.h>
@@ -81,9 +82,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
-  Serial.println("\n=======================================================================\n");
-  Serial.println(SOFTWARE);
-  Serial.println();
+  printBanner(SOFTWARE);
   sdcard.begin();
   rtclock.setFromFile(sdcard);
   rtclock.report();

@@ -1,3 +1,4 @@
+#include <Banner.h>
 #include <InputADC.h>
 #include <SDWriter.h>
 #include <RTClock.h>
@@ -55,9 +56,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
-  Serial.println("\n=======================================================================\n");
-  Serial.println(SOFTWARE);
-  Serial.println();
+  printBanner(SOFTWARE);
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
