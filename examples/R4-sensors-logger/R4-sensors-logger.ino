@@ -137,6 +137,10 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
+  if (!sdcard.check(1e9, Serial)) {
+    Serial.println("HALT");
+    while (true) { yield(); };
+  }
   if (settings.initialDelay() >= 2.0) {
     delay(1000);
     blink.setDouble();
