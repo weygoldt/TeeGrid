@@ -7,6 +7,7 @@
 #include <DewPoint.h>
 #include <SDWriter.h>
 #include <RTClock.h>
+#include <DeviceID.h>
 #include <Blink.h>
 #include <TestSignals.h>
 #include <Configurator.h>
@@ -29,8 +30,9 @@ int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pin
 #define TEMP_PIN         25   // pin for DATA of thermometer
 #define SENSORS_INTERVAL 10.0 // interval between sensors readings in seconds
 
-#define PATH          "recordings"      // folder where to store the recordings
-#define FILENAME      "grid1-SDATETIME" // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define PATH          "recordings"       // folder where to store the recordings
+#define DEVICEID      1                  // may be used for naming files
+#define FILENAME      "gridID-SDATETIME" // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 10*60 // seconds
 #define INITIAL_DELAY  2.0   // seconds
 
@@ -42,6 +44,7 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 #define SOFTWARE      "TeeGrid 8channel-sensors-logger v1.2"
 
 RTClock rtclock;
+DeviceID deviceid(DEVICEID);
 
 DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
 InputADC aidata(AIBuffer, NAIBuffer, channels0, channels1);
@@ -52,7 +55,7 @@ SDWriter file(sdcard, aidata);
 Configurator config;
 InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
 			    CONVERSION, SAMPLING, REFERENCE);
-Settings settings(PATH, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
+Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY, SENSORS_INTERVAL);
 Blink blink(LED_BUILTIN);
 
@@ -224,6 +227,7 @@ void setup() {
   if (Serial)
     config.configure(Serial);
   config.report();
+  deviceid.report();
   aisettings.configure(&aidata);
   setupTestSignals(signalPins, settings.pulseFrequency());
   setupStorage();

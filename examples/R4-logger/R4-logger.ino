@@ -4,6 +4,7 @@
 #include <InputTDM.h>
 #include <SDWriter.h>
 #include <RTClock.h>
+#include <DeviceID.h>
 #include <Blink.h>
 #include <Configurator.h>
 #include <Settings.h>
@@ -20,7 +21,8 @@
 #define GAIN          0.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define FILENAME      "logger1-SDATETIME.wav"  // may include DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define DEVICEID      1              // may be used for naming files
+#define FILENAME      "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 20 //5*60   // seconds
 #define INITIAL_DELAY  10.0  // seconds
 
@@ -51,6 +53,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
 RTClock rtclock;
+DeviceID deviceid(DEVICEID);
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
 
 
@@ -74,6 +77,7 @@ void setup() {
   //if (Serial)
   //  config.configure(Serial);
   config.report();
+  deviceid.report();
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();

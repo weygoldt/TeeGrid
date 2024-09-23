@@ -3,6 +3,7 @@
 #include <Input.h>
 #include <SDWriter.h>
 #include <RTClock.h>
+#include <DeviceID.h>
 #include <Blink.h>
 #include <Settings.h>
 #include <FileStorage.h>
@@ -15,6 +16,7 @@ extern SDCard sdcard;
 extern SDWriter file;
 extern Settings settings;
 extern RTClock rtclock;
+extern DeviceID deviceid;
 extern Blink blink;
 
 
@@ -43,8 +45,9 @@ void setupStorage(const char *software, Input &aidata, char *gainstr) {
 void openNextFile() {
   blink.setSingle();
   blink.blinkSingle(0, 2000);
+  String fname = deviceid.makeStr(settings.fileName());
   time_t t = now();
-  String fname = rtclock.makeStr(settings.fileName(), t, true);
+  fname = rtclock.makeStr(fname, t, true);
   if (fname != prevname) {
     file.sdcard()->resetFileCounter();
     prevname = fname;
