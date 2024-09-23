@@ -32,8 +32,10 @@
 #define LED_PIN          26    // R4.1
 //#define LED_PIN        27    // R4.2
 
-#define TEMP_PIN         35     // pin for DATA line of DS18x20 themperature sensor
+#define TEMP_PIN         35    // pin for DATA line of DS18x20 themperature sensor
 #define SENSORS_INTERVAL 10.0  // interval between sensors readings in seconds
+
+#define SDCARD1_CS       10    // CS pin for second SD card on SPI bus
 
 
 // ----------------------------------------------------------------------------
@@ -58,6 +60,8 @@ DeviceID deviceid(DEVICEID);
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
 SDCard sdcard;
 SDWriter file(sdcard, aidata);
+SDCard sdcard1;
+SDWriter file1(sdcard1, aidata);
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
@@ -80,6 +84,15 @@ SDEraseFormatAction eraseformat_act(sdcard_menu, "Erase and format SD card", sdc
 SDListRootAction listroot_act(sdcard_menu, "List files in root directory", sdcard);
 SDListRecordingsAction listrecs_act(sdcard_menu, "List all recordings", sdcard, settings);
 SDRemoveRecordingsAction eraserecs_act(sdcard_menu, "Erase all recordings", sdcard, settings);
+Configurable sdcard1_menu("Backup SD card", Action::StreamInput);
+SDInfoAction sd1info_act(sdcard1_menu, "Backup SD card info", sdcard);
+SDCheckAction sd1check_act(sdcard1_menu, "Backup SD card check", sdcard);
+SDBenchmarkAction sd1bench_act(sdcard1_menu, "Backup SD card benchmark", sdcard);
+SDFormatAction format1_act(sdcard1_menu, "Format backup SD card", sdcard);
+SDEraseFormatAction eraseformat1_act(sdcard1_menu, "Erase and format backup SD card", sdcard);
+SDListRootAction listroot1_act(sdcard1_menu, "List files in root directory", sdcard);
+SDListRecordingsAction listrecs1_act(sdcard1_menu, "List all recordings", sdcard, settings);
+SDRemoveRecordingsAction eraserecs1_act(sdcard1_menu, "Erase all recordings", sdcard, settings);
 #ifdef FIRMWARE_UPDATE
 Configurable firmware_menu("Firmware", Action::StreamInput);
 ListFirmwareAction listfirmware_act(firmware_menu, "List available updates", sdcard);
@@ -115,6 +128,7 @@ void setup() {
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard.begin();
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
   rtclock.setFromFile(sdcard);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
@@ -144,10 +158,12 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (!sdcard.check(1e9, Serial)) {
+  if (!sdcard.check(1e9)) {
     Serial.println("HALT");
     while (true) { yield(); };
   }
+  if (sdcard1.available() && !sdcard1.check(sdcard.free()))
+    sdcard1.end();
   if (settings.initialDelay() >= 2.0) {
     delay(1000);
     blink.setDouble();
@@ -162,6 +178,7 @@ void setup() {
   String sfile = file.baseName();
   sfile.append("-sensors");
   sensors.openCSV(sdcard, sfile.c_str());
+  openBackupFile();
 }
 
 

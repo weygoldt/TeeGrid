@@ -9,6 +9,7 @@
 
 void setupStorage(const char *software, Input &aidata, char *gainstr=0);
 void openNextFile();
+void openBackupFile();
 void storeData();
 
 
