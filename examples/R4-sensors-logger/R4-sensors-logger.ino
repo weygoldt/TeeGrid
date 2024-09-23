@@ -38,7 +38,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define SOFTWARE      "TeeGrid R4-senors-logger v2.0"
+#define SOFTWARE      "TeeGrid R4-sensors-logger v2.0"
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -123,8 +123,8 @@ void setup() {
   if (Serial)
     config.configure(Serial, 10000);
   config.report();
-  deviceid.report();
   Serial.println();
+  deviceid.report();
   rtclock.report();
   aidata.setSwapLR();
   setupSensors();
