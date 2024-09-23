@@ -14,8 +14,10 @@ void printBanner(const char *software, Stream &stream) {
   if (software != NULL) {
     if (strlen(software) > 7 && strncmp(software, "TeeGrid", 7) == 0)
       software = software + 8;
-    stream.println(software);
+    stream.print(software);
+    stream.print(" ");
   }
+  stream.println("by Benda-Lab");
   stream.println("--------------------------------------------------------");
   stream.println();
 }
