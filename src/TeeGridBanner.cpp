@@ -1,7 +1,7 @@
-#include <Banner.h>
+#include <TeeGridBanner.h>
 
 
-void printBanner(const char *software, Stream &stream) {
+void printTeeGridBanner(const char *software, Stream &stream) {
   stream.println("\n========================================================");
   // Generated with https://www.ascii-art-generator.org/
   // Using font "Standard".

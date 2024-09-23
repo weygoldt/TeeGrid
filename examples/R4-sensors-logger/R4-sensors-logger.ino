@@ -1,4 +1,4 @@
-#include <Banner.h>
+#include <TeeGridBanner.h>
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
@@ -18,18 +18,18 @@
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
-#define NCHANNELS     16       // number of channels (even, from 2 to 16)
-#define SAMPLING_RATE 48000    // samples per second and channel in Hertz
-#define PREGAIN       10.0     // gain factor of preamplifier
-#define GAIN          0.0     // dB
+#define NCHANNELS        16       // number of channels (even, from 2 to 16)
+#define SAMPLING_RATE    48000    // samples per second and channel in Hertz
+#define PREGAIN          10.0     // gain factor of preamplifier
+#define GAIN             0.0     // dB
 
-#define PATH          "recordings"   // folder where to store the recordings
-#define DEVICEID      1              // may be used for naming files
-#define FILENAME      "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 5*60    // seconds
-#define INITIAL_DELAY  10.0    // seconds
+#define PATH             "recordings"   // folder where to store the recordings
+#define DEVICEID         1              // may be used for naming files
+#define FILENAME         "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME   5*60    // seconds
+#define INITIAL_DELAY    10.0    // seconds
 
-#define LED_PIN        26    // R4.1
+#define LED_PIN          26    // R4.1
 //#define LED_PIN        27    // R4.2
 
 #define TEMP_PIN         35     // pin for DATA line of DS18x20 themperature sensor
@@ -112,7 +112,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
-  printBanner(SOFTWARE);
+  printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);

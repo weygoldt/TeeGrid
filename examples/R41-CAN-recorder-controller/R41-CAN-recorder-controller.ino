@@ -1,4 +1,4 @@
-#include <Banner.h>
+#include <TeeGridBanner.h>
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
@@ -69,7 +69,7 @@ void setup() {
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
   blink.switchOff();
-  printBanner(SOFTWARE);
+  printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);

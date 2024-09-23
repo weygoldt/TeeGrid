@@ -1,4 +1,4 @@
-#include <Banner.h>
+#include <TeeGridBanner.h>
 #include <InputADC.h>
 #include <ESensors.h>
 #include <TemperatureDS18x20.h>
@@ -216,7 +216,7 @@ void setup() {
   blink.switchOn();
   Serial.begin(9600);
   while (!Serial && millis() < 2000) {};
-  printBanner(SOFTWARE);
+  printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard.begin();
   rtclock.setFromFile(sdcard);
