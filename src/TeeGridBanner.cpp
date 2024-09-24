@@ -1,3 +1,4 @@
+#include <TeeRecBanner.h>
 #include <TeeGridBanner.h>
 
 
@@ -18,6 +19,8 @@ void printTeeGridBanner(const char *software, Stream &stream) {
     stream.print(" ");
   }
   stream.println("by Benda-Lab");
+  stream.print("based on ");
+  stream.println(TEEREC_SOFTWARE);
   stream.println("--------------------------------------------------------");
   stream.println();
 }
