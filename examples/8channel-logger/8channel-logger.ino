@@ -10,7 +10,6 @@
 #include <InputADCSettings.h>
 #include <FileStorage.h>
 
-
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file teegrid.cfg)
 
@@ -36,21 +35,22 @@ int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test s
 
 #define SOFTWARE      "TeeGrid 8channel-logger v2.6"
 
-RTClock rtclock;
-DeviceID deviceid(DEVICEID);
-
 DATA_BUFFER(AIBuffer, NAIBuffer, 256*256)
 InputADC aidata(AIBuffer, NAIBuffer, channels0, channels1);
 
-SDCard sdcard;
-SDWriter file(sdcard, aidata);
+RTClock rtclock;
+DeviceID deviceid(DEVICEID);
+Blink blink(LED_BUILTIN);
+SDCard sdcard0;
+SDCard sdcard1;
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY);
 InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
 			    CONVERSION, SAMPLING, REFERENCE);
-Blink blink(LED_BUILTIN);
+
+FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 // ----------------------------------------------------------------------------
@@ -61,36 +61,35 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
-  sdcard.begin();
-  rtclock.setFromFile(sdcard);
-  rtclock.report();
+  sdcard0.begin();
+  rtclock.setFromFile(sdcard0);
   settings.disable("DisplayTime");
   settings.disable("SensorsInterval");
   config.setConfigFile("teegrid.cfg");
-  config.load(sdcard);
+  config.load(sdcard0);
   if (Serial)
-    config.configure(Serial);
+    config.configure(Serial, 10000);
   config.report();
-  deviceid.report();
+  Serial.println();
   aisettings.configure(&aidata);
   setupTestSignals(signalPins, settings.pulseFrequency());
-  aidata.check();
+  if (!aidata.check()) {
+    Serial.println("Fix ADC settings and check your hardware.");
+    Serial.println("HALT");
+    while (true) { yield(); };
+  }
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.initialDelay() >= 2.0) {
-    delay(1000);
-    blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.initialDelay()) - 1000);
-  }
-  else
-    delay(uint32_t(1000.0*settings.initialDelay()));
-  setupStorage(SOFTWARE, aidata);
-  openNextFile();
+  files.check();
+  files.report();
+  files.initialDelay(settings.initialDelay());
+  files.start(settings.path(), settings.fileName(), settings.fileTime(),
+              SOFTWARE);
 }
 
 
 void loop() {
-  storeData();
+  files.storeData();
   blink.update();
 }

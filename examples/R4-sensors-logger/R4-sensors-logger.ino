@@ -25,7 +25,7 @@
 
 #define PATH             "recordings"   // folder where to store the recordings
 #define DEVICEID         1              // may be used for naming files
-#define FILENAME         "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILENAME         "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, NUM, ANUM
 #define FILE_SAVE_TIME   5*60    // seconds
 #define INITIAL_DELAY    10.0    // seconds
 
@@ -58,10 +58,8 @@ R41CAN can;
 RTClock rtclock;
 DeviceID deviceid(DEVICEID);
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
-SDCard sdcard;
-SDWriter file(sdcard, aidata);
+SDCard sdcard0;
 SDCard sdcard1;
-SDWriter file1(sdcard1, aidata);
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
@@ -72,36 +70,38 @@ ReportRTCAction report_rtc_act(datetime_menu, "Print date & time", rtclock);
 SetRTCAction set_rtc_act(datetime_menu, "Set date & time", rtclock);
 Configurable config_menu("Configuration", Action::StreamInput);
 ReportConfigAction report_act(config_menu, "Print configuration");
-SaveConfigAction save_act(config_menu,"Save configuration", sdcard);
-LoadConfigAction load_act(config_menu, "Load configuration", sdcard);
-RemoveConfigAction remove_act(config_menu, "Erase configuration", sdcard);
+SaveConfigAction save_act(config_menu,"Save configuration", sdcard0);
+LoadConfigAction load_act(config_menu, "Load configuration", sdcard0);
+RemoveConfigAction remove_act(config_menu, "Erase configuration", sdcard0);
 Configurable sdcard_menu("SD card", Action::StreamInput);
-SDInfoAction sdinfo_act(sdcard_menu, "SD card info", sdcard);
-SDCheckAction sdcheck_act(sdcard_menu, "SD card check", sdcard);
-SDBenchmarkAction sdbench_act(sdcard_menu, "SD card benchmark", sdcard);
-SDFormatAction format_act(sdcard_menu, "Format SD card", sdcard);
-SDEraseFormatAction eraseformat_act(sdcard_menu, "Erase and format SD card", sdcard);
-SDListRootAction listroot_act(sdcard_menu, "List files in root directory", sdcard);
-SDListRecordingsAction listrecs_act(sdcard_menu, "List all recordings", sdcard, settings);
-SDRemoveRecordingsAction eraserecs_act(sdcard_menu, "Erase all recordings", sdcard, settings);
+SDInfoAction sdinfo_act(sdcard_menu, "SD card info", sdcard0);
+SDCheckAction sdcheck_act(sdcard_menu, "SD card check", sdcard0);
+SDBenchmarkAction sdbench_act(sdcard_menu, "SD card benchmark", sdcard0);
+SDFormatAction format_act(sdcard_menu, "Format SD card", sdcard0);
+SDEraseFormatAction eraseformat_act(sdcard_menu, "Erase and format SD card", sdcard0);
+SDListRootAction listroot_act(sdcard_menu, "List files in root directory", sdcard0);
+SDListRecordingsAction listrecs_act(sdcard_menu, "List all recordings", sdcard0, settings);
+SDRemoveRecordingsAction eraserecs_act(sdcard_menu, "Erase all recordings", sdcard0, settings);
 Configurable sdcard1_menu("Backup SD card", Action::StreamInput);
-SDInfoAction sd1info_act(sdcard1_menu, "Backup SD card info", sdcard);
-SDCheckAction sd1check_act(sdcard1_menu, "Backup SD card check", sdcard);
-SDBenchmarkAction sd1bench_act(sdcard1_menu, "Backup SD card benchmark", sdcard);
-SDFormatAction format1_act(sdcard1_menu, "Format backup SD card", sdcard);
-SDEraseFormatAction eraseformat1_act(sdcard1_menu, "Erase and format backup SD card", sdcard);
-SDListRootAction listroot1_act(sdcard1_menu, "List files in root directory", sdcard);
-SDListRecordingsAction listrecs1_act(sdcard1_menu, "List all recordings", sdcard, settings);
-SDRemoveRecordingsAction eraserecs1_act(sdcard1_menu, "Erase all recordings", sdcard, settings);
+SDInfoAction sd1info_act(sdcard1_menu, "Backup SD card info", sdcard1);
+SDCheckAction sd1check_act(sdcard1_menu, "Backup SD card check", sdcard1);
+SDBenchmarkAction sd1bench_act(sdcard1_menu, "Backup SD card benchmark", sdcard1);
+SDFormatAction format1_act(sdcard1_menu, "Format backup SD card", sdcard1);
+SDEraseFormatAction eraseformat1_act(sdcard1_menu, "Erase and format backup SD card", sdcard1);
+SDListRootAction listroot1_act(sdcard1_menu, "List files in root directory", sdcard1);
+SDListRecordingsAction listrecs1_act(sdcard1_menu, "List all recordings", sdcard1, settings);
+SDRemoveRecordingsAction eraserecs1_act(sdcard1_menu, "Erase all recordings", sdcard1, settings);
 #ifdef FIRMWARE_UPDATE
 Configurable firmware_menu("Firmware", Action::StreamInput);
-ListFirmwareAction listfirmware_act(firmware_menu, "List available updates", sdcard);
-UpdateFirmwareAction updatefirmware_act(firmware_menu, "Update firmware", sdcard);
+ListFirmwareAction listfirmware_act(firmware_menu, "List available updates", sdcard0);
+UpdateFirmwareAction updatefirmware_act(firmware_menu, "Update firmware", sdcard0);
 #endif
 
 ESensors sensors;
 
 TemperatureDS18x20 temp(&sensors);
+
+FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 void setupSensors() {
@@ -127,21 +127,19 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
-  sdcard.begin();
+  sdcard0.begin();
   sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
-  rtclock.setFromFile(sdcard);
+  rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
   config.setConfigFile("logger.cfg");
-  config.load(sdcard);
+  config.load(sdcard0);
   if (Serial)
     config.configure(Serial, 10000);
   config.report();
   Serial.println();
-  deviceid.report();
-  rtclock.report();
-  aidata.setSwapLR();
   setupSensors();
+  aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
   for (int k=0;k < NPCMS; k++) {
@@ -158,32 +156,21 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (!sdcard.check(1e9)) {
-    Serial.println("HALT");
-    while (true) { yield(); };
-  }
-  if (sdcard1.available() && !sdcard1.check(sdcard.free()))
-    sdcard1.end();
-  if (settings.initialDelay() >= 2.0) {
-    delay(1000);
-    blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.initialDelay())-1000);
-  }
-  else
-    delay(uint32_t(1000.0*settings.initialDelay()));
+  files.check();
+  files.report();
+  files.initialDelay(settings.initialDelay());
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
-  setupStorage(SOFTWARE, aidata, gs);
-  openNextFile();
-  String sfile = file.baseName();
+  files.start(settings.path(), settings.fileName(), settings.fileTime(),
+              SOFTWARE, gs);
+  String sfile = files.baseName();
   sfile.append("-sensors");
-  sensors.openCSV(sdcard, sfile.c_str());
-  openBackupFile();
+  sensors.openCSV(sdcard0, sfile.c_str());
 }
 
 
 void loop() {
-  storeData();
+  files.storeData();
   blink.update();
   if (sensors.update()) {
     sensors.writeCSV();

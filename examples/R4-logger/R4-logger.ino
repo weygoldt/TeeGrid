@@ -45,16 +45,18 @@ ControlPCM186x *pcm = 0;
 
 R41CAN can;
 
-SDCard sdcard;
-SDWriter file(sdcard, aidata);
+RTClock rtclock;
+DeviceID deviceid(DEVICEID);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
+SDCard sdcard0;
+SDCard sdcard1;
 
 Configurator config;
 Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
-RTClock rtclock;
-DeviceID deviceid(DEVICEID);
-Blink blink(LED_PIN, true, LED_BUILTIN, false);
+
+FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 // -----------------------------------------------------------------------------
@@ -66,8 +68,8 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
-  sdcard.begin();
-  rtclock.setFromFile(sdcard);
+  sdcard0.begin();
+  rtclock.setFromFile(sdcard0);
   rtclock.report();
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
@@ -77,7 +79,6 @@ void setup() {
   //if (Serial)
   //  config.configure(Serial);
   config.report();
-  deviceid.report();
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
@@ -87,25 +88,25 @@ void setup() {
   }
   Serial.println();
   aidata.begin();
-  aidata.check();
+  if (!aidata.check()) {
+    Serial.println("Fix ADC settings and check your hardware.");
+    Serial.println("HALT");
+    while (true) { yield(); };
+  }
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.initialDelay() >= 2.0) {
-    delay(1000);
-    blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.initialDelay())-1000);
-  }
-  else
-    delay(uint32_t(1000.0*settings.initialDelay()));
+  files.check();
+  files.report();
+  files.initialDelay(settings.initialDelay());
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
-  setupStorage(SOFTWARE, aidata, gs);
-  openNextFile();
+  files.start(settings.path(), settings.fileName(), settings.fileTime(),
+              SOFTWARE, gs);
 }
 
 
 void loop() {
-  storeData();
+  files.storeData();
   blink.update();
 }

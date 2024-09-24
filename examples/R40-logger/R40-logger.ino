@@ -39,16 +39,18 @@ ControlPCM186x pcm2(Wire, PCM186x_I2C_ADDR2, InputTDM::TDM1);
 ControlPCM186x *pcms[NPCMS] = {&pcm1, &pcm2};
 ControlPCM186x *pcm = 0;
 
-SDCard sdcard;
-SDWriter file(sdcard, aidata);
+RTClock rtclock;
+DeviceID deviceid(DEVICEID);
+Blink blink(LED_PIN, true, LED_BUILTIN, false);
+SDCard sdcard0;
+SDCard sdcard1;
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
-RTClock rtclock;
-DeviceID deviceid(DEVICEID);
-Blink blink(LED_PIN, true, LED_BUILTIN, false);
+
+FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 // -----------------------------------------------------------------------------
@@ -59,18 +61,16 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
-  sdcard.begin();
-  rtclock.setFromFile(sdcard);
-  rtclock.report();
+  sdcard0.begin();
+  rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
   settings.disable("SensorsInterval");
   config.setConfigFile("teegrid.cfg");
-  config.load(sdcard);
+  config.load(sdcard0);
   if (Serial)
     config.configure(Serial);
   config.report();
-  deviceid.report();
   aidata.setSwapLR();
   Wire.begin();
   for (int k=0;k < NPCMS; k++) {
@@ -79,25 +79,25 @@ void setup() {
   }
   Serial.println();
   aidata.begin();
-  aidata.check();
+  if (!aidata.check()) {
+    Serial.println("Fix ADC settings and check your hardware.");
+    Serial.println("HALT");
+    while (true) { yield(); };
+  }
   aidata.start();
   aidata.report();
   blink.switchOff();
-  if (settings.initialDelay() >= 2.0) {
-    delay(1000);
-    blink.setDouble();
-    blink.delay(uint32_t(1000.0*settings.initialDelay())-1000);
-  }
-  else
-    delay(uint32_t(1000.0*settings.initialDelay()));
+  files.check();
+  files.report();
+  files.initialDelay(settings.initialDelay());
   char gs[16];
   pcm1.gainStr(gs, PREGAIN);
-  setupStorage(SOFTWARE, aidata, gs);
-  openNextFile();
+  files.start(settings.path(), settings.fileName(), settings.fileTime(),
+              SOFTWARE, gs);
 }
 
 
 void loop() {
-  storeData();
+  files.storeData();
   blink.update();
 }

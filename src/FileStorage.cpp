@@ -1,128 +1,157 @@
 //#define SINGLE_FILE_MTP
 
-#include <Input.h>
-#include <SDWriter.h>
-#include <RTClock.h>
-#include <DeviceID.h>
-#include <Blink.h>
-#include <Settings.h>
 #include <FileStorage.h>
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
 
 
-extern SDCard sdcard;
-extern SDWriter file;
-extern SDCard sdcard1;
-extern SDWriter file1;
-extern Settings settings;
-extern RTClock rtclock;
-extern DeviceID deviceid;
-extern Blink blink;
+FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
+			 const RTClock &rtclock, const DeviceID &deviceid,
+			 Blink &blink) :
+  AIInput(aiinput),
+  SDCard0(sdcard0),
+  SDCard1(sdcard1),
+  File0(sdcard0, aiinput),
+  File1(sdcard1, aiinput),
+  Clock(rtclock),
+  DeviceIdent(deviceid),
+  BlinkLED(blink),
+  Filename(NULL),
+  PrevFilename(""),
+  Restarts(0) {
+}
 
 
-int restarts = 0;
-String prevname; // previous file name
-Input *aiinput = 0;
+bool FileStorage::check(Stream &stream) {
+  if (!SDCard0.check(1e9)) {
+    stream.println("HALT");
+    while (true) { yield(); };
+    return false;
+  }
+  if (SDCard1.available() && !SDCard1.check(SDCard0.free()))
+    SDCard1.end();
+  return true;
+}
+
+  
+void FileStorage::report(Stream &stream) const {
+  DeviceIdent.report(stream);
+  Clock.report(stream);
+}
 
 
-void setupFile(SDWriter &sdfile, const char *software, char *gainstr) {
-  sdfile.setWriteInterval(2*aiinput->DMABufferTime());
-  sdfile.setMaxFileTime(settings.fileTime());
+void FileStorage::initialDelay(float initial_delay) {
+  if (initial_delay >= 2.0) {
+    delay(1000);
+    BlinkLED.setDouble();
+    BlinkLED.delay(uint32_t(1000.0*initial_delay) - 1000);
+  }
+  else
+    delay(uint32_t(1000.0*initial_delay));
+}
+
+
+void FileStorage::setupFile(SDWriter &sdfile, float filetime,
+			    const char *software, char *gainstr) {
+  sdfile.setWriteInterval(2*AIInput.DMABufferTime());
+  sdfile.setMaxFileTime(filetime);
   sdfile.header().setSoftware(software);
   if (gainstr != 0)
     sdfile.header().setGain(gainstr);
 }
 
 
-void setupStorage(const char *software, Input &aidata, char *gainstr) {
-  
-  prevname = "";
-  restarts = 0;
-  aiinput = &aidata;
-  if (settings.fileTime() > 30)
-    blink.setTiming(5000);
-  if (file.sdcard()->dataDir(settings.path()))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", settings.path());
-  file1.sdcard()->dataDir(settings.path());
-  setupFile(file, software, gainstr);
-  setupFile(file1, software, gainstr);
-  file.start();
-  file1.start(file);
+void FileStorage::start(const char *path, const char *filename,
+			float filetime, const char *software,
+			       char *gainstr) {
+  Filename = filename;
+  PrevFilename = "";
+  Restarts = 0;
+  if (filetime > 30)
+    BlinkLED.setTiming(5000);
+  if (File0.sdcard()->dataDir(path))
+    Serial.printf("Save recorded data in folder \"%s\".\n\n", path);
+  File1.sdcard()->dataDir(path);
+  setupFile(File0, filetime, software, gainstr);
+  setupFile(File1, filetime, software, gainstr);
+  File0.start();
+  File1.start(File0);
+  openNextFile();
+  openBackupFile();
 }
 
 
-void openNextFile() {
-  blink.setSingle();
-  blink.blinkSingle(0, 2000);
-  String fname = deviceid.makeStr(settings.fileName());
+void FileStorage::openNextFile() {
+  BlinkLED.setSingle();
+  BlinkLED.blinkSingle(0, 2000);
+  String fname = DeviceIdent.makeStr(Filename);
   time_t t = now();
-  fname = rtclock.makeStr(fname, t, true);
-  if (fname != prevname) {
-    file.sdcard()->resetFileCounter();
-    prevname = fname;
+  fname = Clock.makeStr(fname, t, true);
+  if (fname != PrevFilename) {
+    File0.sdcard()->resetFileCounter();
+    PrevFilename = fname;
   }
-  fname = file.sdcard()->incrementFileName(fname);
+  fname = File0.sdcard()->incrementFileName(fname);
   if (fname.length() == 0) {
-    blink.clear();
+    BlinkLED.clear();
     Serial.println("WARNING: failed to increment file name.");
     Serial.println("SD card probably not inserted -> HALT");
     Serial.println();
-    aiinput->stop();
+    AIInput.stop();
     while (1) { yield(); };
     return;
   }
   char dts[20];
-  rtclock.dateTime(dts, t);
-  if (! file.openWave(fname.c_str(), -1, dts)) {
-    blink.clear();
+  Clock.dateTime(dts, t);
+  if (! File0.openWave(fname.c_str(), -1, dts)) {
+    BlinkLED.clear();
     Serial.println();
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted or full -> HALT");
-    aiinput->stop();
+    AIInput.stop();
     while (1) { yield(); };
     return;
   }
-  ssize_t samples = file.write();
+  ssize_t samples = File0.write();
   if (samples == -4) {   // overrun
-    file.start(aiinput->nbuffer()/2);   // skip half a buffer
-    file.write();                       // write all available data
+    File0.start(AIInput.nbuffer()/2);   // skip half a buffer
+    File0.write();                      // write all available data
     // report overrun:
     char mfs[100];
-    sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
+    sprintf(mfs, "%s-error0-overrun.msg", File0.baseName().c_str());
     Serial.println(mfs);
-    File mf = sdcard.openWrite(mfs);
+    File mf = SDCard0.openWrite(mfs);
     mf.close();
   }
-  Serial.println(file.name());
+  Serial.println(File0.name());
 }
 
 
-void openBackupFile() {
-  if (!file1.sdcard()->available())
+void FileStorage::openBackupFile() {
+  if (!File1.sdcard()->available())
     return;
-  file1.openWave(file.name().c_str(), file.header());
-  ssize_t samples = file1.write();
+  File1.openWave(File0.name().c_str(), File0.header());
+  ssize_t samples = File1.write();
   if (samples == -4) {   // overrun
-    file1.start(aiinput->nbuffer()/2);   // skip half a buffer
-    file1.write();                       // write all available data
+    File1.start(AIInput.nbuffer()/2);   // skip half a buffer
+    File1.write();                      // write all available data
     // report overrun:
     char mfs[100];
-    sprintf(mfs, "%s-error0-overrun.msg", file1.baseName().c_str());
+    sprintf(mfs, "%s-error0-overrun.msg", File1.baseName().c_str());
     Serial.println(mfs);
-    File mf = sdcard1.openWrite(mfs);
+    File mf = SDCard1.openWrite(mfs);
     mf.close();
   }
 }
 
 
-void storeData() {
-  if (!file.pending())
+void FileStorage::storeData() {
+  if (!File0.pending())
     return;
-  ssize_t samples = file.write();
+  ssize_t samples = File0.write();
   if (samples < 0) {
-    blink.clear();
+    BlinkLED.clear();
     Serial.println();
     Serial.println("ERROR in writing data to file:");
     char errorstr[20];
@@ -134,9 +163,9 @@ void storeData() {
         Serial.println("  File already full.");
         break;
       case -3:
-        aiinput->stop();
+        AIInput.stop();
         Serial.println("  No data available, data acquisition probably not running.");
-        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*aiinput->DMABufferTime(), 1000.0*file.writeTime());
+        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*AIInput.DMABufferTime(), 1000.0*File0.writeTime());
         strcpy(errorstr, "nodata");
         delay(20);
         break;
@@ -147,47 +176,47 @@ void storeData() {
       case -5:
         Serial.println("  Nothing written into the file.");
         Serial.println("  SD card probably full -> HALT");
-        aiinput->stop();
+        AIInput.stop();
         while (1) { yield(); };
         break;
     }
     if (samples <= -3) {
-      file.closeWave();
+      File0.closeWave();
       char mfs[100];
-      sprintf(mfs, "%s-error%d-%s.msg", file.baseName().c_str(), restarts+1, errorstr);
+      sprintf(mfs, "%s-error%d-%s.msg", File0.baseName().c_str(), Restarts+1, errorstr);
       Serial.println(mfs);
-      File mf = sdcard.openWrite(mfs);
+      File mf = SDCard0.openWrite(mfs);
       mf.close();
       Serial.println();
     }
   }
-  if (file.endWrite() || samples < 0) {
-    file.close();  // file size was set by openWave()
+  if (File0.endWrite() || samples < 0) {
+    File0.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
-    aiinput->stop();
+    AIInput.stop();
     delay(50);
     Serial.println();
     Serial.println("MTP file transfer.");
     Serial.flush();
-    blink.setTriple();
+    BlinkLED.setTriple();
     MTP.begin();
-    MTP.addFilesystem(sdcard, "logger");
+    MTP.addFilesystem(SDCard0, "logger");
     while (true) {
       MTP.loop();
-      blink.update();
+      BlinkLED.update();
       yield();
     }
 #endif      
     if (samples < 0) {
-      restarts++;
-      if (restarts >= 5) {
+      Restarts++;
+      if (Restarts >= 5) {
         Serial.println("ERROR: Too many file errors -> HALT");
-        aiinput->stop();
+        AIInput.stop();
         while (1) { yield(); };
       }
-      if (!aiinput->running())
-        aiinput->start();
-      file.start();
+      if (!AIInput.running())
+        AIInput.start();
+      File0.start();
     }
     openNextFile();
   }
