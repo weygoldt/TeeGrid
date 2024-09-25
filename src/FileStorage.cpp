@@ -30,6 +30,7 @@ bool FileStorage::check(Stream &stream) {
   if (!SDCard0.check(1e9)) {
     stream.println("HALT");
     SDCard0.end();
+    BlinkLED.switchOff();
     while (true) { yield(); };
     return false;
   }
@@ -105,7 +106,8 @@ void FileStorage::openNextFile() {
     Serial.println("SD card probably not inserted -> HALT");
     Serial.println();
     AIInput.stop();
-    while (1) { yield(); };
+    BlinkLED.switchOff();
+    while (true) { yield(); };
     return;
   }
   char dts[20];
@@ -116,7 +118,8 @@ void FileStorage::openNextFile() {
     Serial.println("WARNING: failed to open file on SD card.");
     Serial.println("SD card probably not inserted or full -> HALT");
     AIInput.stop();
-    while (1) { yield(); };
+    BlinkLED.switchOff();
+    while (true) { yield(); };
     return;
   }
   ssize_t samples = File0.write();
@@ -159,44 +162,61 @@ void FileStorage::storeData() {
   if (samples < 0) {
     BlinkLED.clear();
     Serial.println();
-    Serial.println("ERROR in writing data to file:");
+    Serial.println("ERROR in writing data to file in FileStorage::storeData():");
     char errorstr[20];
     switch (samples) {
       case -1:
         Serial.println("  File not open.");
+        strcpy(errorstr, "notopen");
         break;
       case -2:
         Serial.println("  File already full.");
+        strcpy(errorstr, "full");
         break;
       case -3:
         AIInput.stop();
         Serial.println("  No data available, data acquisition probably not running.");
         Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*AIInput.DMABufferTime(), 1000.0*File0.writeTime());
         strcpy(errorstr, "nodata");
-        delay(20);
         break;
       case -4:
         Serial.println("  Buffer overrun.");
+        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*AIInput.DMABufferTime(), 1000.0*File0.writeTime());
         strcpy(errorstr, "overrun");
         break;
       case -5:
         Serial.println("  Nothing written into the file.");
         Serial.println("  SD card probably full -> HALT");
         AIInput.stop();
-        while (1) { yield(); };
+	BlinkLED.switchOff();
+        while (true) { yield(); };
         break;
     }
-    if (samples <= -3) {
-      File0.closeWave();
-      char mfs[100];
-      sprintf(mfs, "%s-error%d-%s.msg", File0.baseName().c_str(), Restarts+1, errorstr);
-      Serial.println(mfs);
-      File mf = SDCard0.openWrite(mfs);
-      mf.close();
-      Serial.println();
+    File0.closeWave();
+    // write error file:
+    char mfs[100];
+    sprintf(mfs, "%s-error%d-%s.msg", File0.baseName().c_str(), Restarts+1, errorstr);
+    Serial.println(mfs);
+    File mf = SDCard0.openWrite(mfs);
+    mf.close();
+    Serial.println();
+    // halt after too many errors:
+    Restarts++;
+    Serial.printf("Incremented restarts to %d, samples=%d\n", Restarts, samples);
+    if (Restarts >= 5) {
+      Serial.println("ERROR in FileStorage::storeData(): too many file errors -> HALT");
+      AIInput.stop();
+      BlinkLED.switchOff();
+      while (true) { yield(); };
     }
+    // restart analog input:
+    if (!AIInput.running())
+      AIInput.start();
+    // open next file:
+    File0.start();
+    openNextFile();
   }
-  if (File0.endWrite() || samples < 0) {
+  if (File0.endWrite()) {
     File0.close();  // file size was set by openWave()
 #ifdef SINGLE_FILE_MTP
     AIInput.stop();
@@ -213,17 +233,6 @@ void FileStorage::storeData() {
       yield();
     }
 #endif      
-    if (samples < 0) {
-      Restarts++;
-      if (Restarts >= 5) {
-        Serial.println("ERROR: Too many file errors -> HALT");
-        AIInput.stop();
-        while (1) { yield(); };
-      }
-      if (!AIInput.running())
-        AIInput.start();
-      File0.start();
-    }
     openNextFile();
   }
 }
