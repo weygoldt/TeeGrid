@@ -1,3 +1,6 @@
+// Define SINGLE_FILE_MTP to stop recording after the first file has
+// been written, and make then the SD card available over USB as MTB
+// filesystem.
 //#define SINGLE_FILE_MTP
 
 #include <FileStorage.h>
@@ -26,6 +29,7 @@ FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
 bool FileStorage::check(Stream &stream) {
   if (!SDCard0.check(1e9)) {
     stream.println("HALT");
+    SDCard0.end();
     while (true) { yield(); };
     return false;
   }
@@ -70,6 +74,8 @@ void FileStorage::start(const char *path, const char *filename,
   Restarts = 0;
   if (filetime > 30)
     BlinkLED.setTiming(5000);
+  else
+    BlinkLED.setTiming(2000);
   if (File0.sdcard()->dataDir(path))
     Serial.printf("Save recorded data in folder \"%s\".\n\n", path);
   File1.sdcard()->dataDir(path);
