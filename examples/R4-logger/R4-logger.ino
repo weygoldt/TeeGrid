@@ -16,8 +16,8 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file logger.cfg)
 #define NCHANNELS     16       // number of channels (even, from 2 to 16)
-#define PREGAIN       1.0     // gain factor of preamplifier
 #define SAMPLING_RATE 48000    // samples per second and channel in Hertz
+#define PREGAIN       1.0     // gain factor of preamplifier
 #define GAIN          0.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
@@ -31,6 +31,8 @@
 #define SOFTWARE      "TeeGrid R4-logger v1.6"
 #define LED_PIN        26    // R4.1
 //#define LED_PIN        27    // R4.2
+
+#define SDCARD1_CS     10    // CS pin for second SD card on SPI bus
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -69,16 +71,17 @@ void setup() {
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard0.begin();
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
   rtclock.setFromFile(sdcard0);
-  rtclock.report();
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
   settings.disable("SensorsInterval");
   config.setConfigFile("logger.cfg");
-  config.load(sdcard);
-  //if (Serial)
-  //  config.configure(Serial);
+  config.load(sdcard0);
+  if (Serial)
+    config.configure(Serial, 10000);
   config.report();
+  Serial.println();
   aidata.setSwapLR();
   Wire.begin();
   Wire1.begin();
