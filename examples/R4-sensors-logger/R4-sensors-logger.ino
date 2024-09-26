@@ -170,7 +170,7 @@ void setup() {
 
 
 void loop() {
-  files.storeData();
+  files.update();
   blink.update();
   if (sensors.update()) {
     sensors.writeCSV();

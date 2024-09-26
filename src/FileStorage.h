@@ -35,8 +35,8 @@ public:
   void start(const char *path, const char *filename, float filetime,
 	     const char *software, char *gainstr=0);
 
-  // Write recorded data to files.
-  void storeData();
+  // Call this in loop() for writing data to files.
+  void update();
 
   String baseName() const { return File0.baseName(); };
 
@@ -44,14 +44,14 @@ public:
 protected:
 
   // Provide timing and metadata to file.
-  void setupFile(SDWriter &sdfile, float filetime,
-		 const char *software, char *gainstr);
+  void setup(SDWriter &sdfile, float filetime,
+	     const char *software, char *gainstr);
   
   // Generate file name, open main file and write first chunk of data.
-  void openNextFile();
-  
-  // Open backup file and write first chunk of data.
-  void openBackupFile();
+  void open(bool backup);
+
+  // Write recorded data to files.
+  bool store(SDWriter &sdfile, bool backup);
 
   Input &AIInput;
   SDCard &SDCard0;
@@ -66,6 +66,8 @@ protected:
   String PrevFilename;   // Previous file name
   int FileCounter;
   int Restarts;
+  int NextStore;
+  int NextOpen;
   
 };
 

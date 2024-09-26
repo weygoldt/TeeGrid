@@ -110,6 +110,6 @@ void setup() {
 
 
 void loop() {
-  files.storeData();
+  files.update();
   blink.update();
 }
