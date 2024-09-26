@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
-#include <SDWriter.h>
+#include <SDCard.h>
 #include <RTClock.h>
 #include <DeviceID.h>
 #include <Blink.h>
@@ -15,8 +15,8 @@
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file teegrid.cfg)
 #define NCHANNELS     8        // number of channels (2, 4, 6, 8)
-#define PREGAIN       10.0     // gain factor of preamplifier (1 or 10).
 #define SAMPLING_RATE 48000    // samples per second and channel in Hertz
+#define PREGAIN       10.0     // gain factor of preamplifier (1 or 10).
 #define GAIN          20.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
@@ -27,8 +27,9 @@
 
 // ----------------------------------------------------------------------------
 
-#define SOFTWARE      "TeeGrid R40-logger v1.6"
 #define LED_PIN       31
+
+#define SOFTWARE      "TeeGrid R40-logger v1.6"
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -62,6 +63,7 @@ void setup() {
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard0.begin();
+  files.check();
   rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
@@ -87,7 +89,6 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  files.check();
   files.report();
   files.initialDelay(settings.initialDelay());
   char gs[16];

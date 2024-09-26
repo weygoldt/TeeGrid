@@ -29,22 +29,14 @@ FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
 
 bool FileStorage::check(Stream &stream) {
   if (!SDCard0.check(1e9)) {
-    // check again (this indeed works!):
+    stream.println("HALT");
     SDCard0.end();
-    delay(10);
-    SDCard0.begin();
-    if (!SDCard0.check(1e9)) {
-      stream.println("HALT");
-      SDCard0.end();
-      BlinkLED.switchOff();
-      while (true) { yield(); };
-      return false;
-    }
+    BlinkLED.switchOff();
+    while (true) { yield(); };
+    return false;
   }
-  if (SDCard1.available() && !SDCard1.check(SDCard0.free())) {
+  if (SDCard1.available() && !SDCard1.check(SDCard0.free()))
     SDCard1.end();
-    // TODO: begin() with same parameters and check again.
-  }
   return true;
 }
 

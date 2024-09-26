@@ -72,6 +72,7 @@ void setup() {
   rtclock.check();
   sdcard0.begin();
   sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
+  files.check();
   rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
@@ -99,7 +100,6 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  files.check();
   files.report();
   files.initialDelay(settings.initialDelay());
   char gs[16];

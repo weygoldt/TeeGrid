@@ -62,6 +62,7 @@ void setup() {
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
   sdcard0.begin();
+  files.check();
   rtclock.setFromFile(sdcard0);
   settings.disable("DisplayTime");
   settings.disable("SensorsInterval");
@@ -81,7 +82,6 @@ void setup() {
   aidata.start();
   aidata.report();
   blink.switchOff();
-  files.check();
   files.report();
   files.initialDelay(settings.initialDelay());
   files.start(settings.path(), settings.fileName(), settings.fileTime(),
