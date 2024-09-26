@@ -63,6 +63,7 @@ protected:
   
   const char *Filename;  // Template for filename
   String PrevFilename;   // Previous file name
+  int FileCounter;
   int Restarts;
   
 };

@@ -22,20 +22,29 @@ FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
   BlinkLED(blink),
   Filename(NULL),
   PrevFilename(""),
+  FileCounter(0),
   Restarts(0) {
 }
 
 
 bool FileStorage::check(Stream &stream) {
   if (!SDCard0.check(1e9)) {
-    stream.println("HALT");
+    // check again (this indeed works!):
     SDCard0.end();
-    BlinkLED.switchOff();
-    while (true) { yield(); };
-    return false;
+    delay(10);
+    SDCard0.begin();
+    if (!SDCard0.check(1e9)) {
+      stream.println("HALT");
+      SDCard0.end();
+      BlinkLED.switchOff();
+      while (true) { yield(); };
+      return false;
+    }
   }
-  if (SDCard1.available() && !SDCard1.check(SDCard0.free()))
+  if (SDCard1.available() && !SDCard1.check(SDCard0.free())) {
     SDCard1.end();
+    // TODO: begin() with same parameters and check again.
+  }
   return true;
 }
 
@@ -122,6 +131,7 @@ void FileStorage::openNextFile() {
     while (true) { yield(); };
     return;
   }
+  FileCounter++;
   ssize_t samples = File0.write();
   if (samples == -4) {   // overrun
     File0.start(AIInput.nbuffer()/2);   // skip half a buffer
