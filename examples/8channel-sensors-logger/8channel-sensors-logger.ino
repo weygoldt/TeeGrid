@@ -5,7 +5,7 @@
 #include <SenseBME280.h>
 #include <LightTSL2591.h>
 #include <DewPoint.h>
-#include <SDWriter.h>
+#include <SDCard.h>
 #include <RTClock.h>
 #include <DeviceID.h>
 #include <Blink.h>

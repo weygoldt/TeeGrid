@@ -7,6 +7,7 @@
 #define FileStorage_h
 
 #include <Input.h>
+#include <SDCard.h>
 #include <SDWriter.h>
 #include <RTClock.h>
 #include <DeviceID.h>
