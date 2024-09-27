@@ -23,7 +23,8 @@ public:
 
   // Check accessibility of SD cards.
   // Halt if the main SD card can not be written.
-  bool check(Stream &stream=Serial);
+  // If check_backup force checking backup SD card as well.
+  bool check(bool check_backup, Stream &stream=Serial);
 
   // Report device identifier and current date and time.
   void report(Stream &stream=Serial) const;

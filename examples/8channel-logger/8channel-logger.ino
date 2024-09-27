@@ -1,5 +1,6 @@
 #include <TeeGridBanner.h>
 #include <InputADC.h>
+#include <SPI.h>
 #include <SDCard.h>
 #include <RTClock.h>
 #include <DeviceID.h>
@@ -24,12 +25,14 @@ int8_t channels1 [] =  {A2, A3, A20, A22, -1, A20, A22, A12, A13};  // input pin
 
 #define PATH          "recordings"       // folder where to store the recordings
 #define DEVICEID      1                  // may be used for naming files
-#define FILENAME      "gridID-SDATETIME" // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
-#define FILE_SAVE_TIME 10*60 // seconds
+#define FILENAME      "gridID-SDATETIME.wav" // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
+#define FILE_SAVE_TIME 1*60 // seconds
 #define INITIAL_DELAY  2.0   // seconds
 
 #define PULSE_FREQUENCY 230 // Hertz
 int signalPins[] = {9, 8, 7, 6, 5, 4, 3, 2, -1}; // pins where to put out test signals
+
+#define SDCARD1_CS       10    // CS pin for second SD card on SPI bus, set to 255 if not used
 
 // ----------------------------------------------------------------------------
 
@@ -41,8 +44,8 @@ InputADC aidata(AIBuffer, NAIBuffer, channels0, channels1);
 RTClock rtclock;
 DeviceID deviceid(DEVICEID);
 Blink blink(LED_BUILTIN);
-SDCard sdcard0;
-SDCard sdcard1;
+SDCard sdcard0("primary");
+SDCard sdcard1("secondary");
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
@@ -61,8 +64,11 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
+  pinMode(SDCARD1_CS, OUTPUT);
+  SPI.begin();
   sdcard0.begin();
-  files.check();
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 5, &SPI);
+  files.check(true);
   rtclock.setFromFile(sdcard0);
   settings.disable("DisplayTime");
   settings.disable("SensorsInterval");

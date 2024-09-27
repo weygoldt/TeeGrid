@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
+#include <SPI.h>
 #include <SDCard.h>
 #include <RTClock.h>
 #include <DeviceID.h>
@@ -58,8 +59,8 @@ R41CAN can;
 RTClock rtclock;
 DeviceID deviceid(DEVICEID);
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
-SDCard sdcard0;
-SDCard sdcard1;
+SDCard sdcard0("primary");
+SDCard sdcard1("secondary");
 
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
@@ -127,9 +128,11 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
+  pinMode(SDCARD1_CS, OUTPUT);
+  SPI.begin();
   sdcard0.begin();
-  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
-  files.check();
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 40, &SPI);
+  files.check(true);
   rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
