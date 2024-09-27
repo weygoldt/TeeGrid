@@ -9,6 +9,7 @@
 #include <Configurator.h>
 #include <Settings.h>
 #include <InputADCSettings.h>
+#include <ToolMenus.h>
 #include <FileStorage.h>
 
 // Default settings: ----------------------------------------------------------
@@ -52,6 +53,13 @@ Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, PULSE_FREQUENCY,
                   0.0, INITIAL_DELAY);
 InputADCSettings aisettings(SAMPLING_RATE, BITS, AVERAGING,
 			    CONVERSION, SAMPLING, REFERENCE);
+DateTimeMenu datetime_menu(rtclock);
+ConfigurationMenu configuration_menu(sdcard0);
+SDCardMenu sdcard0_menu("Primary SD card", sdcard0, settings);
+SDCardMenu sdcard1_menu("Secondary SD card", sdcard1, settings);
+#ifdef FIRMWARE_UPDATE
+FirmwareMenu firmware_menu(sdcard0);
+#endif
 
 FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
@@ -67,7 +75,7 @@ void setup() {
   pinMode(SDCARD1_CS, OUTPUT);
   SPI.begin();
   sdcard0.begin();
-  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 5, &SPI);
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 40, &SPI);
   files.check(true);
   rtclock.setFromFile(sdcard0);
   settings.disable("DisplayTime");

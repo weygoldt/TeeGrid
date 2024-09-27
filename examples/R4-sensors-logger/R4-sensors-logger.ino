@@ -8,10 +8,10 @@
 #include <DeviceID.h>
 #include <Blink.h>
 #include <Configurator.h>
-#include <ToolActions.h>
 #include <Settings.h>
 #include <InputTDMSettings.h>
 #include <SetupPCM.h>
+#include <ToolMenus.h>
 #include <FileStorage.h>
 #include <R41CAN.h>
 #include <ESensors.h>
@@ -65,37 +65,13 @@ SDCard sdcard1("secondary");
 Configurator config;
 Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
-InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
-Configurable datetime_menu("Date & time", Action::StreamInput);
-ReportRTCAction report_rtc_act(datetime_menu, "Print date & time", rtclock);
-SetRTCAction set_rtc_act(datetime_menu, "Set date & time", rtclock);
-Configurable config_menu("Configuration", Action::StreamInput);
-ReportConfigAction report_act(config_menu, "Print configuration");
-SaveConfigAction save_act(config_menu,"Save configuration", sdcard0);
-LoadConfigAction load_act(config_menu, "Load configuration", sdcard0);
-RemoveConfigAction remove_act(config_menu, "Erase configuration", sdcard0);
-Configurable sdcard_menu("SD card", Action::StreamInput);
-SDInfoAction sdinfo_act(sdcard_menu, "SD card info", sdcard0);
-SDCheckAction sdcheck_act(sdcard_menu, "SD card check", sdcard0);
-SDBenchmarkAction sdbench_act(sdcard_menu, "SD card benchmark", sdcard0);
-SDFormatAction format_act(sdcard_menu, "Format SD card", sdcard0);
-SDEraseFormatAction eraseformat_act(sdcard_menu, "Erase and format SD card", sdcard0);
-SDListRootAction listroot_act(sdcard_menu, "List files in root directory", sdcard0);
-SDListRecordingsAction listrecs_act(sdcard_menu, "List all recordings", sdcard0, settings);
-SDRemoveRecordingsAction eraserecs_act(sdcard_menu, "Erase all recordings", sdcard0, settings);
-Configurable sdcard1_menu("Backup SD card", Action::StreamInput);
-SDInfoAction sd1info_act(sdcard1_menu, "Backup SD card info", sdcard1);
-SDCheckAction sd1check_act(sdcard1_menu, "Backup SD card check", sdcard1);
-SDBenchmarkAction sd1bench_act(sdcard1_menu, "Backup SD card benchmark", sdcard1);
-SDFormatAction format1_act(sdcard1_menu, "Format backup SD card", sdcard1);
-SDEraseFormatAction eraseformat1_act(sdcard1_menu, "Erase and format backup SD card", sdcard1);
-SDListRootAction listroot1_act(sdcard1_menu, "List files in root directory", sdcard1);
-SDListRecordingsAction listrecs1_act(sdcard1_menu, "List all recordings", sdcard1, settings);
-SDRemoveRecordingsAction eraserecs1_act(sdcard1_menu, "Erase all recordings", sdcard1, settings);
+InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);
+DateTimeMenu datetime_menu(rtclock);
+ConfigurationMenu configuration_menu(sdcard0);
+SDCardMenu sdcard0_menu("Primary SD card", sdcard0, settings);
+SDCardMenu sdcard1_menu("Secondary SD card", sdcard1, settings);
 #ifdef FIRMWARE_UPDATE
-Configurable firmware_menu("Firmware", Action::StreamInput);
-ListFirmwareAction listfirmware_act(firmware_menu, "List available updates", sdcard0);
-UpdateFirmwareAction updatefirmware_act(firmware_menu, "Update firmware", sdcard0);
+FirmwareMenu firmware_menu(sdcard0);
 #endif
 
 ESensors sensors;

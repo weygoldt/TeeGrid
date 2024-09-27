@@ -107,7 +107,7 @@ void FileStorage::open(bool backup) {
       char mfs[100];
       sprintf(mfs, "%s-backup-error0-overrun.msg", File1.baseName().c_str());
       Serial.println(mfs);
-      File mf = SDCard1.openWrite(mfs);
+      FsFile mf = SDCard1.openWrite(mfs);
       mf.close();
     }
   }
@@ -153,7 +153,7 @@ void FileStorage::open(bool backup) {
       char mfs[100];
       sprintf(mfs, "%s-error0-overrun.msg", File0.baseName().c_str());
       Serial.println(mfs);
-      File mf = SDCard0.openWrite(mfs);
+      FsFile mf = SDCard0.openWrite(mfs);
       mf.close();
     }
     Serial.println(File0.name());
@@ -214,7 +214,7 @@ bool FileStorage::store(SDWriter &sdfile, bool backup) {
       sprintf(mfs, "%s-error%d-%s.msg", sdfile.baseName().c_str(),
 	      Restarts+1, errorstr);
     Serial.println(mfs);
-    File mf = SDCard0.openWrite(mfs);
+    FsFile mf = SDCard0.openWrite(mfs);
     mf.close();
     Serial.println();
     // halt after too many errors:
