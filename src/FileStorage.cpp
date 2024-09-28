@@ -29,12 +29,17 @@ FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
 }
 
 
+void FileStorage::halt(Stream &stream) {
+  stream.println("HALT");
+  while (true) { yield(); };
+}
+
+
 bool FileStorage::check(bool check_backup, Stream &stream) {
   if (!SDCard0.check(1e9)) {
-    stream.println("HALT");
     SDCard0.end();
     BlinkLED.switchOff();
-    while (true) { yield(); };
+    halt(stream);
     return false;
   }
   if ((SDCard1.available() || check_backup) && !SDCard1.check(SDCard0.free()))
@@ -125,11 +130,10 @@ void FileStorage::open(bool backup) {
     if (fname.length() == 0) {
       BlinkLED.clear();
       Serial.printf("WARNING: failed to increment file name on %sSD card.\n", File0.sdcard()->name());
-      Serial.println("SD card probably not inserted -> HALT");
-      Serial.println();
+      Serial.println("SD card probably not inserted -> ");
       AIInput.stop();
       BlinkLED.switchOff();
-      while (true) { yield(); };
+      halt();
       return;
     }
     char dts[20];
@@ -138,10 +142,10 @@ void FileStorage::open(bool backup) {
       BlinkLED.clear();
       Serial.println();
       Serial.printf("WARNING: failed to open file on %sSD card.\n", File0.sdcard()->name());
-      Serial.println("SD card probably not inserted or full -> HALT");
+      Serial.println("SD card probably not inserted or full -> ");
       AIInput.stop();
       BlinkLED.switchOff();
-      while (true) { yield(); };
+      halt();
       return;
     }
     FileCounter++;
@@ -197,10 +201,10 @@ bool FileStorage::store(SDWriter &sdfile, bool backup) {
 	  SDCard1.end();
 	}
 	else {
-	  Serial.printf("  %sSD card probably full -> HALT\n", sdfile.sdcard()->name());
+	  Serial.printf("  %sSD card probably full -> \n", sdfile.sdcard()->name());
 	  AIInput.stop();
 	  BlinkLED.switchOff();
-	  while (true) { yield(); };
+	  halt();
 	}
 	break;
     }
@@ -227,10 +231,10 @@ bool FileStorage::store(SDWriter &sdfile, bool backup) {
 	SDCard1.end();
       }
       else {
-	Serial.println(" -> HALT");
 	AIInput.stop();
 	BlinkLED.switchOff();
-	while (true) { yield(); };
+	Serial.println(" -> ");
+	halt();
       }
     }
     // restart analog input:

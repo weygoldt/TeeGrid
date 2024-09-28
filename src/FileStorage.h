@@ -44,6 +44,9 @@ public:
 
 protected:
 
+  // Stop the sketch.
+  void halt(Stream &stream=Serial);
+
   // Provide timing and metadata to file.
   void setup(SDWriter &sdfile, float filetime,
 	     const char *software, char *gainstr);
