@@ -13,7 +13,7 @@
 #include <Configurator.h>
 #include <Settings.h>
 #include <InputADCSettings.h>
-#include <FileStorage.h>
+#include <LoggerFileStorage.h>
 
 
 // Default settings: ----------------------------------------------------------
@@ -70,7 +70,7 @@ LightTSL2591 tsl;
 IRRatioTSL2591 irratio(&tsl, &sensors);
 IlluminanceTSL2591 illum(&tsl, &sensors);
 
-FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
+LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 void setupSensors() {

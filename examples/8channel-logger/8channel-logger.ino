@@ -10,7 +10,7 @@
 #include <Settings.h>
 #include <InputADCSettings.h>
 #include <ToolMenus.h>
-#include <FileStorage.h>
+#include <LoggerFileStorage.h>
 
 // Default settings: ----------------------------------------------------------
 // (may be overwritten by config file teegrid.cfg)
@@ -61,7 +61,7 @@ SDCardMenu sdcard1_menu("Secondary SD card", sdcard1, settings);
 FirmwareMenu firmware_menu(sdcard0);
 #endif
 
-FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
+LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 // ----------------------------------------------------------------------------

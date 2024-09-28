@@ -10,7 +10,7 @@
 #include <Settings.h>
 #include <InputTDMSettings.h>
 #include <SetupPCM.h>
-#include <FileStorage.h>
+#include <LoggerFileStorage.h>
 #include <R41CAN.h>
 
 // Default settings: ----------------------------------------------------------
@@ -58,7 +58,7 @@ Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
 
-FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
+LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 // -----------------------------------------------------------------------------

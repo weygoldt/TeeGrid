@@ -1,10 +1,10 @@
 /*
-  FileStorage - High level handling of file storage of logger data.
+  LoggerFileStorage - High level handling of file storage of logger data.
   Created by Jan Benda, August 28th, 2023.
 */
 
-#ifndef FileStorage_h
-#define FileStorage_h
+#ifndef LoggerFileStorage_h
+#define LoggerFileStorage_h
 
 #include <Input.h>
 #include <SDCard.h>
@@ -14,12 +14,13 @@
 #include <Blink.h>
 
 
-class FileStorage {
+class LoggerFileStorage {
   
 public:
 
-  FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
-	      const RTClock &rtclock, const DeviceID &deviceid, Blink &blink);
+  LoggerFileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
+		    const RTClock &rtclock, const DeviceID &deviceid,
+		    Blink &blink);
 
   // Check accessibility of SD cards.
   // Halt if the main SD card can not be written.

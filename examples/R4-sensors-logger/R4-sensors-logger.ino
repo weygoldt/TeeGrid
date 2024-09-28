@@ -12,7 +12,7 @@
 #include <InputTDMSettings.h>
 #include <SetupPCM.h>
 #include <ToolMenus.h>
-#include <FileStorage.h>
+#include <LoggerFileStorage.h>
 #include <R41CAN.h>
 #include <ESensors.h>
 #include <TemperatureDS18x20.h>
@@ -78,7 +78,7 @@ ESensors sensors;
 
 TemperatureDS18x20 temp(&sensors);
 
-FileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
+LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
 
 void setupSensors() {

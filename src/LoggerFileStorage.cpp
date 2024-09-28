@@ -3,15 +3,15 @@
 // filesystem.
 //#define SINGLE_FILE_MTP
 
-#include <FileStorage.h>
+#include <LoggerFileStorage.h>
 #ifdef SINGLE_FILE_MTP
 #include <MTP_Teensy.h>
 #endif
 
 
-FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
-			 const RTClock &rtclock, const DeviceID &deviceid,
-			 Blink &blink) :
+LoggerFileStorage::LoggerFileStorage(Input &aiinput, SDCard &sdcard0,
+				     SDCard &sdcard1, const RTClock &rtclock,
+				     const DeviceID &deviceid, Blink &blink) :
   AIInput(aiinput),
   SDCard0(sdcard0),
   SDCard1(sdcard1),
@@ -29,13 +29,13 @@ FileStorage::FileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
 }
 
 
-void FileStorage::halt(Stream &stream) {
+void LoggerFileStorage::halt(Stream &stream) {
   stream.println("HALT");
   while (true) { yield(); };
 }
 
 
-bool FileStorage::check(bool check_backup, Stream &stream) {
+bool LoggerFileStorage::check(bool check_backup, Stream &stream) {
   if (!SDCard0.check(1e9)) {
     SDCard0.end();
     BlinkLED.switchOff();
@@ -48,13 +48,13 @@ bool FileStorage::check(bool check_backup, Stream &stream) {
 }
 
   
-void FileStorage::report(Stream &stream) const {
+void LoggerFileStorage::report(Stream &stream) const {
   DeviceIdent.report(stream);
   Clock.report(stream);
 }
 
 
-void FileStorage::initialDelay(float initial_delay) {
+void LoggerFileStorage::initialDelay(float initial_delay) {
   if (initial_delay >= 2.0) {
     delay(1000);
     BlinkLED.setDouble();
@@ -65,8 +65,8 @@ void FileStorage::initialDelay(float initial_delay) {
 }
 
 
-void FileStorage::setup(SDWriter &sdfile, float filetime,
-			const char *software, char *gainstr) {
+void LoggerFileStorage::setup(SDWriter &sdfile, float filetime,
+			      const char *software, char *gainstr) {
   sdfile.setWriteInterval(2*AIInput.DMABufferTime());
   sdfile.setMaxFileTime(filetime);
   sdfile.header().setSoftware(software);
@@ -75,9 +75,9 @@ void FileStorage::setup(SDWriter &sdfile, float filetime,
 }
 
 
-void FileStorage::start(const char *path, const char *filename,
-			float filetime, const char *software,
-			char *gainstr) {
+void LoggerFileStorage::start(const char *path, const char *filename,
+			      float filetime, const char *software,
+			      char *gainstr) {
   Filename = filename;
   PrevFilename = "";
   Restarts = 0;
@@ -99,7 +99,7 @@ void FileStorage::start(const char *path, const char *filename,
 }
 
 
-void FileStorage::open(bool backup) {
+void LoggerFileStorage::open(bool backup) {
   if (backup) {
     if (!File1.sdcard()->available())
       return;
@@ -165,7 +165,7 @@ void FileStorage::open(bool backup) {
 }
 
 
-bool FileStorage::store(SDWriter &sdfile, bool backup) {
+bool LoggerFileStorage::store(SDWriter &sdfile, bool backup) {
   if (!sdfile.pending())
     return false;
   ssize_t samples = sdfile.write();
@@ -248,7 +248,7 @@ bool FileStorage::store(SDWriter &sdfile, bool backup) {
 }
 
 
-void FileStorage::update() {
+void LoggerFileStorage::update() {
   if (NextStore == 0) {
     if (store(File0, false) && SDCard1.available())
       NextStore = 1;
