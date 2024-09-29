@@ -60,6 +60,7 @@ SDCardMenu sdcard1_menu("Secondary SD card", sdcard1, settings);
 #ifdef FIRMWARE_UPDATE
 FirmwareMenu firmware_menu(sdcard0);
 #endif
+DiagnosticMenu diagnostic_menu("Diagnostics", sdcard0, sdcard1);
 
 LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
