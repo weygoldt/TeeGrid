@@ -115,6 +115,7 @@ void LoggerFileStorage::open(bool backup) {
       FsFile mf = SDCard1.openWrite(mfs);
       mf.close();
     }
+    Serial.printf("and %sSD card)\n", File1.sdcard()->name());
   }
   else {
     BlinkLED.setSingle();
@@ -160,7 +161,12 @@ void LoggerFileStorage::open(bool backup) {
       FsFile mf = SDCard0.openWrite(mfs);
       mf.close();
     }
-    Serial.println(File0.name());
+    if (File1.sdcard()->available()) {
+      Serial.print(File0.name());
+      Serial.printf(" (on %s", File0.sdcard()->name());
+    }
+    else
+      Serial.println(File0.name());
   }
 }
 
@@ -172,15 +178,15 @@ bool LoggerFileStorage::store(SDWriter &sdfile, bool backup) {
   if (samples < 0) {
     BlinkLED.clear();
     Serial.println();
-    Serial.printf("ERROR in writing data to file on %sSD card in FileStorage::store():\n", sdfile.sdcard()->name());
+    Serial.printf("ERROR in writing data to file on %sSD card in LoggerFileStorage::store():\n", sdfile.sdcard()->name());
     char errorstr[20];
     switch (samples) {
       case -1:
-        Serial.printf("  file on %sSD card not open.\n", sdfile.sdcard()->name());
+        Serial.println("  file not open.");
         strcpy(errorstr, "notopen");
         break;
       case -2:
-        Serial.printf("  file on %sSD card already full.\n", sdfile.sdcard()->name());
+        Serial.println("  file already full.");
         strcpy(errorstr, "full");
         break;
       case -3:
@@ -190,12 +196,12 @@ bool LoggerFileStorage::store(SDWriter &sdfile, bool backup) {
         strcpy(errorstr, "nodata");
         break;
       case -4:
-        Serial.printf("  %sbuffer overrun for %sSD card.\n", sdfile.sdcard()->name());
+        Serial.println("  buffer overrun.");
         Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*AIInput.DMABufferTime(), 1000.0*sdfile.writeTime());
         strcpy(errorstr, "overrun");
         break;
       case -5:
-        Serial.printf("  nothing written into the file on %sSD card.\n", sdfile.sdcard()->name());
+        Serial.println("  failed to write anything.");
 	if (backup) {
 	  Serial.printf("  %sSD card probably full.\n", sdfile.sdcard()->name());
 	  SDCard1.end();
@@ -206,6 +212,7 @@ bool LoggerFileStorage::store(SDWriter &sdfile, bool backup) {
 	  BlinkLED.switchOff();
 	  halt();
 	}
+        strcpy(errorstr, "nowrite");
 	break;
     }
     sdfile.closeWave();
@@ -220,12 +227,11 @@ bool LoggerFileStorage::store(SDWriter &sdfile, bool backup) {
     Serial.println(mfs);
     FsFile mf = SDCard0.openWrite(mfs);
     mf.close();
-    Serial.println();
     // halt after too many errors:
     Restarts++;
     Serial.printf("Incremented restarts to %d, samples=%d on %sSD card\n", Restarts, samples, sdfile.sdcard()->name());
     if (Restarts >= 5) {
-      Serial.printf("ERROR in FileStorage::storeData() on %sSD card: too many file errors", sdfile.sdcard()->name());
+      Serial.printf("ERROR in LoggerFileStorage::storeData() on %sSD card: too many file errors", sdfile.sdcard()->name());
       if (backup) {
 	Serial.println(" -> end backups");
 	SDCard1.end();
