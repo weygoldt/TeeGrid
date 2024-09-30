@@ -84,7 +84,7 @@ void openNextGridFile() {
     char mfs[100];
     sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
     Serial.println(mfs);
-    File mf = sdcard.openWrite(mfs);
+    FsFile mf = sdcard.openWrite(mfs);
     mf.close();
   }
   Serial.println(file.name());
@@ -133,7 +133,7 @@ void storeGridData(bool master) {
       char mfs[100];
       sprintf(mfs, "%s-error%d-%s.msg", file.baseName().c_str(), can_restarts+1, errorstr);
       Serial.println(mfs);
-      File mf = sdcard.openWrite(mfs);
+      FsFile mf = sdcard.openWrite(mfs);
       mf.close();
       Serial.println();
     }
