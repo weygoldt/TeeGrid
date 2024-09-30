@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <ControlPCM186x.h>
 #include <InputTDM.h>
+#include <SPI.h>
 #include <SDCard.h>
 #include <RTClock.h>
 #include <DeviceID.h>
@@ -10,6 +11,7 @@
 #include <Settings.h>
 #include <InputTDMSettings.h>
 #include <SetupPCM.h>
+#include <ToolMenus.h>
 #include <LoggerFileStorage.h>
 #include <R41CAN.h>
 
@@ -21,18 +23,23 @@
 #define GAIN          0.0     // dB
 
 #define PATH          "recordings"   // folder where to store the recordings
-#define DEVICEID      1              // may be used for naming files
+#define DEVICEID      2              // may be used for naming files
 #define FILENAME      "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 20 //5*60   // seconds
 #define INITIAL_DELAY  10.0  // seconds
 
 // ----------------------------------------------------------------------------
 
-#define SOFTWARE      "TeeGrid R4-logger v1.6"
 #define LED_PIN        26    // R4.1
 //#define LED_PIN        27    // R4.2
 
-#define SDCARD1_CS     10    // CS pin for second SD card on SPI bus
+//#define SDCARD1_CS     10    // CS pin for second SD card on SPI bus
+#define SDCARD1_CS     38    // CS pin for second SD card on SPI1 bus
+
+
+// ----------------------------------------------------------------------------
+
+#define SOFTWARE      "TeeGrid R4-logger v2.0"
 
 //DATA_BUFFER(AIBuffer, NAIBuffer, 512*256)
 EXT_DATA_BUFFER(AIBuffer, NAIBuffer, 16*512*256)
@@ -50,13 +57,22 @@ R41CAN can;
 RTClock rtclock;
 DeviceID deviceid(DEVICEID);
 Blink blink(LED_PIN, true, LED_BUILTIN, false);
-SDCard sdcard0;
-SDCard sdcard1;
+SDCard sdcard0("primary");
+SDCard sdcard1("secondary");
 
 Configurator config;
-Settings settings(PATH, FILENAME, FILE_SAVE_TIME, 0.0,
+Settings settings(PATH, DEVICEID, FILENAME, FILE_SAVE_TIME, 0.0,
                   0.0, INITIAL_DELAY);
 InputTDMSettings aisettings(SAMPLING_RATE, NCHANNELS, GAIN);                  
+DateTimeMenu datetime_menu(rtclock);
+ConfigurationMenu configuration_menu(sdcard0);
+SDCardMenu sdcard0_menu("Primary SD card", sdcard0, settings);
+SDCardMenu sdcard1_menu("Secondary SD card", sdcard1, settings);
+#ifdef FIRMWARE_UPDATE
+FirmwareMenu firmware_menu(sdcard0);
+#endif
+DiagnosticMenu diagnostic_menu("Diagnostics", sdcard0, sdcard1);
+HelpAction help_act(config, "Help");
 
 LoggerFileStorage files(aidata, sdcard0, sdcard1, rtclock, deviceid, blink);
 
@@ -70,9 +86,13 @@ void setup() {
   while (!Serial && millis() < 2000) {};
   printTeeGridBanner(SOFTWARE);
   rtclock.check();
+  pinMode(SDCARD1_CS, OUTPUT);
+  //SPI.begin();
+  SPI1.setMISO(39);    // Use alternate MISO pin for SPI1 bus
+  SPI1.begin();
   sdcard0.begin();
-  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 20, &SPI);
-  files.check();
+  sdcard1.begin(SDCARD1_CS, DEDICATED_SPI, 40, &SPI1);
+  files.check(true);
   rtclock.setFromFile(sdcard0);
   settings.disable("PulseFrequency");
   settings.disable("DisplayTime");
