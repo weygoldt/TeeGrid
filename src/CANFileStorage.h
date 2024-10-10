@@ -6,15 +6,29 @@
 #ifndef CANFileStorage_h
 #define CANFileStorage_h
 
+#include <R41CAN.h>
 #include <TeensyBoard.h>
+#include <LoggerFileStorage.h>
 
 #ifdef TEENSY4
 
-void setupGridStorage(const char *path, const char *software,
-		      Input &aidata, char *gainstr=0);
-void openNextGridFile();
-void storeGridData(bool master=false);
+class CANFileStorage : public LoggerFileStorage {
+  
+public:
 
+  CANFileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
+		 R41CAN &can, bool master, const RTClock &rtclock,
+		 const DeviceID &deviceid, Blink &blink);
+
+protected:
+
+  // Use CAN bus to synchronize opening of next file.
+  virtual bool synchronize();
+
+  R41CAN &CAN;
+  bool Master;
+  
+};
 
 #endif
 

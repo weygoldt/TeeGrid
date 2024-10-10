@@ -58,6 +58,9 @@ protected:
   // Write recorded data to files.
   bool store(SDWriter &sdfile, bool backup);
 
+  // Derived classes can insert code here before the next file is opened.
+  virtual bool synchronize() { return false; };
+
   Input &AIInput;
   SDCard &SDCard0;
   SDCard &SDCard1;

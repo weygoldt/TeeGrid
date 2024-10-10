@@ -121,6 +121,9 @@ void LoggerFileStorage::open(bool backup) {
     BlinkLED.setSingle();
     BlinkLED.blinkSingle(0, 2000);
     String fname = DeviceIdent.makeStr(Filename);
+    char cs[16];
+    sprintf(cs, "%04d", FileCounter+1);
+    fname.replace("COUNT", cs);
     time_t t = now();
     fname = Clock.makeStr(fname, t, true);
     if (fname != PrevFilename) {
@@ -280,7 +283,8 @@ void LoggerFileStorage::update() {
 	BlinkLED.update();
 	yield();
       }
-#endif      
+#endif
+      synchronize(); // TODO: make this working also for backup.
       open(false);
       if (SDCard1.available())
 	NextOpen = 1;

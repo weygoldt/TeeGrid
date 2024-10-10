@@ -1,164 +1,27 @@
-#include <Input.h>
-#include <SDWriter.h>
-#include <RTClock.h>
-#include <Blink.h>
-#include <R41CAN.h>
 #include <CANFileStorage.h>
 
 #ifdef TEENSY4
 
-extern R41CAN can;
-extern SDCard sdcard;
-extern SDWriter file;
-extern RTClock rtclock;
-extern Blink blink;
 
-extern float FileTime;
-extern String FileName;
-
-int can_restarts = 0;
-String can_prevname; // previous file name
-Input *can_aiinput = 0;
-int FileCounter = 0;
-
-
-void setupGridStorage(const char *path, const char *software,
-		      Input &aidata, char *gainstr) {
-  can_prevname = "";
-  can_restarts = 0;
-  can_aiinput = &aidata;
-  FileCounter = 0;
-  if (FileTime > 30)
-    blink.setTiming(5000);
-  if (file.sdcard()->dataDir(path))
-    Serial.printf("Save recorded data in folder \"%s\".\n\n", path);
-  file.setWriteInterval(2*can_aiinput->DMABufferTime());
-  file.setMaxFileTime(FileTime);
-  file.header().setSoftware(software);
-  if (gainstr != 0)
-    file.header().setGain(gainstr);
+CANFileStorage::CANFileStorage(Input &aiinput, SDCard &sdcard0, SDCard &sdcard1,
+			       R41CAN &can, bool master, const RTClock &rtclock,
+			       const DeviceID &deviceid, Blink &blink) :
+  LoggerFileStorage(aiinput, sdcard0, sdcard1, rtclock, deviceid, blink),
+  CAN(can),
+  Master(master) {
 }
 
 
-void openNextGridFile() {
-  file.start();
-  blink.setSingle(true);
-  blink.blinkSingle(0, 2000, true);
-  String fname(FileName);
-  char cs[16];
-  sprintf(cs, "%04d", FileCounter+1);
-  fname.replace("COUNT", cs);
-  time_t t = now();
-  fname = rtclock.makeStr(fname, t, true);
-  if (fname != can_prevname) {
-    file.sdcard()->resetFileCounter();
-    can_prevname = fname;
-  }
-  fname = file.sdcard()->incrementFileName(fname);
-  if (fname.length() == 0) {
-    blink.clear();
-    Serial.println("WARNING: failed to increment file name.");
-    Serial.println("SD card probably not inserted.");
-    Serial.println();
-    can_aiinput->stop();
-    while (1) { yield(); };
-    return;
-  }
-  char dts[20];
-  rtclock.dateTime(dts, t);
-  if (! file.openWave(fname.c_str(), -1, dts)) {
-    blink.clear();
-    Serial.println();
-    Serial.println("WARNING: failed to open file on SD card.");
-    Serial.println("SD card probably not inserted or full -> halt");
-    can_aiinput->stop();
-    while (1) { yield(); };
-    return;
-  }
-  FileCounter++;
-  ssize_t samples = file.write();
-  if (samples == -4) {   // overrun
-    file.start(can_aiinput->nbuffer()/2);   // skip half a buffer
-    file.write();                     // write all available data
-    // report overrun:
-    char mfs[100];
-    sprintf(mfs, "%s-error0-overrun.msg", file.baseName().c_str());
-    Serial.println(mfs);
-    FsFile mf = sdcard.openWrite(mfs);
-    mf.close();
-  }
-  Serial.println(file.name());
+bool CANFileStorage::synchronize() {
+  if (!Master)
+    CAN.sendEndFile();
+  if (Master)
+    CAN.sendStart();
+  else if (CAN.id() > 0)
+    CAN.receiveStart();
+  return false;
 }
 
-
-void storeGridData(bool master) {
-  if (!file.pending())
-    return;
-  ssize_t samples = file.write();
-  if (samples < 0) {
-    Serial.println();
-    Serial.println("ERROR in writing data to file:");
-    char errorstr[20];
-    switch (samples) {
-      case -1:
-	blink.clear();
-        Serial.println("  File not open.");
-        break;
-      case -2:
-	blink.clear();
-        Serial.println("  File already full.");
-        break;
-      case -3:
-        can_aiinput->stop();
-        Serial.println("  No data available, data acquisition probably not running.");
-        Serial.printf("  dmabuffertime = %.2fms, writetime = %.2fms\n", 1000.0*can_aiinput->DMABufferTime(), 1000.0*file.writeTime());
-        strcpy(errorstr, "nodata");
-        delay(20);
-        break;
-      case -4:
-	blink.clear();
-        Serial.println("  Buffer overrun.");
-        strcpy(errorstr, "overrun");
-        break;
-      case -5:
-	blink.clear();
-        Serial.println("  Nothing written into the file.");
-        Serial.println("  SD card probably full -> halt");
-        can_aiinput->stop();
-        while (1) {};
-        break;
-    }
-    if (samples <= -3) {
-      file.closeWave();
-      char mfs[100];
-      sprintf(mfs, "%s-error%d-%s.msg", file.baseName().c_str(), can_restarts+1, errorstr);
-      Serial.println(mfs);
-      FsFile mf = sdcard.openWrite(mfs);
-      mf.close();
-      Serial.println();
-    }
-  }
-  if (file.endWrite() || samples < 0) {
-    file.close();  // file size was set by openWave()
-    if (!master)
-      can.sendEndFile();
-    if (samples < 0) {
-      can_restarts++;
-      if (can_restarts >= 5) {
-        Serial.println("ERROR: Too many file errors -> halt.");
-        can_aiinput->stop();
-        while (1) { yield(); };
-      }
-      if (!can_aiinput->running())
-        can_aiinput->start();
-    }
-    if (master)
-      can.sendStart();
-    else if (can.id() > 0)
-      can.receiveStart();
-    openNextGridFile();
-  }
-}
 
 #endif
 
