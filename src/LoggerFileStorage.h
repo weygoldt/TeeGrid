@@ -35,7 +35,7 @@ public:
 
   // Initialize recording directory and firt files.
   void start(const char *path, const char *filename, float filetime,
-	     const char *software, char *gainstr=0);
+	     const char *software, char *gainstr=0, bool randomblinks=false);
 
   // Call this in loop() for writing data to files.
   void update();
@@ -54,6 +54,12 @@ protected:
   
   // Generate file name, open main file and write first chunk of data.
   void open(bool backup);
+  
+  // Open file that stores blink times.
+  void openBlinkFiles();
+  
+  // Store blink times in files.
+  void storeBlinks();
 
   // Write recorded data to files.
   bool store(SDWriter &sdfile, bool backup);
@@ -69,6 +75,10 @@ protected:
   const RTClock &Clock;
   const DeviceID &DeviceIdent;
   Blink &BlinkLED;
+  
+  bool RandomBlinks;
+  FsFile BlinkFile0;
+  FsFile BlinkFile1;
   
   const char *Filename;  // Template for filename
   String PrevFilename;   // Previous file name

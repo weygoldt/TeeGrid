@@ -27,6 +27,7 @@
 #define FILENAME      "loggerID-SDATETIME.wav"  // may include ID, IDA, DATE, SDATE, TIME, STIME, DATETIME, SDATETIME, ANUM, NUM
 #define FILE_SAVE_TIME 20 //5*60   // seconds
 #define INITIAL_DELAY  10.0  // seconds
+#define RANDOM_BLINKS true   // set to true for random blinks that are also stored to file.
 
 // ----------------------------------------------------------------------------
 
@@ -125,7 +126,7 @@ void setup() {
   char gs[16];
   pcm->gainStr(gs, PREGAIN);
   files.start(settings.path(), settings.fileName(), settings.fileTime(),
-              SOFTWARE, gs);
+              SOFTWARE, gs, RANDOM_BLINKS);
 }
 
 
