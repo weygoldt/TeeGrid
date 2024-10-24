@@ -281,7 +281,7 @@ void LoggerFileStorage::openBlinkFiles() {
   }
   Serial.print("Store blink times in ");
   Serial.println(fname);
-  Seial.println();
+  Serial.println();
 }
 
 
